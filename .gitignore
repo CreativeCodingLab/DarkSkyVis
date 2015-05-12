@@ -1,0 +1,15 @@
+*.class
+*.nii*
+*.pdf
+*.pyc
+*.o
+*.gz
+*.zip
+*.log
+ds14_scivis_0128_e4_dt04_0.*
+.DS_Store
+Data/*
+*.mp4
+doc/examples/*
+*.gif
+*.png
