@@ -1,0 +1,58 @@
+This is BibTeX, Version 0.99d (TeX Live 2014)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: StarReport.aux
+The style file: eg-alpha-doi.bst
+Reallocated glb_str_ptr (elt_size=4) to 20 items from 10.
+Reallocated global_strs (elt_size=20001) to 20 items from 10.
+Reallocated glb_str_end (elt_size=4) to 20 items from 10.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Database file #1: StarReport.bib
+Repeated entry---line 239 of file StarReport.bib
+ : @article{schafhitzel2007simultaneous
+ :                                     ,
+I'm skipping whatever remains of this entry
+Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
+Warning--to sort, need author or key in spm2014
+Warning--can't use both volume and number fields in balsa2014state
+You've used 31 entries,
+            3585 wiz_defined-function locations,
+            936 strings with 13348 characters,
+and the built_in function-call counts, 18710 in all, are:
+= -- 1852
+> -- 1027
+< -- 4
++ -- 381
+- -- 377
+* -- 1512
+:= -- 2836
+add.period$ -- 69
+call.type$ -- 31
+change.case$ -- 271
+chr.to.int$ -- 31
+cite$ -- 34
+duplicate$ -- 449
+empty$ -- 1386
+format.name$ -- 397
+if$ -- 4275
+int.to.chr$ -- 1
+int.to.str$ -- 0
+missing$ -- 31
+newline$ -- 163
+num.names$ -- 90
+pop$ -- 340
+preamble$ -- 1
+purify$ -- 303
+quote$ -- 0
+skip$ -- 940
+stack$ -- 0
+substring$ -- 950
+swap$ -- 106
+text.length$ -- 4
+text.prefix$ -- 4
+top$ -- 0
+type$ -- 274
+warning$ -- 2
+while$ -- 141
+width$ -- 36
+write$ -- 392
+(There was 1 error message)

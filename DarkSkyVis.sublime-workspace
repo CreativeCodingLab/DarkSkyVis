@@ -1,0 +1,1620 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"for",
+				"forin	for … in … done"
+			],
+			[
+				"except",
+				"Exception	class"
+			],
+			[
+				"rand",
+				"random	statement"
+			],
+			[
+				"Get",
+				"GetPointData"
+			],
+			[
+				"__m",
+				"__setMapper	function"
+			],
+			[
+				"get",
+				"getPartitions	function"
+			],
+			[
+				"gmaen",
+				"gmean"
+			],
+			[
+				"fo",
+				"following"
+			],
+			[
+				"sub",
+				"Subvolume"
+			],
+			[
+				"process",
+				"processess"
+			],
+			[
+				"try",
+				"try	Try/Except"
+			],
+			[
+				"Sca",
+				"SCALA_HOME"
+			],
+			[
+				"scalar",
+				"scalar_range	statement"
+			],
+			[
+				"nL",
+				"nLon	param"
+			],
+			[
+				"data",
+				"data_at_comp_pos"
+			],
+			[
+				"NetCDF",
+				"netCDF4"
+			],
+			[
+				"outline",
+				"outlineActor"
+			],
+			[
+				"text",
+				"textShape	statement"
+			],
+			[
+				"Ky",
+				"Kyle_MPRAGE"
+			],
+			[
+				"lat",
+				"latitude"
+			],
+			[
+				"long",
+				"longitude"
+			],
+			[
+				"Adj",
+				"AdjMatrix"
+			],
+			[
+				"la",
+				"layerGroups"
+			],
+			[
+				"layerGrou",
+				"layerGroupName"
+			],
+			[
+				"proto",
+				"prototype"
+			],
+			[
+				"start",
+				"startCity"
+			],
+			[
+				"brea",
+				"breadthFirstSearch"
+			],
+			[
+				"ve",
+				"vertex"
+			],
+			[
+				"num",
+				"numNodes"
+			],
+			[
+				"lev",
+				"Level"
+			],
+			[
+				"level",
+				"printLevelSpacingStart"
+			],
+			[
+				"heap",
+				"heaplvl5"
+			],
+			[
+				"hea",
+				"heaplvl5"
+			],
+			[
+				"cur",
+				"curLvl"
+			],
+			[
+				"Clou",
+				"Cloud-Rain"
+			],
+			[
+				"cit",
+				"cityName"
+			],
+			[
+				"elas",
+				"elapsedArray"
+			],
+			[
+				"clac",
+				"calculateTimeNode"
+			],
+			[
+				"ela",
+				"elapsedNode"
+			],
+			[
+				"qu",
+				"quantity"
+			],
+			[
+				"quan",
+				"quantities"
+			],
+			[
+				"cla",
+				"calculateTimeArray"
+			],
+			[
+				"inser",
+				"insertNode"
+			],
+			[
+				"star",
+				"startTime"
+			],
+			[
+				"clock",
+				"clock_t"
+			],
+			[
+				"begin",
+				"beginTime"
+			],
+			[
+				"time",
+				"time_t"
+			],
+			[
+				"p",
+				"pNodes"
+			],
+			[
+				"tre",
+				"treeNode"
+			],
+			[
+				"con",
+				"console"
+			],
+			[
+				"comm",
+				"community"
+			],
+			[
+				"F",
+				"FarNorthSide"
+			],
+			[
+				"if",
+				"ife	if … else"
+			],
+			[
+				"Sout",
+				"SouthSide"
+			],
+			[
+				"West",
+				"WestSide"
+			],
+			[
+				"read",
+				"readlines	function"
+			],
+			[
+				"po",
+				"position"
+			],
+			[
+				"poin",
+				"pointLight"
+			],
+			[
+				"Po",
+				"pointLight"
+			],
+			[
+				"sp",
+				"sphereMaterial"
+			],
+			[
+				"base",
+				"buildDataset"
+			],
+			[
+				"Freq",
+				"FreqDist"
+			],
+			[
+				"pre",
+				"preprocessing"
+			],
+			[
+				"classif",
+				"classification"
+			],
+			[
+				"constru",
+				"constructFeatureIndex"
+			],
+			[
+				"filt",
+				"filterFeatureFrequency"
+			],
+			[
+				"feature",
+				"featureDist"
+			],
+			[
+				"token",
+				"tokenNegation"
+			],
+			[
+				"twi",
+				"twokenizer"
+			],
+			[
+				"emoji",
+				"emojiRE"
+			],
+			[
+				"class",
+				"class	class"
+			],
+			[
+				"cc",
+				"cc	shortcut - case class"
+			],
+			[
+				"case",
+				"case	case"
+			],
+			[
+				"useCl",
+				"useCluster4"
+			],
+			[
+				"def",
+				"define"
+			],
+			[
+				"pr",
+				"prn-str"
+			],
+			[
+				"prn",
+				"prn-str"
+			],
+			[
+				"stim",
+				"stimListPath"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"contents": "import vtk\nimport time\nimport cPickle\nimport numpy as np\nfrom sdfpy import load_sdf\nfrom thingking import loadtxt\n\n\nglobal ren\nglobal iren\nglobal renWin\nglobal frame\n\n\ndef l2a(l):\n    return np.array(l)\n\n\ndef loadArray(fname):\n    with open(fname, 'rb') as fObj:\n        return l2a(cPickle.load(fObj))\n\n\n# Define a simple function to convert proper to comoving Mpc/h.\ndef cMpc(proper):\n    h_100 = particles.parameters['h_100']\n    width = particles.parameters['L0']\n    cosmo_a = particles.parameters['a']\n    kpc_to_Mpc = 1./1000\n    return (proper + width/2.) * h_100 * kpc_to_Mpc / cosmo_a\n\n\n\n\nimport vtk\nfrom darksky.utils.dkDataSource import HaloDataLoader, ParticleDataLoader\n\n\nhd = HaloDataLoader()\npd = ParticleDataLoader()\n\n\nh1 = hd('1.000')\np1 = pd('1.000')\n\n\n\n*DataLoaders are \n\n\n",
+			"settings":
+			{
+				"buffer_size": 792,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": ".gitignore",
+			"settings":
+			{
+				"buffer_size": 139,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/Users/krbalmryde/Library/Application Support/Sublime Text 3/Packages/User/Preferences.sublime-settings",
+			"settings":
+			{
+				"buffer_size": 1554,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "DarkSkyVis.sublime-project",
+			"settings":
+			{
+				"buffer_size": 1997,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 339.0,
+		"last_filter": "py",
+		"selected_items":
+		[
+			[
+				"py",
+				"Set Syntax: Python"
+			],
+			[
+				"bash",
+				"Set Syntax: Shell Script (Bash)"
+			],
+			[
+				"te",
+				"Set Syntax: LaTeX"
+			],
+			[
+				"tex",
+				"Set Syntax: LaTeX"
+			],
+			[
+				"py	",
+				"Set Syntax: Python"
+			],
+			[
+				"bas",
+				"Set Syntax: Shell Script (Bash)"
+			],
+			[
+				"lint",
+				"Anaconda: Next lint error"
+			],
+			[
+				"ba",
+				"Set Syntax: Shell Script (Bash)"
+			],
+			[
+				"p",
+				"Set Syntax: Python"
+			],
+			[
+				"mark",
+				"Set Syntax: Markdown"
+			],
+			[
+				"lat",
+				"Set Syntax: LaTeX"
+			],
+			[
+				"pyt",
+				"Set Syntax: Python"
+			],
+			[
+				"syc++",
+				"Set Syntax: C++"
+			],
+			[
+				"syp",
+				"Set Syntax: Python"
+			],
+			[
+				"c++",
+				"Set Syntax: C++"
+			],
+			[
+				"",
+				"Anaconda: Autoformat PEP8 Errors"
+			],
+			[
+				"ana",
+				"Anaconda: Autoformat PEP8 Errors"
+			],
+			[
+				"anacon lin",
+				"Anaconda: Next lint error"
+			],
+			[
+				"late",
+				"Set Syntax: LaTeX"
+			],
+			[
+				"snip",
+				"Snippet: Sub Sub Section"
+			],
+			[
+				"md",
+				"Set Syntax: Markdown"
+			],
+			[
+				"anaconda disable",
+				"Anaconda: Disable linting on this file"
+			],
+			[
+				"anaconda d",
+				"Anaconda: Disable linting on this file"
+			],
+			[
+				"dis",
+				"Anaconda: Disable linting on this file"
+			],
+			[
+				"disabl",
+				"Anaconda: Disable linting on this file"
+			],
+			[
+				"ANAconda: li",
+				"Anaconda: Disable linting on this file"
+			],
+			[
+				"mar",
+				"Set Syntax: MultiMarkdown"
+			],
+			[
+				"PY",
+				"Set Syntax: Python"
+			],
+			[
+				"cm",
+				"Set Syntax: CMake"
+			],
+			[
+				"c",
+				"Set Syntax: C++"
+			],
+			[
+				"htm",
+				"Set Syntax: HTML"
+			],
+			[
+				"html",
+				"Set Syntax: HTML (Rails)"
+			],
+			[
+				"F",
+				"Format Code"
+			],
+			[
+				"for",
+				"Format Code"
+			],
+			[
+				"f",
+				"Format Code"
+			],
+			[
+				"form",
+				"Format Code"
+			],
+			[
+				"js",
+				"Set Syntax: JSON"
+			],
+			[
+				"code",
+				"Format Code"
+			],
+			[
+				"jso",
+				"Set Syntax: JSON"
+			],
+			[
+				"insta",
+				"Package Control: Install Package"
+			],
+			[
+				"For",
+				"Format Code"
+			],
+			[
+				"inst",
+				"Package Control: Install Package"
+			],
+			[
+				"packare",
+				"Package Control: Remove Package"
+			],
+			[
+				"instal",
+				"Package Control: Install Package"
+			],
+			[
+				"ins",
+				"Package Control: Install Package"
+			],
+			[
+				"JSO",
+				"Set Syntax: JSON"
+			],
+			[
+				"color",
+				"Color Picker"
+			],
+			[
+				"java",
+				"Set Syntax: JavaScript"
+			],
+			[
+				"isntall",
+				"Package Control: Install Package"
+			],
+			[
+				"snipp",
+				"Snippet: Tabular"
+			],
+			[
+				"snippet",
+				"Snippet: Chapter"
+			],
+			[
+				"sca",
+				"Set Syntax: Scala Improved"
+			],
+			[
+				"scala",
+				"Set Syntax: Scala"
+			],
+			[
+				"pyth",
+				"Set Syntax: Python Improved"
+			],
+			[
+				"hask",
+				"Set Syntax: Haskell"
+			],
+			[
+				"scal",
+				"Set Syntax: Scala Improved"
+			],
+			[
+				"disable",
+				"Package Control: Disable Package"
+			],
+			[
+				"disa",
+				"SublimeCodeIntel: Disable Plugin"
+			],
+			[
+				"ov",
+				"Set Syntax: Objective-C++"
+			],
+			[
+				"scala ",
+				"Set Syntax: Scala Improved"
+			],
+			[
+				"Scala",
+				"Set Syntax: Scala"
+			],
+			[
+				"Pyth",
+				"Set Syntax: Python Improved"
+			],
+			[
+				"rem",
+				"Package Control: Remove Package"
+			],
+			[
+				"install",
+				"Package Control: Install Package"
+			],
+			[
+				"scaa",
+				"SublimeREPL: Scala"
+			],
+			[
+				"re",
+				"SublimeREPL: Scala"
+			],
+			[
+				"enab",
+				"Package Control: Enable Package"
+			],
+			[
+				"glsl",
+				"Set Syntax: GLSL"
+			],
+			[
+				"gl",
+				"Set Syntax: GLSL"
+			],
+			[
+				"obj",
+				"Set Syntax: Objective-C"
+			],
+			[
+				"syn",
+				"Set Syntax: C"
+			],
+			[
+				"synt C",
+				"Set Syntax: C"
+			],
+			[
+				"objc",
+				"Set Syntax: Objective-C"
+			],
+			[
+				"snippet	",
+				"Snippet: Do While Loop"
+			],
+			[
+				"xm",
+				"Set Syntax: XML"
+			],
+			[
+				"repl",
+				"SublimeREPL: Clojure"
+			],
+			[
+				"pow",
+				"Set Syntax: Powershell v2"
+			],
+			[
+				"power",
+				"Set Syntax: Powershell v2"
+			],
+			[
+				"synsh",
+				"Set Syntax: Shell Script (Bash)"
+			],
+			[
+				"bat",
+				"Set Syntax: Batch File"
+			],
+			[
+				"ma",
+				"Set Syntax: MATLAB"
+			],
+			[
+				"M",
+				"Set Syntax: MATLAB"
+			],
+			[
+				"remp",
+				"Package Control: Remove Package"
+			],
+			[
+				"mat",
+				"Set Syntax: MATLAB"
+			],
+			[
+				"symat",
+				"Set Syntax: MATLAB"
+			],
+			[
+				"in",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 457.0
+	},
+	"console":
+	{
+		"height": 125.0,
+		"history":
+		[
+			"import urllib.request,os,hashlib; h = '7183a2d3e96f11eeadd761d777e62404' + 'e330c659d4bb41d3bdf022e94cab3cd0'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://sublime.wbond.net/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/utils"
+	],
+	"file_history":
+	[
+		"/Users/krbalmryde/Library/Application Support/Sublime Text 3/Packages/Default/Preferences.sublime-settings",
+		"/Users/krbalmryde/Library/Application Support/Sublime Text 3/Packages/User/Python.sublime-settings",
+		"/Users/krbalmryde/Library/Application Support/Sublime Text 3/Packages/User/JSON.sublime-settings",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/README.md",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/images/DarkSkyTimeBox1.png",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/.gitignore",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/data/rockstar/auto-rockstar.cfg",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/data/rockstar/rockstar.cfg",
+		"/Users/krbalmryde/Dropbox/class-projects/cs594/SciVis2015/src/VTKDarkSkyHalosPaths.py",
+		"/Users/krbalmryde/Dropbox/class-projects/cs594/SciVis2015/src/VTKDarkSkyParticles.py",
+		"/Users/krbalmryde/Dropbox/Class-projects/cs594/SciVis2015/src/vtkDarkSkyHalos.py",
+		"/Users/krbalmryde/Dropbox/class-projects/cs594/SciVis2015/src/ExtractDSData.py",
+		"/Users/krbalmryde/Dropbox/class-projects/cs594/SciVis2015/doc/examples/yt/load_data.py",
+		"/Users/krbalmryde/Dropbox/class-projects/cs594/SciVis2015/src/VTKDarkSkyTime.py",
+		"/Users/krbalmryde/Dropbox/class-projects/cs594/SciVis2015/src/DarkSkyUtilities.py",
+		"/Users/krbalmryde/Dropbox/class-projects/cs524/StarReport/REVISIONS.txt",
+		"/Users/krbalmryde/Dropbox/class-projects/cs524/StarReport/StarReport.bib",
+		"/Users/krbalmryde/Dropbox/class-projects/cs594/SciVis2015/Paper/SciVis.inc",
+		"/Users/krbalmryde/Dropbox/class-projects/cs524/StarReport/StarReport.inc",
+		"/Users/krbalmryde/Dropbox/class-projects/cs524/StarReport/StarReport.tex",
+		"/Users/krbalmryde/Dropbox/Class-projects/cs594/SciVis2015/Paper/SciVis.tex",
+		"/Users/krbalmryde/Dropbox/class-projects/cs594/SciVis2015/src/VTKDarkSkyHalos.py",
+		"/Users/krbalmryde/Dropbox/Class-projects/cs594/SciVis2015/src/ds14_cg_particle_velocity_to_VTK.py",
+		"/Users/krbalmryde/Dropbox/class-projects/cs335/.metadata/.plugins/com.python.pydev.analysis/python_v1_bm109oo8jsa5gnqmc06ekl12p/v1_indexcache/include_server.include_analyzer_5hwz.v1_indexcache",
+		"/Users/krbalmryde/Dropbox/Class-projects/cs594/SciVis2015/Paper/SciVis.inc",
+		"/Users/krbalmryde/Downloads/pmcid-PMC3838923.nbib",
+		"/Users/krbalmryde/Dropbox/class-projects/cs594/SciVis2015/src/VTKDarkSky.py",
+		"/Users/krbalmryde/Dropbox/class-projects/cs594/SciVis2015/src/MPIDarkSkyLayerExtraction.py",
+		"/Users/krbalmryde/Dropbox/Class-Projects/cs594/SciVis2015/.gitignore",
+		"/Users/krbalmryde/Dropbox/Class-projects/cs594/SciVis2015/src/trackHalos.py",
+		"/Users/krbalmryde/Dropbox/Class-projects/cs594/SciVis2015/doc/examples/Animation.py",
+		"/Users/krbalmryde/.ipython/profile_default/startup/00-profile.py",
+		"/Users/krbalmryde/Dropbox/class-projects/cs594/SciVis2015/doc/examples/interactor_demo.py",
+		"/Users/krbalmryde/Dropbox/class-projects/cs594/topic8/MyNetCDF.py",
+		"/Users/krbalmryde/Dropbox/class-projects/cs594/SciVis2015/src/useful.py",
+		"/Users/krbalmryde/Dropbox/class-projects/cs227/DoublyLinkedPriorityListTest.java",
+		"/Users/krbalmryde/Dropbox/class-projects/cs594/SciVis2015/src/darksky",
+		"/Users/krbalmryde/Dropbox/class-projects/cs594/topic9/Topic9-Task2.py",
+		"/Users/krbalmryde/Dropbox/class-projects/cs594/SciVis2015/src/ToBeParallel.py",
+		"/Users/krbalmryde/.bash_aliases",
+		"/Users/krbalmryde/.bash_functions",
+		"/Users/krbalmryde/.bash_profile",
+		"/Users/krbalmryde/Dropbox/Class-Projects/cs594/SciVis2015/data/ds14_scivis_0128/rockstar/hlists/hlist_1.00000.list",
+		"/Users/krbalmryde/Dropbox/Class-projects/cs594/SciVis2015/src/VTKDarkSky.py",
+		"/Users/krbalmryde/Dropbox/Class-projects/cs594/SciVis2015/src/ToJsonTest.py",
+		"/Users/krbalmryde/Dropbox/Class-Projects/cs594/SciVis2015/src/ds14_scivis_0128_1.000.json",
+		"/Users/krbalmryde/Dropbox/Class-projects/cs594/SciVis2015/src/ExtractDSData.py",
+		"/Users/krbalmryde/Dropbox/Class-Projects/cs594/topic9/Topic9-Task2.py",
+		"/Users/krbalmryde/Dropbox/Code-Projects/UnPw.txt",
+		"/Users/krbalmryde/Dropbox/Class-Projects/cs594/topic9/func.sh",
+		"/Users/krbalmryde/Downloads/materials/Data/velocityMag.vtk",
+		"/Users/krbalmryde/Dropbox/Class-projects/cs594/SciVis2015/src/VTKDarkSky-StreamLines.py",
+		"/Users/krbalmryde/Dropbox/Class-Projects/cs594/SciVis2015/src/ToBeParallel.py",
+		"/Users/krbalmryde/Dropbox/Class-projects/cs594/SciVis2015/src/ToBeParallel.py",
+		"/Users/krbalmryde/Dropbox/Class-Projects/cs594/SciVis2015/src/examples/yt/load_data.py",
+		"/Users/krbalmryde/Dropbox/Class-Projects/cs594/SciVis2015/src/VtkPointCloud.py",
+		"/Users/krbalmryde/Dropbox/Class-Projects/cs594/niiPy/src/NiftiVTK.py",
+		"/Users/krbalmryde/Dropbox/Class-projects/cs594/SciVis2015/util/color_circle_Ajj.pal",
+		"/Users/krbalmryde/Dropbox/Class-Projects/cs594/SciVis2015/src/ds14_cg_particle_velocity_to_VTK.py",
+		"/Users/krbalmryde/Dropbox/Class-Projects/cs524/Journal/TextRendering/src/doc/lowlevel.py",
+		"/Users/krbalmryde/Dropbox/Class-projects/cs594/SciVis2015/src/ContourWidget.py",
+		"/Users/krbalmryde/Dropbox/Class-projects/cs594/SciVis2015/src/foo.py",
+		"/Users/krbalmryde/Dropbox/Class-Projects/cs594/SciVis2015/README.md",
+		"/Users/krbalmryde/Dropbox/Class-Projects/cs594/SciVis2015/src/useful.py",
+		"/Users/krbalmryde/Dropbox/Class-projects/cs594/SciVis2015/src/testYTvr.py",
+		"/Users/krbalmryde/Dropbox/Class-Projects/cs594/SciVis2015/src/explore.py",
+		"/Users/krbalmryde/Dropbox/Class-Projects/cs594/topic9/ReadMe.txt",
+		"/Users/krbalmryde/Dropbox/Class-projects/cs594/topic9/TestT2.py",
+		"/Users/krbalmryde/Dropbox/Class-Projects/cs594/topic9/Topic9-Task1.py",
+		"/Users/krbalmryde/Topic9-Task2.py",
+		"/Users/krbalmryde/Dropbox/Class-Projects/cs594/topic9/scriptT2",
+		"/Users/krbalmryde/Dropbox/Class-Projects/cs594/topic9/mpiPY/e2/sendRecv.py",
+		"/Users/krbalmryde/Dropbox/Class-Projects/cs594/topic6/MyNetCDF.py",
+		"/Users/krbalmryde/Dropbox/Class-Projects/cs524/Journal/TextRendering/src/SynestheticRenderer.py",
+		"/Users/krbalmryde/Dropbox/Class-projects/cs524/Journal/TextRendering/src/TextRender.py",
+		"/Users/krbalmryde/Dropbox/Class-Projects/ISTA555/AnalyzeHappiness/Project1.py",
+		"/Users/krbalmryde/Dropbox/Class-Projects/ISTA555/YouAreWhatYouEat/src/Project4.py",
+		"/Users/krbalmryde/Dropbox/Class-Projects/cs524/Journal/TextRendering/src/util/WordPolarityVectorized.py",
+		"/Users/krbalmryde/Dropbox/Class-projects/cs594/topic9/ReadMe.txt",
+		"/Users/krbalmryde/Dropbox/Class-projects/cs594/topic9/scriptT1",
+		"/Users/krbalmryde/Dropbox/Class-projects/cs594/topic9/Topic9-Task1.py",
+		"/Users/krbalmryde/Dropbox/Class-Projects/cs594/topic9/mpiPY/e4/scatter.py",
+		"/Users/krbalmryde/Dropbox/Class-Projects/cs594/topic9/script",
+		"/Users/krbalmryde/Dropbox/Class-projects/cs594/topic9/script",
+		"/Users/krbalmryde/Desktop/WebGL Export.html",
+		"/Users/krbalmryde/Dropbox/Class-projects/cs594/topic9/func.sh",
+		"/Users/krbalmryde/Dropbox/Class-Projects/cs594/topic9/mpiPY/e1/helloworld.py",
+		"/Users/krbalmryde/Dropbox/Class-Projects/cs594/topic9/mpiPY/e1/script",
+		"/Users/krbalmryde/Dropbox/Class-projects/cs594/topic9/.alias",
+		"/Users/krbalmryde/Dropbox/Class-Projects/cs594/topic9/mpiPY/e3/bcast.py",
+		"/Users/krbalmryde/Dropbox/Class-projects/cs594/topic9/Topic9.py",
+		"/Users/krbalmryde/Dropbox/Class-Projects/Class.sublime-project",
+		"/Users/krbalmryde/Dropbox/Class-Projects/cs524/Journal/TextRendering/src/buildWordNet.py",
+		"/Users/krbalmryde/Dropbox/Class-Projects/cs524/Journal/TextRendering/src/data/SentiWordNet_3.0.0_20130122.txt",
+		"/Users/krbalmryde/Dropbox/Class-projects/cs301/HW12/HW12.txt",
+		"/Users/krbalmryde/Dropbox/Class-Projects/cs594/SciVis2015/data/ds14_scivis_0128/rockstar/hlists/hlist_0.65000.list",
+		"/Users/krbalmryde/Dropbox/Class-projects/cs594/SciVis2015/src/explore.py",
+		"/Users/krbalmryde/Dropbox/Class-Projects/cs524/Journal/README.md",
+		"/Users/krbalmryde/Dropbox/Class-Projects/cs524/Journal/TextRendering/Notes.md",
+		"/Users/krbalmryde/Dropbox/Class-projects/cs524/Journal/.gitignore",
+		"/Users/krbalmryde/Dropbox/Class-projects/cs594/SciVis2015/.gitignore",
+		"/Users/krbalmryde/Dropbox/Class-Projects/cs594/SciVis2015/doc/Redshift_blueshift.svg",
+		"/Users/krbalmryde/Dropbox/Class-projects/cs594/SciVis2015/src/useful.py",
+		"/Users/krbalmryde/Dropbox/Class-Projects/cs594/SciVis2015/src/examples/yt/load_data_yt.py",
+		"/Users/krbalmryde/Dropbox/Class-projects/cs594/SciVis2015/data/ds14_scivis_0128/rockstar/out_97.list",
+		"/Users/krbalmryde/Dropbox/Class-projects/cs594/SciVis2015/data/ds14_scivis_0128/rockstar/outputs/dead_15.list",
+		"/Users/krbalmryde/Lorenzo_Is.txt",
+		"/Users/krbalmryde/Dropbox/Class-Projects/cs594/SciVis2015/src/ds14_cg_particle_velocity.py",
+		"/Users/krbalmryde/Dropbox/Class-projects/cs594/SciVis2015/src/examples/StreamlinesWithLineWidget.py",
+		"/Users/krbalmryde/Dropbox/Class-projects/cs594/SciVis2015/src/examples/StreamlinesVTK.py",
+		"/Users/krbalmryde/Dropbox/Class-projects/cs594/SciVis2015/src/examples/ColorIsosurface.py",
+		"/Users/krbalmryde/Dropbox/Class-projects/cs594/SciVis2015/Data/ds14_scivis_0128/cosmology.tbl",
+		"/Users/krbalmryde/Dropbox/Class-Projects/cs594/topic8/MyNetCDF.py",
+		"/Users/krbalmryde/Library/Enthought/Canopy_64bit/User/lib/python2.7/site-packages/yt/testing.py",
+		"/Users/krbalmryde/Library/Enthought/Canopy_64bit/User/lib/python2.7/site-packages/yt/startup_tasks.py",
+		"/Users/krbalmryde/Library/Enthought/Canopy_64bit/User/lib/python2.7/site-packages/yt/setup.py",
+		"/Users/krbalmryde/Dropbox/Class-projects/cs594/SciVis2015/README.md",
+		"/Users/krbalmryde/Dropbox/Class-projects/cs594/SciVis2015/util/enhance.py",
+		"/Users/krbalmryde/Library/Enthought/Canopy_64bit/User/lib/python2.7/site-packages/yt/__hg_version__.py",
+		"/Users/krbalmryde/Library/Enthought/Canopy_64bit/User/lib/python2.7/site-packages/yt/__init__.py",
+		"/Users/krbalmryde/Library/Enthought/Canopy_64bit/User/lib/python2.7/site-packages/yt/api.py",
+		"/Users/krbalmryde/Library/Enthought/Canopy_64bit/User/lib/python2.7/site-packages/yt/arraytypes.py",
+		"/Users/krbalmryde/Library/Enthought/Canopy_64bit/User/lib/python2.7/site-packages/yt/config.py",
+		"/Users/krbalmryde/Library/Enthought/Canopy_64bit/User/lib/python2.7/site-packages/yt/convenience.py",
+		"/Users/krbalmryde/Library/Enthought/Canopy_64bit/User/lib/python2.7/site-packages/yt/funcs.py",
+		"/Users/krbalmryde/Library/Enthought/Canopy_64bit/User/lib/python2.7/site-packages/yt/mods.py",
+		"/Users/krbalmryde/Library/Enthought/Canopy_64bit/User/lib/python2.7/site-packages/yt/pmods.py",
+		"/Users/krbalmryde/Dropbox/Class-projects/cs594/Temp/README.md"
+	],
+	"find":
+	{
+		"height": 26.0
+	},
+	"find_in_files":
+	{
+		"height": 95.0,
+		"where_history":
+		[
+			"chicago_health.json",
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": true,
+		"find_history":
+		[
+			"self.yt",
+			"yt",
+			"vtkTimerCallback",
+			"sdf",
+			"VtkDarkSky",
+			"particle_velocity",
+			"self",
+			"addPoints",
+			"Zoom",
+			"vtkTimerCallback",
+			"zhao2014fused",
+			"christ",
+			"temporal",
+			"Comparison",
+			"Plante",
+			"comparison",
+			"fsl",
+			"section 2",
+			"],",
+			"05",
+			"__MakeLUT",
+			"self.increment",
+			".3",
+			"1.01",
+			"timerId",
+			"vtkTimerCallback",
+			"vtkRenderWindow",
+			"frame_counter",
+			"window",
+			"base_name",
+			"-",
+			"vtkActor",
+			"__setMapper",
+			"linesPolyData",
+			"len(",
+			"Last_progenitor",
+			"Descid",
+			"fromfile",
+			"index",
+			"idex",
+			" \n        \n        ",
+			" \n        ",
+			") ",
+			"scale",
+			") ",
+			" ",
+			"glob",
+			"density",
+			"\"\"\"",
+			"gatherMeans",
+			"self.ytVelocity[:,0]",
+			"self.ytVelocity",
+			" points",
+			" points!\"",
+			"dMin",
+			"return",
+			"dmVel",
+			"dMax",
+			"[:,0]",
+			"dmVel[:,0]",
+			"index",
+			"p1D",
+			"particle",
+			"ad",
+			"cPickle",
+			"self.dMin",
+			"ytMagnitude",
+			"[A-Z]",
+			"[a-z]",
+			"Velocity",
+			"VECTORS",
+			"Keypress",
+			"m",
+			"np.fromiter",
+			"xyz",
+			"dm",
+			"m",
+			"offset",
+			"addPoints",
+			"getBounds",
+			"def",
+			"y",
+			"x",
+			"xyz",
+			"index",
+			"x",
+			"XX",
+			"dmX",
+			"initSeedPoint",
+			"streamline_",
+			"streamline_actor",
+			"p1",
+			"DarkMatter_",
+			"[i]",
+			"addPoints",
+			".3",
+			"__getDarkMatterPaticleData",
+			"self",
+			"self.",
+			"self",
+			"ytVelocity",
+			"/2",
+			".3",
+			"z",
+			"y",
+			"x",
+			"resetPoints",
+			"YY",
+			"[ (lBounds[i]",
+			"x",
+			"XX",
+			"<",
+			"Index",
+			"uBounds",
+			"Index",
+			"V",
+			"XX",
+			"Bounds",
+			"offset",
+			"vtkVelocity",
+			"# self.vtkVelocity",
+			"vtkPhi",
+			"<",
+			"x",
+			"zBounds",
+			"x",
+			"xBounds",
+			"vtkColorS"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": true,
+		"replace_history":
+		[
+			". Neuroimaging",
+			" neuroimaging",
+			"neuroimaging",
+			"Neuroimaging",
+			"hub",
+			"Hub",
+			"\"district\":",
+			"community",
+			"\"side\":\"central\",(\"slug\":)(\"rogers_park\"|\"loop\")",
+			",\"side\":\"central\",$1",
+			"secondary",
+			"\"secondary\"",
+			"\"neighborhood\"",
+			"\"community\"",
+			"\"side\"",
+			"\n,\"",
+			";\\n",
+			"\"\"\"\n",
+			"\n",
+			"\n\n",
+			"\n",
+			"\n\n",
+			"\n",
+			"\n\n",
+			"",
+			"\n",
+			"\\n",
+			"\n",
+			"",
+			"\n",
+			"\n\n\n",
+			"\n",
+			"",
+			"\n",
+			"!Audio\\DING.wav,\"0,0,0\",700",
+			"/",
+			"",
+			"2",
+			"",
+			".wav",
+			"2.wa",
+			"	",
+			"    ",
+			"\\t",
+			" "
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": false,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 3,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 792,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								34,
+								34
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": ".gitignore",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 139,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								93,
+								93
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "/Users/krbalmryde/Library/Application Support/Sublime Text 3/Packages/User/Preferences.sublime-settings",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1554,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								907,
+								907
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JSON.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "DarkSkyVis.sublime-project",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1997,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1383,
+								1383
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JSON.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 285.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 26.0
+	},
+	"input":
+	{
+		"height": 41.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.exec":
+	{
+		"height": 158.0
+	},
+	"output.find_results":
+	{
+		"height": 126.0
+	},
+	"pinned_build_system": "",
+	"project": "DarkSkyVis.sublime-project",
+	"replace":
+	{
+		"height": 48.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"scivis",
+				"cs594/SciVis2015/Paper/SciVis.inc"
+			],
+			[
+				"vtkdar",
+				"cs594/SciVis2015/src/VTKDarkSkyHalos.py"
+			],
+			[
+				"vtkdark",
+				"cs594/SciVis2015/src/VTKDarkSkyHalos.py"
+			],
+			[
+				"scivis.inc",
+				"cs335/.metadata/.plugins/com.python.pydev.analysis/python_v1_bm109oo8jsa5gnqmc06ekl12p/v1_indexcache/include_server.include_analyzer_5hwz.v1_indexcache"
+			],
+			[
+				"vtkd",
+				"cs594/SciVis2015/src/VTKDarkSky.py"
+			],
+			[
+				"star",
+				"cs524/StarReport/StarReport.tex"
+			],
+			[
+				"starr",
+				"cs524/StarReport/StarReport.inc"
+			],
+			[
+				"",
+				"cs227/DoublyLinkedPriorityListTest.java"
+			],
+			[
+				"project4",
+				"ISTA555/YouAreWhatYouEat/src/Project4.py"
+			],
+			[
+				"ista555",
+				"ISTA555/AnalyzeHappiness/Project1.py"
+			],
+			[
+				"topic8",
+				"cs594/topic8/MyNetCDF.py"
+			],
+			[
+				"hlist_1",
+				"cs594/SciVis2015/data/ds14_scivis_0128/rockstar/hlists/hlist_1.00000.list"
+			],
+			[
+				"hlist_0.65000.list",
+				"cs594/SciVis2015/data/ds14_scivis_0128/rockstar/hlists/hlist_0.65000.list"
+			],
+			[
+				"ex",
+				"cs594/SciVis2015/src/explore.py"
+			],
+			[
+				"sen",
+				"cs524/Journal/TextRendering/src/data/SentiWordNet_3.0.0_20130122.txt"
+			],
+			[
+				"topic",
+				"cs594/topic5/Topic5.py"
+			],
+			[
+				"nif",
+				"cs594/niiPy/src/NiftiVTK.py"
+			],
+			[
+				"myne",
+				"cs594/topic7/MyNetCDF.py"
+			],
+			[
+				"hw10",
+				"cs301/HW10/HW10.cpp"
+			],
+			[
+				"cy",
+				"cs594/topic5/cylinder.vtk"
+			],
+			[
+				"niipy",
+				"cs594/niiPy/niftiRenderer.py"
+			],
+			[
+				"rend",
+				"cs594/niiPy/vtk_render.py"
+			],
+			[
+				"hw1.t",
+				"ISTA516/HW1/hw1.tex"
+			],
+			[
+				"main.j",
+				"cs424/HW3/RightHereRightNow.github.io/javascripts/main.js"
+			],
+			[
+				"basic",
+				"cs424/Notes/basic.html"
+			],
+			[
+				"topo",
+				"cs424/HW2/bicyclerace.github.io/webapp/js/external-libraries/topojson.v1.min.js"
+			],
+			[
+				"nc",
+				"cs594/topic2/NetCDF_dump.txt"
+			],
+			[
+				"syn",
+				"cs524/Journal/BookVolRen/src/SynestheticRenderer.py"
+			],
+			[
+				"data/one-grams.txt",
+				"ISTA555/YouAreWhatYouEat/data/one-grams.txt"
+			],
+			[
+				"project1",
+				"ISTA555/AnalyzeHappiness/Project1.py"
+			],
+			[
+				"useful",
+				"ISTA555/YouAreWhatYouEat/src/useful.py"
+			],
+			[
+				"lab1",
+				"cs251/Lab13/lab13.txt"
+			],
+			[
+				"overb",
+				"cs251/HW1/Prog1Overboard.cpp"
+			],
+			[
+				"dic",
+				"cs251/HW5/HW5/dictionary.txt"
+			],
+			[
+				"uber",
+				"cs424/HW3/RightHereRightNow.github.io/APP/framework/markers/UberMarker.js"
+			],
+			[
+				"yelp",
+				"cs424/HW3/RightHereRightNow.github.io/APP/framework/markers/YelpMarker.js"
+			],
+			[
+				"cta",
+				"cs424/HW3/RightHereRightNow.github.io/APP/framework/markers/CTAMarker.js"
+			],
+			[
+				"databa",
+				"cs424/HW3/RightHereRightNow.github.io/APP/data/database.js"
+			],
+			[
+				"sol",
+				"cs251/lab10/Solution.cpp"
+			],
+			[
+				"solu",
+				"cs251/lab10/Solution.cpp"
+			],
+			[
+				"uiweath",
+				"cs424/HW2/bicyclerace.github.io/webapp/js/controllers/ui/UIWeatherViewController.js"
+			],
+			[
+				"uiwea",
+				"cs424/HW2/bicyclerace.github.io/webapp/styles/UIWeatherViewController.css"
+			],
+			[
+				"us.",
+				"cs424\\Notes\\Choropleth\\us.json"
+			],
+			[
+				"step",
+				"cs424\\HW1\\step-7.html"
+			],
+			[
+				"uk",
+				"cs424\\HW1\\uk.json"
+			],
+			[
+				"chi",
+				"cs424\\HW1\\data\\chicago_health2.json"
+			],
+			[
+				"dataf",
+				"cs424\\HW1\\backup\\dataFix.html"
+			],
+			[
+				"chica",
+				"cs424\\HW1\\data\\chicago_health.json"
+			],
+			[
+				"chea",
+				"cs424\\HW1\\chicago_health.json"
+			],
+			[
+				"chicagogeocrs84",
+				"cs424\\HW1\\data\\chicagoGEOcrs84.json"
+			],
+			[
+				"home4",
+				"cs533/HW4/HW4/homework4.cpp"
+			],
+			[
+				"homewo5",
+				"cs533/HW5/HW5/homework5.cpp"
+			],
+			[
+				"detec",
+				"ISTA516/HW5/js/Detector.js"
+			],
+			[
+				"1",
+				"ISTA516/HW5/1st.html"
+			],
+			[
+				"sort",
+				"cs227/SortTest.java"
+			],
+			[
+				"home",
+				"cs533/HW3/homework3.cpp"
+			],
+			[
+				"hw1",
+				"cs533/HW1/hw1.cxx"
+			],
+			[
+				"demo",
+				"cs533/HW1/paintdemo_mac/demo.cxx"
+			],
+			[
+				"geo",
+				"ISTA555/Docs/twitter_code/GeoTag.scala"
+			],
+			[
+				"emo",
+				"ISTA555/YouAreWhatYouEat/data/Emoji-FreqDist.txt"
+			],
+			[
+				"emoj",
+				"ISTA555/YouAreWhatYouEat/data/etc/emoji-codes.txt"
+			],
+			[
+				"use",
+				"ISTA555/YouAreWhatYouEat/src/useful.py"
+			],
+			[
+				"project2",
+				"ISTA555/GoodMovieOrBad/docs/project2_key.py"
+			],
+			[
+				"project4.",
+				"ISTA555/YouAreWhatYouEat/src/Project4.py"
+			],
+			[
+				"proj2",
+				"ISTA555/GoodMovieOrBad/docs/project2_key.py"
+			],
+			[
+				"project4re",
+				"ISTA555/YouAreWhatYouEat/docs/Project 4 Report.txt"
+			],
+			[
+				"proj4",
+				"ISTA555/YouAreWhatYouEat/src/Project4.py"
+			],
+			[
+				"perspouse",
+				"ISTA555/NSAInterview/docs/project3_data/per_spouse.test"
+			],
+			[
+				"movi",
+				"ISTA555/GoodMovieOrBad/src/MovieSentiment.scala"
+			],
+			[
+				"slice",
+				"osx/examples/niftiViewer/niftiViewer/Slices.mm"
+			],
+			[
+				"pro",
+				"src/Program.cpp"
+			],
+			[
+				"pr",
+				"src/Program.cpp"
+			],
+			[
+				"in",
+				"osx/Includes.hpp"
+			],
+			[
+				"be",
+				"src/Behavior.cpp"
+			],
+			[
+				"co",
+				"osx/CocoaGL.mm"
+			],
+			[
+				"ren",
+				"osx/RendererOSX.mm"
+			],
+			[
+				"ma",
+				"niftiViewer/niftiViewer/Main.mm"
+			],
+			[
+				"prog",
+				"src/Program.cpp"
+			],
+			[
+				"progr",
+				"src/Program.cpp"
+			],
+			[
+				"mri",
+				"Utilities/.Utilities.backup/MRI.py"
+			],
+			[
+				"java",
+				"Scripts/Java/JavaBatRecursion/JavaBat_Recursion.java"
+			],
+			[
+				"ass2",
+				"CLASS/cs372/ass2.hs"
+			],
+			[
+				"javab",
+				"Scripts/Java/JavaBatRecursion/JavaBat_Recursion.java"
+			],
+			[
+				"pig",
+				"Scripts/CLOJURE/piglatin.clj"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"",
+				"~/Dropbox/Code-Projects/KrbAlmryde.github.io/KrbAlmryde.sublime-project"
+			]
+		],
+		"width": 380.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": false,
+	"show_open_files": true,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 219.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}

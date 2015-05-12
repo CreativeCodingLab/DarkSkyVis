@@ -60,10 +60,10 @@ The final dataset type links the individual halo catalogs that each represent a 
 ---
 ## Progress
 The first image is proof of concept image of flowlines generated from particle velocities extracted from the `ds14_scivis_0128_e4_dt04_1.0000` dataset. Data was converted to VTK XML format and visualized using Paraview
-![Particle Velocity](Pics/ds14_scivis_0128_particle_velocity.png)
-![Halos](Pics/halos.png)
-![Halos and Particles](Pics/halos_and_particles.png)
-![ds14_z Projection](Pics/ds14_scivis_0128_e4_dt04_1.0000_Projection_z_all_cic.png)
+![Particle Velocity](images/progress/round1/ds14_scivis_0128_particle_velocity.png)
+![Halos](images/progress/round1/halos.png)
+![Halos and Particles](images/progress/round1/halos_and_particles.png)
+![ds14_z Projection](images/progress/round1/ds14_scivis_0128_e4_dt04_1.0000_Projection_z_all_cic.png)
 
 ---
 ## Notes on Measurements

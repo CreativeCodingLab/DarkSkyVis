@@ -1,0 +1,84 @@
+%% DF add-on to set variable parameters for EG proceedings
+%
+\EGyear{2015}   % term used to identify the conf year; eg. '99, 2000, ...
+\ConfYear{2015} % the year of the conference
+\ConfEditors{\ } % guest editors' names
+\ConfEditorStrg{} % functional description Editor/Editors/Guest Editors...
+\ConfName{CS 524, March} % name of the event
+%
+\volume{0}     % the volume in which the conf. proc. will be published;
+\issue{0}       % the issue number of the conf. proc.;
+%
+\pdfSubject{}
+
+\gdef\j@year{2015}
+\gdef\j@volume{0}
+\gdef\j@issue{0}
+
+\renewcommand\p@copyrightTextLong[1]{%
+
+%
+}%
+
+\renewcommand\p@copyrightTextShort[1]{%
+
+}%
+
+
+
+\renewcommand\p@copyrightTextShortEven[1]{%
+
+}%
+
+\renewcommand\p@copyrightTextAuthors[1]{%
+
+}%
+
+
+
+
+\def\SpecialIssuePaper{%
+\noEGpagenumber%
+\copyrightTextTitPag{\p@copyrightTextLong{\number\p@EGyear{}}}
+\def\@oddfoot{{\tiny\raisebox{\z@}[8pt][1pt]{\parbox[t]{20pc}{\sloppy
+  \p@copyrightTextShort{\number\p@EGyear{}}}}}}
+\def\@evenfoot{\mbox{}\hfill {\tiny\raisebox{\z@}[8pt][1pt]{\parbox[t]{20pc}{\sloppy
+  \p@copyrightTextShortEven{\number\p@EGyear{}}}}}}
+
+\def\ps@titlepage{\let\@mkboth\@gobbletwo
+ \def\@oddhead{\raisebox{\z@}[8pt][1pt]{\parbox{\textwidth}{\small
+   \parbox[t]{.7\textwidth}{\sloppy\raggedright
+     \p@ConfName\  \p@EGyear{} \\
+     \p@ConfEditors{}\\
+     \p@ConfEditorStrg}% (Guest Editors)}
+   \hfill
+%   \textit{Volume \j@volume} (\textit{\p@ConfYear\/}),
+   %\textit{Volume \j@volume} (\textit{\j@year\/}),
+   %\textit{Number \j@issue}
+   }%
+ }%
+}
+ \def\@oddfoot{{\tiny\raisebox{\z@}[8pt][1pt]{\parbox[t]{20pc}{\sloppy
+  \p@copyrightTextTitPag}}}\hfill}
+ \let\@evenhead=\@oddhead
+% \let\@evenfoot=\@oddfoot
+ \let\sectionmark=\EmptySectionmark
+ \let\subsectionmark=\EmptySubsectionmark
+}}
+
+
+
+%\EGyear{2015}   % term used to identify the conf year; eg. '99, 2000, ...
+%\ConfYear{2015} % the year of the conference
+%\ConfEditors{H.\ Carr, K.-L.\ Ma, and G. Santucci} % guest editors' names
+%\ConfEditorStrg{(Guest Editors)} % functional description Editor/Editors/Guest Editors...
+%\ConfName{Eurographics Conference on Visualization (EuroVis)} % name of the event
+%
+%\volume{34}     % the volume in which the conf. proc. will be published;
+%\issue{3}       % the issue number of the conf. proc.;
+%
+%\pdfSubject{Eurographics Conference on Visualization \p@EGyear, CGF Vol \j@volume, No \j@issue}
+
+
+\endinput
+
