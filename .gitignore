@@ -10,6 +10,7 @@ ds14_scivis_0128_e4_dt04_0.*
 .DS_Store
 Data/*
 *.mp4
+doc/papers/*
 doc/examples/*
 *.gif
 *.png
