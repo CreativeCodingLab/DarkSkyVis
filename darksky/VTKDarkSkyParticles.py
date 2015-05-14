@@ -43,15 +43,15 @@ class vtkTimerCallback():
         self.timer_count += 1
 
 
-class VtkDarkSkyParticles(object):
+class vtkDarkSkyParticles(object):
     """docstring for VtkDarkSky"""
     def __init__(self, filename, key, useSDF=True, cMpc=False):
-        super(VtkDarkSkyParticles, self).__init__()
-        self.start = time.clock()
-        self.filename = filename
-        self.isCoMoving = cMpc
-        self.vtkPolyData = vtk.vtkPolyData()
+        super(vtkDarkSkyParticles, self).__init__()
         self.useSDF = useSDF
+        self.isCoMoving = cMpc
+        self.filename = filename
+        self.start = time.clock()
+        self.vtkPolyData = vtk.vtkPolyData()
         # Only do one of these
         # ======================
         if self.useSDF:
@@ -67,19 +67,20 @@ class VtkDarkSkyParticles(object):
         self.sdfParticles = sdf.load_sdf(self.filename)
         self.sdfHeader = self.sdfParticles.parameters
         self.sdfPosition = self.sdfGetXYZ()
-        self.sdfVelocity = self.__getUVW()
+        self.sdfVelocity = self.sdfGetUVW()
+        self.sdfMagnitude = self.sdfGetMagnitude()
         self.sdfPhi = self.sdfParticles['phi']
-        self.sdfIndex = self.sdfParticles['ident']
+        self.sdfIdent = self.sdfParticles['ident']
 
     def initYT(self):
         print "Extracting YT data"
         self.ytDataSource = yt.load(self.filename)
         self.ytAllData = self.ytDataSource.all_data()
-        self.ytPhi = self.__getDarkMatterPaticleData(0)
-        self.ytIndex = self.__getDarkMatterPaticleData(1)
-        self.ytPosition = self.__getDarkMatterPaticleData(2)
-        self.ytVelocity = self.__getDarkMatterPaticleData(3)
-        self.ytMagnitude = self.__getDarkMatterPaticleData(4)
+        self.ytPhi = self.__ytGetDarkMatterPaticleData(0)
+        self.ytIndex = self.__ytGetDarkMatterPaticleData(1)
+        self.ytPosition = self.__ytGetDarkMatterPaticleData(2)
+        self.ytVelocity = self.__ytGetDarkMatterPaticleData(3)
+        self.ytMagnitude = self.__ytGetDarkMatterPaticleData(4)
 
     def initVTK(self, key):
         print "initializing VTK objects"
@@ -87,24 +88,10 @@ class VtkDarkSkyParticles(object):
         self.__setMinMaxRange(key)
         self.__normalize(key)
         self.resetPoints()
-        for i in xrange(self.sdfIndex.size):
+        for i in xrange(self.sdfIdent.size):
             self.addPoints(i, key)
-            if i == 1000:
-                print "at 1,000 points! {} secs".format(time.clock() - start)
-            elif i == 10000:
-                print "at 10,000 points! {} secs".format(time.clock() - start)
-            elif i == 100000:
-                print "at 100,000 points! {} secs".format(time.clock() - start)
-            elif i == 500000:
-                print "at 500,000 points! {} secs".format(time.clock() - start)
-            elif i == 1000000:
-                print "at 1,000,000 points!! {} secs".format(time.clock() - start)
-            elif i == 1100000:
-                print "at 1,100,000 points! {} secs".format(time.clock() - start)
-            elif i == 1500000:
-                print "at 1,500,000 points! {} secs".format(time.clock() - start)
-            elif i == 2000000:
-                print "at 2,000,000 points! {} secs".format(time.clock() - start)
+            if i % 500000 == 0:
+                print "at {} points! {} secs".format(i, time.clock() - start)
         print "total runtime was: {}".format(time.clock() - start)
 
     def resetPoints(self):
@@ -166,11 +153,16 @@ class VtkDarkSkyParticles(object):
         else:
             return xyz
 
-    def __getUVW(self):
+    def sdfGetUVW(self):
         u = self.sdfParticles['vx']
         v = self.sdfParticles['vy']
         w = self.sdfParticles['vz']
         return np.dstack((u, v, w))[0]
+
+    def sdfGetMagnitude(self):
+        return abs(np.sqrt(self.sdfVelocity[:, 0]**2 +
+                           self.sdfVelocity[:, 1]**2 +
+                           self.sdfVelocity[:, 2]**+2))
 
     def __toCoMoving(self, proper):
         h_100 = self.sdfHeader['h_100']
@@ -184,8 +176,8 @@ class VtkDarkSkyParticles(object):
             self.dMin = self.sdfPhi.min()
             self.dMax = self.sdfPhi.max()
         elif key is 'index':
-            self.dMin = self.sdfIndex.min()
-            self.dMax = self.sdfIndex.max()
+            self.dMin = self.sdfIdent.min()
+            self.dMax = self.sdfIdent.max()
         elif key is 'mag':
             self.dMin = self.sdfMagnitude.min()
             self.dMax = self.sdfMagnitude.max()
@@ -207,7 +199,7 @@ class VtkDarkSkyParticles(object):
         if key is 'phi':
             return self.sdfPhi[index]
         elif key is 'index':
-            return self.sdfIndex[index]
+            return self.sdfIdent[index]
         elif key is 'mag':
             return self.sdfMagnitude[index]
         elif key is 'velx':
@@ -225,7 +217,7 @@ class VtkDarkSkyParticles(object):
             if key is 'phi':
                 self.sdfPhi = self.sdfPhi/self.factor
             elif key is 'index':
-                self.sdfIndex = self.sdfIndex/self.factor
+                self.sdfIdent = self.sdfIdent/self.factor
             elif key is 'mag':
                 self.sdfMagnitude/self.factor
             elif key is 'velx':
@@ -238,8 +230,8 @@ class VtkDarkSkyParticles(object):
         else:
             pass
 
-    def __getDarkMatterPaticleData(self, index):
-        registry = [('dark_matter', 'phi'),
+    def __ytGetDarkMatterPaticleData(self, index):
+        registry = [('dark_matter', 'particle_phi'),
                     ('dark_matter', 'particle_index'),
                     ('dark_matter', 'particle_position'),
                     ('dark_matter', 'particle_velocity'),
@@ -309,7 +301,7 @@ if __name__ == '__main__':
     start = time.clock()
     # fn = "../data/BlueWater/1.0000"
     fn = "../data/ds14_scivis_0128/ds14_scivis_0128_e4_dt04_1.0000"
-    dk = VtkDarkSkyParticles(fn, 'phi')
+    dk = vtkDarkSkyParticles(fn, 'phi')
     # Renderer
     # Create the Renderer
     ren = vtk.vtkRenderer()

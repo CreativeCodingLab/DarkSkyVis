@@ -9,6 +9,8 @@ Program: useful.py
 ==============================================================================
 """
 import numpy as np
+import pandas as pd
+import thingking as tk
 
 
 class Attribute(object):
@@ -23,6 +25,42 @@ class Attribute(object):
 
     def __str__(self):
         return self.detail
+
+
+class HaloWrangler(object):
+    """docstring for HaloWrangler"""
+    def __init__(self, filename, epoch):
+        super(HaloWrangler, self).__init__()
+        self.filename = filename
+        self.epoch = epoch
+        self.initRockStar()
+
+    def initRockStar(self):
+        halos = tk.loadtxt(self.filename)
+        __data = dict()
+        hlist = ["scale", "id", "desc_scale", "desc_id", "num_prog",
+                 "pid", "upid", "desc_pid", "phantom", "sam_mvir",
+                 "mvir", "rvir", "rs", "vrms", "mmp",
+                 "scale_of_last_mm", "vmax", "x", "y", "z",
+                 "vx", "vy", "vz", "jx", "jy", "jz", "spin",
+                 "breadth_first_id", "depth_first_id", "tree_root_id",
+                 "orig_halo_id", "snap_num", "next_coprogenitor_depthfirst_id",
+                 "last_progenitor_depthfirst_id", "rs_klypin", "m_all",
+                 "m200b", "m200c", "m500c", "m2500c", "xoff", "voff",
+                 "spin_bullock", "b_to_a", "c_to_a", "a_x", "a_y", "a_z",
+                 "b_to_a_500c", "c_to_a_500c", "a_x_500c", "a_y_500c",
+                 "a_z_500c", "t_over_u", "m_pe_behroozi", "m_pe_diemer",
+                 "macc", "mpeak", "vacc", "vpeak", "halfmass_scale",
+                 "acc_rate_inst", "acc_rate_100myr", "acc_rate_tdyn"
+                 ]
+        for i, k in enumerate(hlist):
+            # create a dictionary where each key in one of the index values
+            # above and the Series index is the halo ID
+            __data[k] = pd.Series(halos[:, i], index=halos[:, 1])
+            # I might remove the index value and let it use the default
+            # indexing operation
+
+        self.rsDataFrame = pd.DataFrame(__data)
 
 
 class Halo(object):
@@ -40,10 +78,10 @@ class Halo(object):
     def __setitem__(self, key, value):
         self.__setattr__(key, value)
 
-    def __init__(self, halo, fname, pos):
+    def __init__(self, halo, fname, epoch):
         super(Halo, self).__init__()
         self.filename = fname
-        self.pos = pos
+        self.epoch = epoch
 
         hlist = iter(halo)
         # Begin building values
@@ -62,7 +100,7 @@ class Halo(object):
         self.__setitem__("rs", hlist.next())
         self.__setitem__("vrms", hlist.next())
         self.__setitem__("mmp", hlist.next())
-        self.__setitem__("scale_of_last_MM", hlist.next())
+        self.__setitem__("scale_of_last_mm", hlist.next())
         self.__setitem__("vmax", hlist.next())
         self.__setitem__("x", hlist.next())
         self.__setitem__("y", hlist.next())
@@ -72,47 +110,47 @@ class Halo(object):
         self.__setitem__("v", hlist.next())
         self.__setitem__("w", hlist.next())
         self.__setitem__("uvw", np.array([self.u, self.v, self.w]))
-        self.__setitem__("Jx", hlist.next())
-        self.__setitem__("Jy", hlist.next())
-        self.__setitem__("Jz", hlist.next())
-        self.__setitem__("Spin", hlist.next())
-        self.__setitem__("Breadth_first_ID", hlist.next())
-        self.__setitem__("Depth_first_ID", hlist.next())
-        self.__setitem__("Tree_root_ID", hlist.next())
-        self.__setitem__("Orig_halo_ID", hlist.next())
-        self.__setitem__("Snap_num", hlist.next())
-        self.__setitem__("Next_coprogenitor_depthfirst_ID", hlist.next())
-        self.__setitem__("Last_progenitor_depthfirst_ID", hlist.next())
-        self.__setitem__("Rs_Klypin", hlist.next())
-        self.__setitem__("M_all", hlist.next())
-        self.__setitem__("M200b", hlist.next())
-        self.__setitem__("M200c", hlist.next())
-        self.__setitem__("M500c", hlist.next())
-        self.__setitem__("M2500c", hlist.next())
-        self.__setitem__("Xoff", hlist.next())
-        self.__setitem__("Voff", hlist.next())
-        self.__setitem__("Spin_Bullock", hlist.next())
+        self.__setitem__("jx", hlist.next())
+        self.__setitem__("jy", hlist.next())
+        self.__setitem__("jz", hlist.next())
+        self.__setitem__("spin", hlist.next())
+        self.__setitem__("breadth_first_id", hlist.next())
+        self.__setitem__("depth_first_id", hlist.next())
+        self.__setitem__("tree_root_id", hlist.next())
+        self.__setitem__("orig_halo_id", hlist.next())
+        self.__setitem__("snap_num", hlist.next())
+        self.__setitem__("next_coprogenitor_depthfirst_id", hlist.next())
+        self.__setitem__("last_progenitor_depthfirst_id", hlist.next())
+        self.__setitem__("rs_klypin", hlist.next())
+        self.__setitem__("m_all", hlist.next())
+        self.__setitem__("m200b", hlist.next())
+        self.__setitem__("m200c", hlist.next())
+        self.__setitem__("m500c", hlist.next())
+        self.__setitem__("m2500c", hlist.next())
+        self.__setitem__("xoff", hlist.next())
+        self.__setitem__("voff", hlist.next())
+        self.__setitem__("spin_bullock", hlist.next())
         self.__setitem__("b_to_a", hlist.next())
         self.__setitem__("c_to_a", hlist.next())
-        self.__setitem__("A_x", hlist.next())
-        self.__setitem__("A_y", hlist.next())
-        self.__setitem__("A_z", hlist.next())
+        self.__setitem__("a_x", hlist.next())
+        self.__setitem__("a_y", hlist.next())
+        self.__setitem__("a_z", hlist.next())
         self.__setitem__("b_to_a_500c", hlist.next())
         self.__setitem__("c_to_a_500c", hlist.next())
-        self.__setitem__("A_x_500c", hlist.next())
-        self.__setitem__("A_y_500c", hlist.next())
-        self.__setitem__("A_z_500c", hlist.next())
-        self.__setitem__("T_over_U", hlist.next())
-        self.__setitem__("M_pe_Behroozi", hlist.next())
-        self.__setitem__("M_pe_Diemer", hlist.next())
-        self.__setitem__("Macc", hlist.next())
-        self.__setitem__("Mpeak", hlist.next())
-        self.__setitem__("Vacc", hlist.next())
-        self.__setitem__("Vpeak", hlist.next())
-        self.__setitem__("Halfmass_Scale", hlist.next())
-        self.__setitem__("Acc_Rate_Inst", hlist.next())
-        self.__setitem__("Acc_Rate_100Myr", hlist.next())
-        self.__setitem__("Acc_Rate_Tdyn", hlist.next())
+        self.__setitem__("a_x_500c", hlist.next())
+        self.__setitem__("a_y_500c", hlist.next())
+        self.__setitem__("a_z_500c", hlist.next())
+        self.__setitem__("t_over_u", hlist.next())
+        self.__setitem__("m_pe_behroozi", hlist.next())
+        self.__setitem__("m_pe_diemer", hlist.next())
+        self.__setitem__("macc", hlist.next())
+        self.__setitem__("mpeak", hlist.next())
+        self.__setitem__("vacc", hlist.next())
+        self.__setitem__("vpeak", hlist.next())
+        self.__setitem__("halfmass_scale", hlist.next())
+        self.__setitem__("acc_rate_inst", hlist.next())
+        self.__setitem__("acc_rate_100myr", hlist.next())
+        self.__setitem__("acc_rate_tdyn", hlist.next())
 
     def display(self, var=None):
         return """
