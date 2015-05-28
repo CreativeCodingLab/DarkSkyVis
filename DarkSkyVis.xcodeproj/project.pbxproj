@@ -1,0 +1,287 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		83991E921B0E64F80022E55D /* libSDF.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 83991E911B0E64F80022E55D /* libSDF.a */; };
+		83B92C441B0B0F4D0064925F /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83B92C431B0B0F4D0064925F /* OpenGL.framework */; };
+		83B92C461B0B0F5B0064925F /* Aluminum.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83B92C451B0B0F5B0064925F /* Aluminum.framework */; };
+		AF1C6A61700EAB71FBE0947D /* SDFReader.mm in Sources */ = {isa = PBXBuildFile; fileRef = AF1C6BF5279E5F6175F027A4 /* SDFReader.mm */; };
+		AF1C6EFB380743C2DFE75010 /* DarkSkyVis.mm in Sources */ = {isa = PBXBuildFile; fileRef = AF1C6028091D8083B6770EE0 /* DarkSkyVis.mm */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		AF1C689EE86C91FBAAE065F0 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 7;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		83991E911B0E64F80022E55D /* libSDF.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSDF.a; path = DarkSkyVis/sdf/libSDF.a; sourceTree = "<group>"; };
+		83B92C431B0B0F4D0064925F /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
+		83B92C451B0B0F5B0064925F /* Aluminum.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Aluminum.framework; path = /Library/Frameworks/Aluminum.framework; sourceTree = "<absolute>"; };
+		AF1C6028091D8083B6770EE0 /* DarkSkyVis.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = DarkSkyVis.mm; sourceTree = "<group>"; };
+		AF1C67F9FFAE9F83DA13B7FC /* DarkSkyVis */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = DarkSkyVis; sourceTree = BUILT_PRODUCTS_DIR; };
+		AF1C6BF5279E5F6175F027A4 /* SDFReader.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = SDFReader.mm; sourceTree = "<group>"; };
+		AF1C6F14DD65D1A6D84D3B6C /* SDFReader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SDFReader.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		AF1C6EF1EBC0AD3BCE708A35 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				83B92C441B0B0F4D0064925F /* OpenGL.framework in Frameworks */,
+				83B92C461B0B0F5B0064925F /* Aluminum.framework in Frameworks */,
+				83991E921B0E64F80022E55D /* libSDF.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		83991E571B0E572E0022E55D /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				83991E911B0E64F80022E55D /* libSDF.a */,
+				83B92C451B0B0F5B0064925F /* Aluminum.framework */,
+				83B92C431B0B0F4D0064925F /* OpenGL.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		AF1C60F278D0EE1D876EFDD2 = {
+			isa = PBXGroup;
+			children = (
+				83991E571B0E572E0022E55D /* Frameworks */,
+				AF1C652FA8CEFF3D855AC9A1 /* Products */,
+				AF1C6FDD06DF10615EB5DEAF /* DarkSkyVis */,
+			);
+			sourceTree = "<group>";
+		};
+		AF1C652FA8CEFF3D855AC9A1 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				AF1C67F9FFAE9F83DA13B7FC /* DarkSkyVis */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		AF1C6FDD06DF10615EB5DEAF /* DarkSkyVis */ = {
+			isa = PBXGroup;
+			children = (
+				AF1C6028091D8083B6770EE0 /* DarkSkyVis.mm */,
+				AF1C6BF5279E5F6175F027A4 /* SDFReader.mm */,
+				AF1C6F14DD65D1A6D84D3B6C /* SDFReader.h */,
+			);
+			path = DarkSkyVis;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		AF1C618A440DB8A3D6B9A439 /* DarkSkyVis */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AF1C6719877D8F6FA8CAEF07 /* Build configuration list for PBXNativeTarget "DarkSkyVis" */;
+			buildPhases = (
+				AF1C6E55B2445A1827584C23 /* Sources */,
+				AF1C6EF1EBC0AD3BCE708A35 /* Frameworks */,
+				AF1C689EE86C91FBAAE065F0 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = DarkSkyVis;
+			productName = DarkSkyVis;
+			productReference = AF1C67F9FFAE9F83DA13B7FC /* DarkSkyVis */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		AF1C699B4097FEEC575399AB /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				ORGANIZATIONNAME = KrbAlmryde;
+			};
+			buildConfigurationList = AF1C6C97BBC6BE766635DA1A /* Build configuration list for PBXProject "DarkSkyVis" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = AF1C60F278D0EE1D876EFDD2;
+			productRefGroup = AF1C652FA8CEFF3D855AC9A1 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				AF1C618A440DB8A3D6B9A439 /* DarkSkyVis */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		AF1C6E55B2445A1827584C23 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AF1C6EFB380743C2DFE75010 /* DarkSkyVis.mm in Sources */,
+				AF1C6A61700EAB71FBE0947D /* SDFReader.mm in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		AF1C617286ADC32F1948275C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				HEADER_SEARCH_PATHS = (
+					/opt/local/include,
+					"$(PROJECT_DIR)/DarkSkyVis/sdf",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/DarkSkyVis/sdf",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		AF1C64E5A1E46B7938A6BA5C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_SEARCH_PATHS = "\"/Library/Frameworks\"/**";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = /opt/local/include;
+				LIBRARY_SEARCH_PATHS = /opt/local/lib;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		AF1C6729F2141AF3ADB6BFD2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_SEARCH_PATHS = "\"/Library/Frameworks\"/**";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = /opt/local/include;
+				LIBRARY_SEARCH_PATHS = /opt/local/lib;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		AF1C6F89017064B928E7ACA7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				HEADER_SEARCH_PATHS = (
+					/opt/local/include,
+					"$(PROJECT_DIR)/DarkSkyVis/sdf",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/DarkSkyVis/sdf",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		AF1C6719877D8F6FA8CAEF07 /* Build configuration list for PBXNativeTarget "DarkSkyVis" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AF1C617286ADC32F1948275C /* Debug */,
+				AF1C6F89017064B928E7ACA7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AF1C6C97BBC6BE766635DA1A /* Build configuration list for PBXProject "DarkSkyVis" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AF1C6729F2141AF3ADB6BFD2 /* Debug */,
+				AF1C64E5A1E46B7938A6BA5C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = AF1C699B4097FEEC575399AB /* Project object */;
+}

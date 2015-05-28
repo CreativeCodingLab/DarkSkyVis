@@ -1,0 +1,89 @@
+The 'basic' way to visualise vector fields is to specify points, then to
+specify a vector at each point, then use vtkGlyph3D and pass to your
+mapper, actor. There are many techniques for visualising vector fields
+(vtkHedgehog, vtkStreamline...) see for example thrshldV.tcl, streamV.tcl
+If you really want to specify the lines yourself create one vtkPolyData and
+add points and cells (your lines) to it and pass to your mapper, actor.
+If you really have a need for using vtkLineSource use vtkAppendPolyData to
+collect all lines into a single polydata and pass to your mapper, actor.
+
+ regards
+     Dave P
+
+
+
+points = vtk.vtkPointsArray()
+
+uvw = vtk.vtkVector3f(self.sdfVelocity[index])
+
+
+
+
+
+
+Halo.mvir == mass (kpc/h comoving)
+Halo.rvir == radius (kpc/h comoving)
+Halo.vmax == maximum circular velocity
+Halo.Spin == halo spin parameter
+Halo.Spin_Bullock == Bullock spin parameter (J/(sqrt(2)*GMVR))?!
+Halo.Xoff == Offset of density peak from average particle position (kpc/h comoving)
+
+
+
+DataFrame.loc[label] will get THAT row from its LABEL
+
+Halo data is structured as rows == 1 Halo, indexed by its ID
+                           colums == attributes
+
+
+
+import vtk
+import time
+import cPickle
+import numpy as np
+from sdfpy import load_sdf
+from thingking import loadtxt
+
+
+global ren
+global iren
+global renWin
+global frame
+
+
+def l2a(l):
+    return np.array(l)
+
+
+def loadArray(fname):
+    with open(fname, 'rb') as fObj:
+        return l2a(cPickle.load(fObj))
+
+
+# Define a simple function to convert proper to comoving Mpc/h.
+def cMpc(proper):
+    h_100 = particles.parameters['h_100']
+    width = particles.parameters['L0']
+    cosmo_a = particles.parameters['a']
+    kpc_to_Mpc = 1./1000
+    return (proper + width/2.) * h_100 * kpc_to_Mpc / cosmo_a
+
+
+
+
+import vtk
+from darksky.utils.dkDataSource import HaloDataLoader, ParticleDataLoader
+
+
+hd = HaloDataLoader()
+pd = ParticleDataLoader()
+
+
+h1 = hd('1.000')
+p1 = pd('1.000')
+
+
+
+*DataLoaders are
+
+

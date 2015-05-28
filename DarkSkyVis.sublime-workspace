@@ -4,6 +4,34 @@
 		"selected_items":
 		[
 			[
+				"setM",
+				"setMinMaxRange"
+			],
+			[
+				"vtkStr",
+				"vtkStructuredGrid"
+			],
+			[
+				"initS",
+				"initStreamlines	function"
+			],
+			[
+				"init",
+				"initHedgeHog"
+			],
+			[
+				"sdfP",
+				"sdfPhi	statement"
+			],
+			[
+				"fi",
+				"filename	statement"
+			],
+			[
+				"Parti",
+				"particle_index"
+			],
+			[
 				"for",
 				"forin	for … in … done"
 			],
@@ -320,34 +348,42 @@
 	"buffers":
 	[
 		{
-			"contents": "import vtk\nimport time\nimport cPickle\nimport numpy as np\nfrom sdfpy import load_sdf\nfrom thingking import loadtxt\n\n\nglobal ren\nglobal iren\nglobal renWin\nglobal frame\n\n\ndef l2a(l):\n    return np.array(l)\n\n\ndef loadArray(fname):\n    with open(fname, 'rb') as fObj:\n        return l2a(cPickle.load(fObj))\n\n\n# Define a simple function to convert proper to comoving Mpc/h.\ndef cMpc(proper):\n    h_100 = particles.parameters['h_100']\n    width = particles.parameters['L0']\n    cosmo_a = particles.parameters['a']\n    kpc_to_Mpc = 1./1000\n    return (proper + width/2.) * h_100 * kpc_to_Mpc / cosmo_a\n\n\n\n\nimport vtk\nfrom darksky.utils.dkDataSource import HaloDataLoader, ParticleDataLoader\n\n\nhd = HaloDataLoader()\npd = ParticleDataLoader()\n\n\nh1 = hd('1.000')\np1 = pd('1.000')\n\n\n\n*DataLoaders are \n\n\n",
+			"file": "DarkSkyVis/DarkSkyVis/SDFReader.h",
 			"settings":
 			{
-				"buffer_size": 792,
+				"buffer_size": 1289,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": ".gitignore",
+			"file": "DarkSkyVis/DarkSkyVis/DarkSkyVis.mm",
 			"settings":
 			{
-				"buffer_size": 139,
+				"buffer_size": 4811,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "/Users/krbalmryde/Library/Application Support/Sublime Text 3/Packages/User/Preferences.sublime-settings",
+			"contents": "char *hdr = NULL;\n    char *fname = argv[1];  // Particle filename, for example ds14_scivis_0128_e4_dt04_1.0000 \n    SDF *sdfp = SDFopen(NULL, fname);\n    if( sdfp == NULL ){\n        Error(\"Could not SDFopen(%s, %s): %s\\n\", \n            hdr?hdr:\"<null>\", \n            fname?fname:\"<null>\", \n            SDFerrstring);\n    }\n\n    // Read how many values of \"x\" there are in this file.\n    int64_t nrecs = SDFnrecs(\"x\", sdfp);\n    printf(\"How many x: %ld\\n\", nrecs);\n\n    //Read the parameter of h_100:\n    float h;\n    SDFgetfloat(sdfp, \"h_100\", &h);\n    printf(\"Value of h_100: %e\\n\", h);\n\n    // Read the first 10 values of \"x\", \"y\", and \"z\".\n    int nnames = 4; \n    char *names[4] = {\"ident\", \"x\", \"y\", \"z\"}; \n    int64_t n = 10;\n\n    // Storage for the types of x, y, z\n    enum SDF_type_enum *types = Malloc(nnames*sizeof(enum SDF_type_enum));\n    // Get variable types\n    for (int var=0; var<nnames; var++){\n        types[var] = SDFtype(names[var], sdfp);\n    }\n\n    // Storage for the array counts\n    // If the SDF file had struct{float x[3]}, acnt for x would be 3. Probably\n    // 1 for most arrays from the Dark Sky simulations.\n    int *acnt = Malloc(nnames*sizeof(int));\n    // Get variable counts if the variable is itself an array.\n    for (int var=0; var<nnames; var++){\n        acnt[var] = SDFarrcnt(names[var], sdfp);\n    }\n\n    // Storage for the strides of x, y, z \n    int *strides = Malloc(nnames*sizeof(int));\n    // Set the strides for each of the variables\n    for (int var=0; var<nnames; var++){\n        strides[var] = SDFtype_sizes[types[var]]*acnt[var];\n    }\n\n    // Declare how many of each variable to read. In this case, all are equal\n    // to n.\n    int *nread = Malloc(nnames*sizeof(int));\n    for (int var=0; var<nnames; var++){\n        nread[var] = n; \n    }\n\n    // Allocate space for variables\n    int64_t *id = Malloc(strides[0] * nread[0]);\n    float *x = Malloc(strides[1] * nread[1]);\n    float *y = Malloc(strides[2] * nread[2]);\n    float *z = Malloc(strides[3] * nread[3]);\n    void *addrs[4] = {id, x, y, z}; \n\n    // Read the data\n    SDFrdvecsarr(sdfp, nnames, names, nread, addrs, strides);\n\n    // Print it out\n    for (int ii=0; ii<n; ii++){\n        printf(\"id: %ld x: %e y: %e z: %e\\n\", id[ii], x[ii], y[ii], z[ii]);\n    }\n\n    // Now seek to the 1000th entry\n    for(int j=0; j<nnames; j++){\n        SDFseek(names[j], 1000, SDF_SEEK_SET, sdfp);\n    }\n\n    // Read the data\n    SDFrdvecsarr(sdfp, nnames, names, nread, addrs, strides);\n\n    // Print it out\n    for (int ii=0; ii<n; ii++){\n        printf(\"id: %ld x: %e y: %e z: %e\\n\", id[ii], x[ii], y[ii], z[ii]);\n    }\n\n    Free(id);\n    Free(x);\n    Free(y);\n    Free(z);\n    Free(types);\n    Free(strides);\n    Free(acnt);\n    Free(nread);\n\n    return 0;",
 			"settings":
 			{
-				"buffer_size": 1554,
+				"buffer_size": 2762,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "DarkSkyVis.sublime-project",
+			"contents": "pre = { \n    'wh': (467,303),\n    'xy': (522.0,160.0),\n    'tr': 467+522.0\n\n}\n\nbuttonPre = {\n    'xy': (455, -10),    \n}\n\npost = { \n    'wh': (207,134),\n    'xy': (603.96704,249.216),\n    'tr': 207+603.96704\n}\n\nbuttonPost = {\n    'xy': ( 194, -10),    \n}\n\n\n\nOn First load:\n    ===================\n    In PictureZone.java\n    ===================\n    NAME: 55538c09e1b8325b2500103f\n    getScreenSize: java.awt.Dimension[width=372,height=277]\n    System Width/Height: java.awt.Dimension[width=1280,height=800]\n    local X,Y: 21.0, 419.0\n    ===================\n\n\nPost Editing\n    ===================\n    In PictureZone.java\n    ===================\n    NAME: 55538c09e1b8325b2500103f\n    getScreenSize: java.awt.Dimension[width=563,height=420]\n    System Width/Height: java.awt.Dimension[width=1280,height=800]\n    local X,Y: 304.11096, 25.194702\n    ===================\n\n\nOn Second Load:\n    ===================\n    In PictureZone.java\n    ===================\n    NAME: 55538c09e1b8325b2500103f\n    this.getWidth(), this.getHeight(): 563, 419\n    getScreenSize: java.awt.Dimension[width=563,height=419]\n    NA get rotationradius: 104.0\n    NA System Width/Height: java.awt.Dimension[width=1280,height=800]\n    OK local X,Y: 304.0,25.0   \n    ===================\n\n\n\n Topleft getX,Y: 365.00, 139.00\nTopRight getX,Y: 928.00, 140.00\n\n\nblood -> agar/sereg\nblood-stained -> agarwaen\n\nhorn (animal) -> tarka\n\nred -> carad/caran   adj: naru\nrose -> cartel\n\n\n\n\n\"the cow that wears a blood-stained rose\"  ==>  \"i' karaar tanya lanna y' agarwaen dune\"\n",
 			"settings":
 			{
-				"buffer_size": 1997,
+				"buffer_size": 1538,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "DarkSkyVis/DarkSkyVis/SDFReader.mm",
+			"settings":
+			{
+				"buffer_size": 1230,
 				"line_ending": "Unix"
 			}
 		}
@@ -359,12 +395,32 @@
 	"build_varint": "",
 	"command_palette":
 	{
-		"height": 339.0,
-		"last_filter": "py",
+		"height": 203.0,
+		"last_filter": "pyt",
 		"selected_items":
 		[
 			[
+				"pyt",
+				"Set Syntax: Python"
+			],
+			[
+				"c++",
+				"Set Syntax: C++"
+			],
+			[
 				"py",
+				"Set Syntax: Python"
+			],
+			[
+				"pyth",
+				"Set Syntax: Python"
+			],
+			[
+				"remove",
+				"Package Control: Remove Package"
+			],
+			[
+				"py	",
 				"Set Syntax: Python"
 			],
 			[
@@ -378,10 +434,6 @@
 			[
 				"tex",
 				"Set Syntax: LaTeX"
-			],
-			[
-				"py	",
-				"Set Syntax: Python"
 			],
 			[
 				"bas",
@@ -408,20 +460,12 @@
 				"Set Syntax: LaTeX"
 			],
 			[
-				"pyt",
-				"Set Syntax: Python"
-			],
-			[
 				"syc++",
 				"Set Syntax: C++"
 			],
 			[
 				"syp",
 				"Set Syntax: Python"
-			],
-			[
-				"c++",
-				"Set Syntax: C++"
 			],
 			[
 				"",
@@ -576,10 +620,6 @@
 				"Set Syntax: Scala"
 			],
 			[
-				"pyth",
-				"Set Syntax: Python Improved"
-			],
-			[
 				"hask",
 				"Set Syntax: Haskell"
 			],
@@ -731,16 +771,35 @@
 	[
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/utils"
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyVis",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyVis/DarkSkyVis"
 	],
 	"file_history":
 	[
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/docs/notes_and_musings.txt",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/vtkTest.py",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/utils/vtkDarkSkyUtilities.py",
+		"/Users/krbalmryde/.bash_aliases",
+		"/Users/krbalmryde/.bash_functions",
+		"/Users/Shared/adi/adi.pb",
+		"/Users/krbalmryde/Downloads/UnityPackages/install.ini",
+		"/Users/krbalmryde/.bash_profile",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/VTKDarkSkyFlow.py",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/.gitignore",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/utils/DarkSkyUtilities.py",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/vtkHedgeHog.py",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/VTKDarkSkyParticles.py",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/vtkDarkSkyHalos.py",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/README.md",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/VTKDarkSky-StreamLines.py",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/VTKDarkSkyTime.py",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/VTKDarkSkyHalosPaths.py",
+		"/Users/krbalmryde/Library/Application Support/Sublime Text 3/Packages/User/Preferences.sublime-settings",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyVis.sublime-project",
 		"/Users/krbalmryde/Library/Application Support/Sublime Text 3/Packages/Default/Preferences.sublime-settings",
 		"/Users/krbalmryde/Library/Application Support/Sublime Text 3/Packages/User/Python.sublime-settings",
 		"/Users/krbalmryde/Library/Application Support/Sublime Text 3/Packages/User/JSON.sublime-settings",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/README.md",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/images/DarkSkyTimeBox1.png",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/.gitignore",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/data/rockstar/auto-rockstar.cfg",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/data/rockstar/rockstar.cfg",
 		"/Users/krbalmryde/Dropbox/class-projects/cs594/SciVis2015/src/VTKDarkSkyHalosPaths.py",
@@ -774,9 +833,6 @@
 		"/Users/krbalmryde/Dropbox/class-projects/cs594/SciVis2015/src/darksky",
 		"/Users/krbalmryde/Dropbox/class-projects/cs594/topic9/Topic9-Task2.py",
 		"/Users/krbalmryde/Dropbox/class-projects/cs594/SciVis2015/src/ToBeParallel.py",
-		"/Users/krbalmryde/.bash_aliases",
-		"/Users/krbalmryde/.bash_functions",
-		"/Users/krbalmryde/.bash_profile",
 		"/Users/krbalmryde/Dropbox/Class-Projects/cs594/SciVis2015/data/ds14_scivis_0128/rockstar/hlists/hlist_1.00000.list",
 		"/Users/krbalmryde/Dropbox/Class-projects/cs594/SciVis2015/src/VTKDarkSky.py",
 		"/Users/krbalmryde/Dropbox/Class-projects/cs594/SciVis2015/src/ToJsonTest.py",
@@ -847,26 +903,11 @@
 		"/Users/krbalmryde/Dropbox/Class-projects/cs594/SciVis2015/src/examples/StreamlinesVTK.py",
 		"/Users/krbalmryde/Dropbox/Class-projects/cs594/SciVis2015/src/examples/ColorIsosurface.py",
 		"/Users/krbalmryde/Dropbox/Class-projects/cs594/SciVis2015/Data/ds14_scivis_0128/cosmology.tbl",
-		"/Users/krbalmryde/Dropbox/Class-Projects/cs594/topic8/MyNetCDF.py",
-		"/Users/krbalmryde/Library/Enthought/Canopy_64bit/User/lib/python2.7/site-packages/yt/testing.py",
-		"/Users/krbalmryde/Library/Enthought/Canopy_64bit/User/lib/python2.7/site-packages/yt/startup_tasks.py",
-		"/Users/krbalmryde/Library/Enthought/Canopy_64bit/User/lib/python2.7/site-packages/yt/setup.py",
-		"/Users/krbalmryde/Dropbox/Class-projects/cs594/SciVis2015/README.md",
-		"/Users/krbalmryde/Dropbox/Class-projects/cs594/SciVis2015/util/enhance.py",
-		"/Users/krbalmryde/Library/Enthought/Canopy_64bit/User/lib/python2.7/site-packages/yt/__hg_version__.py",
-		"/Users/krbalmryde/Library/Enthought/Canopy_64bit/User/lib/python2.7/site-packages/yt/__init__.py",
-		"/Users/krbalmryde/Library/Enthought/Canopy_64bit/User/lib/python2.7/site-packages/yt/api.py",
-		"/Users/krbalmryde/Library/Enthought/Canopy_64bit/User/lib/python2.7/site-packages/yt/arraytypes.py",
-		"/Users/krbalmryde/Library/Enthought/Canopy_64bit/User/lib/python2.7/site-packages/yt/config.py",
-		"/Users/krbalmryde/Library/Enthought/Canopy_64bit/User/lib/python2.7/site-packages/yt/convenience.py",
-		"/Users/krbalmryde/Library/Enthought/Canopy_64bit/User/lib/python2.7/site-packages/yt/funcs.py",
-		"/Users/krbalmryde/Library/Enthought/Canopy_64bit/User/lib/python2.7/site-packages/yt/mods.py",
-		"/Users/krbalmryde/Library/Enthought/Canopy_64bit/User/lib/python2.7/site-packages/yt/pmods.py",
-		"/Users/krbalmryde/Dropbox/Class-projects/cs594/Temp/README.md"
+		"/Users/krbalmryde/Dropbox/Class-Projects/cs594/topic8/MyNetCDF.py"
 	],
 	"find":
 	{
-		"height": 26.0
+		"height": 38.0
 	},
 	"find_in_files":
 	{
@@ -879,9 +920,84 @@
 	},
 	"find_state":
 	{
-		"case_sensitive": true,
+		"case_sensitive": false,
 		"find_history":
 		[
+			"particle.size",
+			"=*malloc",
+			"\\= * malloc",
+			"= * malloc",
+			"malloc",
+			"types",
+			"hdr",
+			"ParticleLoaderSDF",
+			"vtkScalars",
+			"sdfPosition",
+			"parameters",
+			"sdfGet",
+			"SDFWrangler",
+			"setMinMaxRange",
+			"dk.",
+			"darkSky",
+			"self.sdf",
+			"sdfPosition",
+			"particles",
+			"__normalize",
+			"__setMinMaxRange",
+			"__toCoMoving",
+			"self.",
+			"vtkDepth",
+			"4",
+			"vtkDarkSkyFlow",
+			"Cell",
+			"vtkScalar",
+			"self.vtkStructuredGrid.",
+			"vtkPolyData",
+			"->",
+			"512",
+			"derer->",
+			"->",
+			"HedgeHod",
+			"initHedgeHog",
+			"vtkFlowActor",
+			"__setMapper",
+			"__getMagnitude",
+			"=",
+			"__getUVW",
+			"self.yt",
+			"vtkVelocity",
+			"__getMagnitude",
+			"= self.sdfParticles['",
+			"__getUVW",
+			"sdfGetXYZ",
+			"vtkStreamActor",
+			"vtkHedgHogActor",
+			"filename",
+			"vtkDarkSkyParticles",
+			"VtkDarkSky",
+			"__setMinMaxRange",
+			"resetPoints",
+			"sdfIdent",
+			"vtkDepth",
+			"vtkVelocity",
+			"vtkDepth",
+			"uvw",
+			"WriteVectorField",
+			",",
+			"__setitem__",
+			"vtkDepth",
+			"halo ",
+			"pos",
+			"counter",
+			"sdfIndex",
+			"index",
+			"particle_index",
+			"__ytGetDarkMatterPaticleData",
+			"__getDarkMatterPaticleData",
+			"vtkDepth",
+			"VtkDarkSkyParticles",
+			"*",
+			"Pics",
 			"self.yt",
 			"yt",
 			"vtkTimerCallback",
@@ -934,82 +1050,7 @@
 			"gatherMeans",
 			"self.ytVelocity[:,0]",
 			"self.ytVelocity",
-			" points",
-			" points!\"",
-			"dMin",
-			"return",
-			"dmVel",
-			"dMax",
-			"[:,0]",
-			"dmVel[:,0]",
-			"index",
-			"p1D",
-			"particle",
-			"ad",
-			"cPickle",
-			"self.dMin",
-			"ytMagnitude",
-			"[A-Z]",
-			"[a-z]",
-			"Velocity",
-			"VECTORS",
-			"Keypress",
-			"m",
-			"np.fromiter",
-			"xyz",
-			"dm",
-			"m",
-			"offset",
-			"addPoints",
-			"getBounds",
-			"def",
-			"y",
-			"x",
-			"xyz",
-			"index",
-			"x",
-			"XX",
-			"dmX",
-			"initSeedPoint",
-			"streamline_",
-			"streamline_actor",
-			"p1",
-			"DarkMatter_",
-			"[i]",
-			"addPoints",
-			".3",
-			"__getDarkMatterPaticleData",
-			"self",
-			"self.",
-			"self",
-			"ytVelocity",
-			"/2",
-			".3",
-			"z",
-			"y",
-			"x",
-			"resetPoints",
-			"YY",
-			"[ (lBounds[i]",
-			"x",
-			"XX",
-			"<",
-			"Index",
-			"uBounds",
-			"Index",
-			"V",
-			"XX",
-			"Bounds",
-			"offset",
-			"vtkVelocity",
-			"# self.vtkVelocity",
-			"vtkPhi",
-			"<",
-			"x",
-			"zBounds",
-			"x",
-			"xBounds",
-			"vtkColorS"
+			" points"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -1077,54 +1118,75 @@
 			[
 				{
 					"buffer": 0,
+					"file": "DarkSkyVis/DarkSkyVis/SDFReader.h",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 792,
+						"buffer_size": 1289,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								34,
-								34
+								0,
+								0
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/Python/Python.tmLanguage"
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 2,
+					"stack_index": 4,
 					"type": "text"
 				},
 				{
 					"buffer": 1,
-					"file": ".gitignore",
+					"file": "DarkSkyVis/DarkSkyVis/DarkSkyVis.mm",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 139,
+						"buffer_size": 4811,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								93,
-								93
+								3327,
+								3426
+							],
+							[
+								3781,
+								3834
+							],
+							[
+								4090,
+								4146
+							],
+							[
+								4442,
+								4496
+							],
+							[
+								4570,
+								4570
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/Text/Plain text.tmLanguage"
+							"syntax": "Packages/Objective-C/Objective-C++.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 1370.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 3,
@@ -1132,28 +1194,28 @@
 				},
 				{
 					"buffer": 2,
-					"file": "/Users/krbalmryde/Library/Application Support/Sublime Text 3/Packages/User/Preferences.sublime-settings",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1554,
+						"buffer_size": 2762,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								907,
-								907
+								1796,
+								1796
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/JavaScript/JSON.tmLanguage",
-							"translate_tabs_to_spaces": false
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 436.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 1,
@@ -1161,31 +1223,59 @@
 				},
 				{
 					"buffer": 3,
-					"file": "DarkSkyVis.sublime-project",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1997,
+						"buffer_size": 1538,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1383,
-								1383
+								1293,
+								1293
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/JavaScript/JSON.tmLanguage",
-							"translate_tabs_to_spaces": false
+							"syntax": "Packages/Python/Python.tmLanguage"
 						},
 						"translation.x": 0.0,
-						"translation.y": 285.0,
+						"translation.y": 582.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "DarkSkyVis/DarkSkyVis/SDFReader.mm",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1230,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								693,
+								693
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Objective-C/Objective-C++.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 161.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
 					"type": "text"
 				}
 			]
@@ -1193,7 +1283,7 @@
 	],
 	"incremental_find":
 	{
-		"height": 26.0
+		"height": 25.0
 	},
 	"input":
 	{
@@ -1234,7 +1324,7 @@
 	"project": "DarkSkyVis.sublime-project",
 	"replace":
 	{
-		"height": 48.0
+		"height": 46.0
 	},
 	"save_all_on_build": true,
 	"select_file":
@@ -1244,15 +1334,55 @@
 		"selected_items":
 		[
 			[
+				"utili",
+				"darksky/utils/vtkDarkSkyUtilities.py"
+			],
+			[
+				"par",
+				"darksky/vtkDarkSkyParticles.py"
+			],
+			[
+				"vtkdark",
+				"darksky/vtkDarkSkyFlow.py"
+			],
+			[
+				"darkskyt",
+				"darksky/vtkDarkSkyTime.py"
+			],
+			[
+				"",
+				"darksky/VTKDarkSkyFlow.py"
+			],
+			[
+				"ut",
+				"darksky/utils/DarkSkyUtilities.py"
+			],
+			[
+				"re",
+				"README.md"
+			],
+			[
+				"vtk",
+				"darksky/VTKDarkSkyParticles.py"
+			],
+			[
+				"u",
+				"darksky/utils/DarkSkyUtilities.py"
+			],
+			[
+				"str",
+				"darksky/VTKDarkSky-StreamLines.py"
+			],
+			[
+				"read",
+				"README.md"
+			],
+			[
 				"scivis",
 				"cs594/SciVis2015/Paper/SciVis.inc"
 			],
 			[
 				"vtkdar",
-				"cs594/SciVis2015/src/VTKDarkSkyHalos.py"
-			],
-			[
-				"vtkdark",
 				"cs594/SciVis2015/src/VTKDarkSkyHalos.py"
 			],
 			[
@@ -1270,10 +1400,6 @@
 			[
 				"starr",
 				"cs524/StarReport/StarReport.inc"
-			],
-			[
-				"",
-				"cs227/DoublyLinkedPriorityListTest.java"
 			],
 			[
 				"project4",
@@ -1590,7 +1716,7 @@
 		[
 			[
 				"",
-				"~/Dropbox/Code-Projects/KrbAlmryde.github.io/KrbAlmryde.sublime-project"
+				"~/Dropbox/Code-Projects/EVL/NiftiViewer-OLD/NiftiViewer.sublime-project"
 			]
 		],
 		"width": 380.0

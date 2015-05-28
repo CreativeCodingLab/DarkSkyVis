@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>BD06F2C0-80FB-4B15-97A2-BCFF7F8962A3</string>
+	<key>IDESourceControlProjectName</key>
+	<string>DarkSkyVis</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>5AD1DCAE4D0153DDCC778D12939AEDB3CD4BF738</key>
+		<string>https://bitbucket.org/JohnSalmon/sdf.git</string>
+		<key>6CFD7091A570A1A4AAB7253440AB7D7E375EAFEC</key>
+		<string>https://github.com/CreativeCodingLab/DarkSkyVis.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>DarkSkyVis/DarkSkyVis.xcodeproj</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>5AD1DCAE4D0153DDCC778D12939AEDB3CD4BF738</key>
+		<string>../../../DarkSkyVis/DarkSkyVis/sdf</string>
+		<key>6CFD7091A570A1A4AAB7253440AB7D7E375EAFEC</key>
+		<string>../../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/CreativeCodingLab/DarkSkyVis.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>6CFD7091A570A1A4AAB7253440AB7D7E375EAFEC</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>6CFD7091A570A1A4AAB7253440AB7D7E375EAFEC</string>
+			<key>IDESourceControlWCCName</key>
+			<string>DarkSkyVis</string>
+		</dict>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>5AD1DCAE4D0153DDCC778D12939AEDB3CD4BF738</string>
+			<key>IDESourceControlWCCName</key>
+			<string>sdf</string>
+		</dict>
+	</array>
+</dict>
+</plist>

@@ -1,4 +1,45 @@
+## Important Notes
+Particle position data is listed in `proper kpc/h` while the halo data is in `comoving Mpc/h` in order
+to change this the following function can be used:
+```python
+def convert_to_cMpc(proper):
+    h_100 = particles.parameters['h_100']
+    width = particles.parameters['L0']
+    cosmo_a = particles.parameters['a']
+    kpc_to_Mpc = 1./1000
+    return (proper + width/2.) * h_100 * kpc_to_Mpc / cosmo_a
+```
+
+Halo radius, __rvir__, is in kpc/h and must be converted to Mpc/h in order to correctly extract the
+surrounding particles. This is as simple as doing `rvir * (1/1000.)`
+
+## Stuff to look up later
+coyote universe
+which partilces move the most in the beginning
+
+redshit approximation at time 0
+
+
 ## Things I am working on
+Presently I am working on tracking a Halo and its descendants through time and extracting its corresponding Particles that make up the halo in question. My approach to this problem is to do the following:
+
+1) Identify a halo at time-0
+    a) get its xyz coords
+    b) get its mass
+    c) get its radius
+    d) get its child-id
+
+2) Identify particles which surround Identified Halo at time-0
+    a) Filter particles that do not fall within the radius of the halo
+    b) get their xyz coords
+    c) get their id
+    d) get their phi (gravitational potential) scalar
+    e) get their uvw coords
+    f) get their acceleration vector
+    f) compute their uvw magnitude
+
+
+---
 So it turns out using SDF's data loader is A LOT faster to process the data arrays due to its use of numpy's memmap function. Effectively, it is indexing into the binary file object, rather than loading the whole thing into memory. This way its only ever holding a small subset of the actual data, and swapping it out as it needs. The added benefit is that it is treated and behaves like any other numpy object, so *most* operations should be similar if not identical.
 
 After doing a preliminary run, I discovered that SDF not only generates the same results, but it also renders the vtk instance in under ~30 seconds! That 75% reduction in rendering time!! The limitation is that the SDF data does have all the super cool derived fields pre-built for me, so Ill have to generate those myself.
@@ -15,8 +56,18 @@ While I think our visualization idea is wicked super cool, and for my own learni
 With regards to tasks, I do know that the SciVis contest asks that we try to understand the substructure of a Halo, that is the composition of particles that make up an entity that is a Halo. The obvious solution I had was to filter the particles based on the width/mass of a particular Halo, then do something like an RK4 integration using the particles velocity to get a sense of how the Halo might be behaving. For example maybe the Halo has begun to generate its own gravity and the particles are moving in a circular/orbital like manner around some point, or maybe the structure is unstable and its decomposing over time so the streamlines are moving outward....oh the possibilities!)
 
 The practical benefit of this technique would be to reduce the number of particles we are interacting with, which would reduce the memory load etc. I also did a little digging and found out that VTK has some limited support for parallel processing! As of v6.1 there are at least a few core components with VTK that are parallelize-able which would speed things up considerably!
+## Papers I am reading
+[Seeing the Difference between Cosmological Simulations](https://steveharoz.com/research/cosmology/SeeingDiff-CGA.pdf)  This is a __GREAT__ paper published in 2008 that worked with a very similar dataset to the one I am currently working with.
 
 
+
+## Helpful Definitions
+There are a TON of scalars
+
+Phi: Gravatational Potential
+Acceleration
+Velocity
+Magnitude
 
 ## Progress
 ### Round2

@@ -27,16 +27,16 @@ class vtkDarkSkyFlow(object):
             self.initYT()
         # =======================
         self.initVTK(key)
-        self.initFlow(style)
+        self.write(fn)
+        # self.initFlow(style)
 
     def initFlow(self, style=None):
         print "initializing Flow objects", style
         self.vtkFlowActor = vtk.vtkActor()
-        self.initHedgeHog()
-        # if style is None:
-        #     self.initHedgeHog()
-        # elif style in "streamlines":
-        #     self.initStreamlines()
+        if style is None:
+            self.initHedgeHog()
+        elif style in "streamlines":
+            self.initStreamlines()
 
     def initSDF(self):
         print "loading SDF data!"
@@ -139,9 +139,43 @@ class vtkDarkSkyFlow(object):
         mapper = vtk.vtkPolyDataMapper()
         print "mapper.SetInputConnection(self.vtkHedgHog.GetOutputPort())"
         mapper.SetInputConnection(self.vtkHedgHog.GetOutputPort())
+        print "Setting color information"
+        mapper.SetColorModeToDefault()
+        mapper.SetScalarRange(self.dMin, self.dMax)
+        mapper.SetScalarVisibility(1)
         print "Setting mapper to actor"
         self.vtkFlowActor.SetMapper(mapper)
         # self.vtkFlowActor.GetProperty().SetColor(1.0, 1.0, 1.0)
+
+    def initSeedPoint(self):
+        print "initializing SeedPoint"
+        self.vtkSeeds = vtk.vtkPlaneSource()
+        self.vtkSeeds.SetXResolution(4)
+        self.vtkSeeds.SetYResolution(4)
+        self.vtkSeeds.SetOrigin(0.0, 0.0, 0.0)
+        self.vtkSeeds.SetPoint1(-10.0, -10.0, -10.0)
+        self.vtkSeeds.SetPoint2(10.0, 10.0, 10.0)
+
+    def initStreamlines(self):
+        print "initializing Streamlines"
+        RK4 = vtk.vtkRungeKutta4()
+        self.initSeedPoint()
+
+        self.vtkStreamline = vtk.vtkStreamLine()
+        self.vtkStreamline.SetInputData(self.vtkStructuredGrid)
+        self.vtkStreamline.SetSourceConnection(self.vtkSeeds.GetOutputPort())
+        self.vtkStreamline.SetMaximumPropagationTime(500)
+        self.vtkStreamline.SetIntegrationStepLength(.2)
+        self.vtkStreamline.SetStepLength(0.001)
+        self.vtkStreamline.SetNumberOfThreads(1)
+        self.vtkStreamline.SetIntegrationDirectionToIntegrateBothDirections()
+        self.vtkStreamline.SetIntegrator(RK4)
+        self.vtkStreamline.VorticityOn()
+
+        mapper = vtk.vtkPolyDataMapper()
+        mapper.SetInputConnection(self.vtkStreamline.GetOutputPort())
+        self.vtkFlowActor.SetMapper(mapper)
+        self.vtkFlowActor.VisibilityOn()
 
     def sdfGetXYZ(self):
         x = self.sdfParticles['x']
@@ -163,6 +197,12 @@ class vtkDarkSkyFlow(object):
         return abs(np.sqrt(self.sdfVelocity[:, 0]**2 +
                            self.sdfVelocity[:, 1]**2 +
                            self.sdfVelocity[:, 2]**+2))
+
+    def write(self, fn):
+        writer = vtk.vtkXMLStructuredGridWriter()
+        writer.SetFileName(fn+".vts")
+        writer.SetInputData(self.vtkStructuredGrid)
+        writer.Write()
 
     # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     #                   Private Methods
@@ -283,7 +323,7 @@ if __name__ == '__main__':
     # DarkSky
     start = time.clock()
     fn = "../data/ds14_scivis_0128/ds14_scivis_0128_e4_dt04_1.0000"
-    dk = vtkDarkSkyFlow(fn, 'mag')
+    dk = vtkDarkSkyFlow(fn, 'phi')
 
     # Renderer
     # Create the Renderer

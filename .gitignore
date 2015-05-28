@@ -1,6 +1,7 @@
 *.class
 *.nii*
 *.pdf
+*.png  # dont want images taking up space
 *.pyc
 *.o
 *.gz
@@ -13,3 +14,5 @@ data/*
 docs/papers/*
 docs/examples/*
 *.gif
+darksky/images/*
+.idea

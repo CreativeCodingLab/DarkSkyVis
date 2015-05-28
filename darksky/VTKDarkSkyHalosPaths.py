@@ -88,7 +88,7 @@ class HaloPath(object):
         print "Connecting the Dots!"
         self.vtkLines = vtk.vtkCellArray()
         # line = vtk.vtkLine()
-        self.vtkLines.InsertNextCell(89)
+        self.vtkLines.InsertNextCell(89)  # Inserting all 89 cells at once.
         for i in range(89):
             # line = vtk.vtkLine()
             # line.GetPointIds().SetId(i, i)

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Scheme
+   version = "1.3">
+   <BuildAction>
+      <BuildActionEntries>
+         <BuildActionEntry
+            buildForRunning = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "AF1C618A440DB8A3D6B9A439"
+               BuildableName = "DarkSkyVis"
+               BlueprintName = "DarkSkyVis"
+               ReferencedContainer = "container:DarkSkyVis.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+      </BuildActionEntries>
+   </BuildAction>
+   <LaunchAction
+      useCustomWorkingDirectory = "NO"
+      buildConfiguration = "Debug">
+      <BuildableProductRunnable>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "AF1C618A440DB8A3D6B9A439"
+            BuildableName = "DarkSkyVis"
+            BlueprintName = "DarkSkyVis"
+            ReferencedContainer = "container:DarkSkyVis.xcodeproj">
+         </BuildableReference>
+      </BuildableProductRunnable>
+   </LaunchAction>
+</Scheme>
