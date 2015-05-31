@@ -12,6 +12,15 @@
 	[
 		{
 			"path": "."
+		},
+		{
+			"path": "./DarkSkyJs"
+		},
+		{
+			"path": "./DarkSkyPy"
+		},
+		{
+			"path": "./DarkSkyCpp"
 		}
 	],
 	"settings":

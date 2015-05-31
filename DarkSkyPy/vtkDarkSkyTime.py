@@ -50,8 +50,8 @@ class VtkDarkSkyTime(object):
         self.vtkDepth = vtk.vtkDoubleArray()
 
         self.vtkDepth.SetName("DarkMatter_Phi")
-        self.dMin = 0.0
-        self.dMax = 20.0
+        self.dMin = 0.0  # -3.46307e+06  # Got these values apriori
+        self.dMax = 20  # 550615.0
 
         self.vtkPolyData.SetPoints(self.vtkPoints)
         self.vtkPolyData.SetVerts(self.vtkCells)
@@ -148,7 +148,7 @@ class SDFLoader(object):
 
     def __call__(self, filename):
         self.initSDF(filename)
-        return self.sdfPosition
+        # return self.sdfPosition
 
     def initSDF(self, filename):
         self.sdfParticles = sdf.load_sdf(filename)
@@ -156,7 +156,7 @@ class SDFLoader(object):
         self.sdfPosition = self.sdfGetXYZ()
         # self.sdfVelocity = self.sdfGetUVW()
         # self.sdfMagnitude = self.sdfGetMagnitude()
-        # self.sdfPhi = self.sdfParticles['phi']
+        self.sdfPhi = self.sdfParticles['phi']
         # self.sdfIdent = self.sdfParticles['ident']
 
     def sdfGetXYZ(self):
@@ -216,6 +216,7 @@ def Smile_For_the_Camera():
     file_name = "darkSky" + str(frame).zfill(5) + ".png"
     image = vtk.vtkWindowToImageFilter()
     image.SetInput(renWin)
+    image.SetMagnification(4)
     png_writer = vtk.vtkPNGWriter()
     png_writer.SetInputConnection(image.GetOutputPort())
     png_writer.SetFileName(file_name)
@@ -242,17 +243,28 @@ def key_pressed_callback(obj, event):
         camera.Zoom(0.95)
 
 
+def getMinMax(value):
+    global minV, maxV
+    if value <= minV:
+        minV = value
+    elif value >= maxV:
+        maxV = value
+
+
+    pass
 if __name__ == '__main__':
     start = time.clock()
     darkSky = VtkDarkSkyTime()
     Bounder = IndexBuilder(454.17418235000014)
     Loader = SDFLoader()
     totalPoints = 0
+    minV, maxV = 0., 0.
+    frame = 0
 
     # PAT = "../data/BlueWaters/*[01].[0-9][0-9]00"
     PAT = "../data/ds14_scivis_0128/ds14_scivis_0128_e4_dt04_[01].[0-9][0-9]00"
     length = len(glob(PAT))-1
-    for i, fn in enumerate(glob(PAT)[10::-5]):
+    for i, fn in enumerate(glob(PAT)[::-5]):
         s = time.clock()
         print "\nLoading", fn, "now"
         # try:
@@ -266,19 +278,26 @@ if __name__ == '__main__':
         #     ds.domain_right_edge = np.ceil(RE / 10.0) * 10.0
         #     dmXYZ = ad[('dark_matter', 'particle_position')]
         # dmXYZ = np.load('particle_position' + fn)
-        dmXYZ = Loader(fn)
+        Loader(fn)
+        dmXYZ = Loader.sdfPosition.copy()
+        # dmPhi = Loader.sdfPhi.copy()
         iXYZ = Bounder(dmXYZ)
         XYZ = dmXYZ[iXYZ]
+        # PHI = dmPhi[iXYZ]
         print XYZ.shape,
         totalPoints += XYZ.shape[0]
 
         print "\nAdding Points!"
         for j in xrange(XYZ.shape[0]):
             xyz = XYZ[j]
+            # phi = PHI[j]
+            # getMinMax(phi)
             darkSky.addPoints(xyz, float(i))
+            # darkSky.addPoints(xyz, phi)
         print "\nWe are at time ", i, "of", length-1
         print "We have accumulated", totalPoints
         print "Current runtime is", time.clock() - start, "\n"
+        print "Current min/maxV is", minV, maxV, "\n"
 
     # Create the Renderer
     ren = vtk.vtkRenderer()
@@ -288,7 +307,7 @@ if __name__ == '__main__':
 
     # Create the RendererWindow
     renWin = vtk.vtkRenderWindow()
-    renWin.SetSize(512, 512)
+    renWin.SetSize(750, 575)
     renWin.AddRenderer(ren)
 
     # Interactor
@@ -303,8 +322,8 @@ if __name__ == '__main__':
     iren.Initialize()
 
     # Sign up to receive TimerEvent
-    cb = vtkTimerCallback(darkSky.vtkActor, ren.GetActiveCamera())
-    iren.AddObserver('TimerEvent', cb.execute)
-    timerId = iren.CreateRepeatingTimer(100)
+    # cb = vtkTimerCallback(darkSky.vtkActor, ren.GetActiveCamera())
+    # iren.AddObserver('TimerEvent', cb.execute)
+    # timerId = iren.CreateRepeatingTimer(100)
 
     iren.Start()

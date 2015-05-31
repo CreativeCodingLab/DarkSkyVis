@@ -16,3 +16,4 @@ docs/examples/*
 *.gif
 darksky/images/*
 .idea
+images/*

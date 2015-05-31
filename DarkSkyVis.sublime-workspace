@@ -4,6 +4,14 @@
 		"selected_items":
 		[
 			[
+				"sdf",
+				"sdfPosition"
+			],
+			[
+				"sdfGet",
+				"sdfGetAcceleration"
+			],
+			[
 				"setM",
 				"setMinMaxRange"
 			],
@@ -348,43 +356,64 @@
 	"buffers":
 	[
 		{
-			"file": "DarkSkyVis/DarkSkyVis/SDFReader.h",
+			"contents": "import vtk\nimport time\nimport numpy as np\nimport sdfpy as sdf\nfrom glob import glob\nimport thingking as tk  # loadtxt\nfrom itertools import imap\nfrom utils.vtkDarkSkyUtilities import Halo, SDFLoader, l2a\n\n\ndef gatherHalos(fileList, ID, coords, n):\n    \"\"\"\n    The name is silly, but the role it serves in not\n\n    Recursive Halo tracker which follows the parent/descendant id of a Halo\n    across a set of Halo-Files/Time Points.\n\n    Returns a set of coordinates of a Halo's position over time\n    \"\"\"\n    print len(fileList), ID, len(coords), n\n    if len(fileList) == 0:\n        print \"file is empty\"\n        return coords, n\n    fn = fileList[0]\n    halos = l2a([Halo(x) for x in tk.loadtxt(fn)])\n    ids = l2a([x.id for x in halos])\n    if ID is None:\n        print ID, \"is None\"\n        ID = ids[0]\n    index = (ids == ID).nonzero()[0][0]\n    if index < 0 or index is []:\n        print \"its -1!\"\n        return coords, n\n    elif index > -1:\n        tHl = halos[index]\n        # print details\n        print index, fn, tHl.id, tHl.desc_id, tHl.pid, n\n        xyzR = [tHl.x, tHl.y, tHl.z, tHl.rvir]\n        # mrs = tHl.mvir, tHl.rvir, tHl.rs   # halo mass, radius, & scale radius\n        coords.append(xyzR)\n        return intoTheVoid(fileList[1:], tHl.desc_id, coords, n+1)\n\n\ndef filter_sphere(pos, center, radius, domain_width):\n    pass\n\n\n\ndef main():\n    PATds = \"../data/ds14_scivis_0128/ds14_scivis_0128_e4_dt04_[01].[0-9][0-9]00\"\n    PATrs = \"../data/rockstar/hlists/hlist_[01].[0-9][0-9]*.list\"\n    dsLoader = SDFLoader(True)  # Yes, convert to comoving\n\n    dsFiles = glob(PATds)[10:]  # Skip the first 10 since we dont have halos to match\n    rsFiles = glob(PATrs)\n\n    hID = 257.\n    coords, n = gatherHalos(rsFiles, hID, [], 0)\n\n\n\nif __name__ == '__main__':\n    main()\n\n\n\n\n'''\n# What am I trying to do?\n1) Identify a halo at time-0\n    a) get its xyz coords\n    b) get its mass\n    c) get its radius\n    d) get its child-id\n\n2) Identify particles which surround Identified Halo at time-0\n    a) Filter particles that do not fall within the radius of the halo\n    b) get their xyz coords\n    c) get their id\n    d) get their phi (gravitational potential) scalar\n    e) get their uvw coords\n    f) get their acceleration vector\n    f) compute their uvw magnitude\n\n\n'''\n\n    def __toCoMoving(self, proper):\n        h_100 = self.sdfHeader['h_100']\n        width = self.sdfHeader['L0']\n        cosmo_a = self.sdfHeader['a']\n        kpc_to_Mpc = 1./1000\n        return (proper + width/2.) * h_100 * kpc_to_Mpc / cosmo_a\n\n    def __shift_periodic(pos, left, right, domain_width):\n        \"\"\"\n        Periodically shift positions that are right of left+domain_width to\n        the left, and those left of right-domain_width to the right.\n        \"\"\"\n        for i in range(3):\n            mask = pos[:,i] >= left[i] + domain_width[i]\n            pos[mask, i] -= domain_width[i]\n            mask = pos[:,i] < right[i] - domain_width[i]\n            pos[mask, i] += domain_width[i]\n        return\n\n    def filter_sphere(self, center, radius, myiter):\n        \"\"\"\n        Filter data by masking out data outside of a sphere defined\n        by a center and radius. Account for periodicity of data, allowing\n        left/right to be outside of the domain.\n        \"\"\"\n\n        # Get left/right for periodicity considerations\n        left = center - radius\n        right = center + radius\n        for data in myiter:\n            pos = np.array([data['x'].copy(), data['y'].copy(), data['z'].copy()]).T\n\n            DW = self.true_domain_width\n            _shift_periodic(pos, left, right, DW)\n\n            # Now get all particles that are within the sphere\n            mask = ((pos-center)**2).sum(axis=1)**0.5 < radius\n\n            sdflog.debug(\"Filtering particles, returning %i out of %i\" % (mask.sum(), mask.shape[0]))\n\n            if not np.any(mask):\n                continue\n\n            filtered = {ax: pos[:, i][mask] for i, ax in enumerate('xyz')}\n            for f in data.keys():\n                if f in 'xyz':\n                    continue\n                filtered[f] = data[f][mask]\n\n            yield filtered\n\n",
+			"file": "darksky/vtkExtractHaloContents.py",
+			"file_size": 4118,
+			"file_write_time": 130772483460000000,
 			"settings":
 			{
-				"buffer_size": 1289,
+				"buffer_size": 4126,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "DarkSkyVis/DarkSkyVis/DarkSkyVis.mm",
+			"file": "darksky/utils/vtkDarkSkyUtilities.py",
 			"settings":
 			{
-				"buffer_size": 4811,
+				"buffer_size": 11471,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"contents": "char *hdr = NULL;\n    char *fname = argv[1];  // Particle filename, for example ds14_scivis_0128_e4_dt04_1.0000 \n    SDF *sdfp = SDFopen(NULL, fname);\n    if( sdfp == NULL ){\n        Error(\"Could not SDFopen(%s, %s): %s\\n\", \n            hdr?hdr:\"<null>\", \n            fname?fname:\"<null>\", \n            SDFerrstring);\n    }\n\n    // Read how many values of \"x\" there are in this file.\n    int64_t nrecs = SDFnrecs(\"x\", sdfp);\n    printf(\"How many x: %ld\\n\", nrecs);\n\n    //Read the parameter of h_100:\n    float h;\n    SDFgetfloat(sdfp, \"h_100\", &h);\n    printf(\"Value of h_100: %e\\n\", h);\n\n    // Read the first 10 values of \"x\", \"y\", and \"z\".\n    int nnames = 4; \n    char *names[4] = {\"ident\", \"x\", \"y\", \"z\"}; \n    int64_t n = 10;\n\n    // Storage for the types of x, y, z\n    enum SDF_type_enum *types = Malloc(nnames*sizeof(enum SDF_type_enum));\n    // Get variable types\n    for (int var=0; var<nnames; var++){\n        types[var] = SDFtype(names[var], sdfp);\n    }\n\n    // Storage for the array counts\n    // If the SDF file had struct{float x[3]}, acnt for x would be 3. Probably\n    // 1 for most arrays from the Dark Sky simulations.\n    int *acnt = Malloc(nnames*sizeof(int));\n    // Get variable counts if the variable is itself an array.\n    for (int var=0; var<nnames; var++){\n        acnt[var] = SDFarrcnt(names[var], sdfp);\n    }\n\n    // Storage for the strides of x, y, z \n    int *strides = Malloc(nnames*sizeof(int));\n    // Set the strides for each of the variables\n    for (int var=0; var<nnames; var++){\n        strides[var] = SDFtype_sizes[types[var]]*acnt[var];\n    }\n\n    // Declare how many of each variable to read. In this case, all are equal\n    // to n.\n    int *nread = Malloc(nnames*sizeof(int));\n    for (int var=0; var<nnames; var++){\n        nread[var] = n; \n    }\n\n    // Allocate space for variables\n    int64_t *id = Malloc(strides[0] * nread[0]);\n    float *x = Malloc(strides[1] * nread[1]);\n    float *y = Malloc(strides[2] * nread[2]);\n    float *z = Malloc(strides[3] * nread[3]);\n    void *addrs[4] = {id, x, y, z}; \n\n    // Read the data\n    SDFrdvecsarr(sdfp, nnames, names, nread, addrs, strides);\n\n    // Print it out\n    for (int ii=0; ii<n; ii++){\n        printf(\"id: %ld x: %e y: %e z: %e\\n\", id[ii], x[ii], y[ii], z[ii]);\n    }\n\n    // Now seek to the 1000th entry\n    for(int j=0; j<nnames; j++){\n        SDFseek(names[j], 1000, SDF_SEEK_SET, sdfp);\n    }\n\n    // Read the data\n    SDFrdvecsarr(sdfp, nnames, names, nread, addrs, strides);\n\n    // Print it out\n    for (int ii=0; ii<n; ii++){\n        printf(\"id: %ld x: %e y: %e z: %e\\n\", id[ii], x[ii], y[ii], z[ii]);\n    }\n\n    Free(id);\n    Free(x);\n    Free(y);\n    Free(z);\n    Free(types);\n    Free(strides);\n    Free(acnt);\n    Free(nread);\n\n    return 0;",
+			"file": "darksky/vtkDarkSkyTime.py",
 			"settings":
 			{
-				"buffer_size": 2762,
+				"buffer_size": 10678,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"contents": "pre = { \n    'wh': (467,303),\n    'xy': (522.0,160.0),\n    'tr': 467+522.0\n\n}\n\nbuttonPre = {\n    'xy': (455, -10),    \n}\n\npost = { \n    'wh': (207,134),\n    'xy': (603.96704,249.216),\n    'tr': 207+603.96704\n}\n\nbuttonPost = {\n    'xy': ( 194, -10),    \n}\n\n\n\nOn First load:\n    ===================\n    In PictureZone.java\n    ===================\n    NAME: 55538c09e1b8325b2500103f\n    getScreenSize: java.awt.Dimension[width=372,height=277]\n    System Width/Height: java.awt.Dimension[width=1280,height=800]\n    local X,Y: 21.0, 419.0\n    ===================\n\n\nPost Editing\n    ===================\n    In PictureZone.java\n    ===================\n    NAME: 55538c09e1b8325b2500103f\n    getScreenSize: java.awt.Dimension[width=563,height=420]\n    System Width/Height: java.awt.Dimension[width=1280,height=800]\n    local X,Y: 304.11096, 25.194702\n    ===================\n\n\nOn Second Load:\n    ===================\n    In PictureZone.java\n    ===================\n    NAME: 55538c09e1b8325b2500103f\n    this.getWidth(), this.getHeight(): 563, 419\n    getScreenSize: java.awt.Dimension[width=563,height=419]\n    NA get rotationradius: 104.0\n    NA System Width/Height: java.awt.Dimension[width=1280,height=800]\n    OK local X,Y: 304.0,25.0   \n    ===================\n\n\n\n Topleft getX,Y: 365.00, 139.00\nTopRight getX,Y: 928.00, 140.00\n\n\nblood -> agar/sereg\nblood-stained -> agarwaen\n\nhorn (animal) -> tarka\n\nred -> carad/caran   adj: naru\nrose -> cartel\n\n\n\n\n\"the cow that wears a blood-stained rose\"  ==>  \"i' karaar tanya lanna y' agarwaen dune\"\n",
+			"file": "darksky/vtkDarkSkyParticles.py",
 			"settings":
 			{
-				"buffer_size": 1538,
+				"buffer_size": 11338,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "DarkSkyVis/DarkSkyVis/SDFReader.mm",
+			"contents": " Provide a 100-200 word description of your research and how the image you are \n submitting provides visual documentation of your overall work at UIC. This \n description must include, but is not limited to, an explanation of how the \n image relates to your research. You may also include such information as what \n the image represents (if it is not immediately apparent), and where and/or how \n the image was created.  \n\n\nCosmological simulations are a cornerstone of our understanding of the Universe \nduring its 13.7 billion year progression from small fluctuations that we see in \nthe cosmic microwave background to today, where we are surrounded by galaxies \nand clusters of galaxies interconnected by a vast cosmic web.\n\nSimulations of the formation of structure in the Universe typically simulate \ndark matter, a collisionless fluid, as a discretized set of particles that \ninteract only gravitationally\n\n\nThis is an exploration of the Time-Space Cube using the Dark Sky particle data. \nIn this instance, between 10 and 20 timesteps were sampled around a range of \nbounds to represent the expansion of the universe. Time Layers are colored using \nJET values, with Hot colors representing the latest point in time, while cool \ncolors represent early points in time.\n\n\nThis series provides a more complete picture of how the Universe expands overtime. \nHot colors represent the 'end' of the structural-temporal expansion while the \ncool colors represent the earlier points in time.\n\n\nHowever, this was only a single point in time. The last point in time to be \nprecise. While the visualization is interesting on its own, what we would really \nlike to see is how it changes across time. \n\nHowever, rather the perform a 2D composition of a single plane, we wanted to see \nit in 3D. To do that we composed an expanding bounding box Space-Time Cube of \nSpace and Time...\n\nWe found that there was a approximately ~454.174*/mpc expansion in terms of the \ndimensional bounds of each time point. In other words, the Universe was expanding \nat a rate of about ~454.174*/Mpc in all directions. \n\nOur approach then was to extract a subset of each time step with an expanding \nboundary box which begins at the boundary of the previous time point, and \nextended to the boundary of the current time point. \n\nThis required iterating over each ds14_scivis_0128_e4_dt04_[01].[0-9][0-9]00 \nfile, 100 in total, and extracting on the order of several millions of particles. \nThis is where MPI and BlueWaters comes in handy. \n\nBy distributing each file and desired bounds to a separate process, we could extract only those point coordinates that we were interested in, in parallel, speeding up the processes significantly. Since the coordinates all fell within unique ranges, the order in which we received them is unimportant.\n\n\n\nThe submitted image explores the expansion of both space and time by aggregating\nlayers of \n\nThe submitted image consists of an aggregated sub-sampling of 20 out \nof the 100 points, sampling every 5th point in time (Or every 5th dataset). This\ntechnique was \n\nThe rate of expansion is consistent across all time points and all dimensions, \nthus for each sample, a 'band' is extracted ",
 			"settings":
 			{
-				"buffer_size": 1230,
+				"buffer_size": 3199,
+				"line_ending": "Unix",
+				"name": "Provide a 100-200 word description of your resear"
+			}
+		},
+		{
+			"contents": "def _shift_periodic(pos, left, right, domain_width):\n    \"\"\"\n    Periodically shift positions that are right of left+domain_width to\n    the left, and those left of right-domain_width to the right.\n    \"\"\"\n    for i in range(3):\n        mask = pos[:,i] >= left[i] + domain_width[i]\n        pos[mask, i] -= domain_width[i]\n        mask = pos[:,i] < right[i] - domain_width[i]\n        pos[mask, i] += domain_width[i]\n    return\n    \ndef filter_sphere(self, center, radius, myiter):\n    \"\"\"\n    Filter data by masking out data outside of a sphere defined\n    by a center and radius. Account for periodicity of data, allowing\n    left/right to be outside of the domain.\n    \"\"\"\n\n    # Get left/right for periodicity considerations\n    left = center - radius\n    right = center + radius\n    for data in myiter:\n        pos = np.array([data['x'].copy(), data['y'].copy(), data['z'].copy()]).T\n\n        DW = self.true_domain_width\n        _shift_periodic(pos, left, right, DW)\n\n        # Now get all particles that are within the sphere \n        mask = ((pos-center)**2).sum(axis=1)**0.5 < radius\n\n        sdflog.debug(\"Filtering particles, returning %i out of %i\" % (mask.sum(), mask.shape[0]))\n\n        if not np.any(mask):\n            continue\n\n        filtered = {ax: pos[:, i][mask] for i, ax in enumerate('xyz')}\n        for f in data.keys():\n            if f in 'xyz':\n                continue\n            filtered[f] = data[f][mask]\n\n        yield filtered\n",
+			"settings":
+			{
+				"buffer_size": 1458,
 				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "A View Through Space and Time of a Dark Sky\n\nMy research involves the visualization of large scale, multi-variate time-dependent scientific data. The submitted work involves the visualization of a large scale cosmological simulation illustrating the expansion and formation of galaxies and other cosmological structures within the known Universe. Cosmological simulations such as this one make up the core of our understanding of the known Universe and are an integral part of astrophysicist's ability to model those observable phenomena. \nThe dataset in question consists of 100 time-points, each consisting of over 2 million data points representing \"Dark Matter\" particles.\n\nThis visualization offers a view into the global expansion over time of the simulation, highlighting the formation of cosmological structures as well as illustrating the size and scale of the data itself.  The image consists of a aggregated sub-sampling of 20 out of the 100 points, sampling every 5th point in time (Or every 5th dataset) in order to visualize discreet steps in time. Color was used to clearly highlight those temporal differences, with warm colors representing later epochs and cool colors representing earlier epochs. Because the rate of expansion between each time point is consistent, a 'band' was extracted from each dimension of the sampled dataset and overlaid atop the previous sample, thereby encapsulating one within the next. Ultimately, this image represents one of many stepping stones towards effectively visualizing data of this scale and complexity.",
+			"settings":
+			{
+				"buffer_size": 1560,
+				"line_ending": "Unix",
+				"name": "A View Through Space and Time of a Dark Sky"
 			}
 		}
 	],
@@ -395,10 +424,14 @@
 	"build_varint": "",
 	"command_palette":
 	{
-		"height": 203.0,
-		"last_filter": "pyt",
+		"height": 339.0,
+		"last_filter": "py",
 		"selected_items":
 		[
+			[
+				"py",
+				"Set Syntax: Python"
+			],
 			[
 				"pyt",
 				"Set Syntax: Python"
@@ -406,10 +439,6 @@
 			[
 				"c++",
 				"Set Syntax: C++"
-			],
-			[
-				"py",
-				"Set Syntax: Python"
 			],
 			[
 				"pyth",
@@ -771,31 +800,40 @@
 	[
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyVis",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyVis/DarkSkyVis"
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/data/rockstar",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/data/rockstar/hlists"
 	],
 	"file_history":
 	[
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/data/rockstar/hlists/hlist_0.12000.list",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/vtkDarkSkyParticles.py",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/vtkDarkSkyFlow.py",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/vtkDarkSkyHalosPaths.py",
+		"/Users/krbalmryde/.ipython/profile_default/startup/00-profile.py",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/utils/vtkDarkSkyUtilities.py",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyVis.sublime-project",
+		"/Users/krbalmryde/Library/Application Support/Sublime Text 3/Packages/User/Preferences.sublime-settings",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/.gitignore",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/README.md",
+		"/Users/krbalmryde/Downloads/DataAnimation/DataAnimation.cxx",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyVis/DarkSkyVis/SDFReader.mm",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyVis/DarkSkyVis/SDFReader.h",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyVis/DarkSkyVis/DarkSkyVis.mm",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/docs/notes_and_musings.txt",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/vtkTest.py",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/utils/vtkDarkSkyUtilities.py",
 		"/Users/krbalmryde/.bash_aliases",
 		"/Users/krbalmryde/.bash_functions",
 		"/Users/Shared/adi/adi.pb",
 		"/Users/krbalmryde/Downloads/UnityPackages/install.ini",
 		"/Users/krbalmryde/.bash_profile",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/VTKDarkSkyFlow.py",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/.gitignore",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/utils/DarkSkyUtilities.py",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/vtkHedgeHog.py",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/VTKDarkSkyParticles.py",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/vtkDarkSkyHalos.py",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/README.md",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/VTKDarkSky-StreamLines.py",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/VTKDarkSkyTime.py",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/VTKDarkSkyHalosPaths.py",
-		"/Users/krbalmryde/Library/Application Support/Sublime Text 3/Packages/User/Preferences.sublime-settings",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyVis.sublime-project",
 		"/Users/krbalmryde/Library/Application Support/Sublime Text 3/Packages/Default/Preferences.sublime-settings",
 		"/Users/krbalmryde/Library/Application Support/Sublime Text 3/Packages/User/Python.sublime-settings",
 		"/Users/krbalmryde/Library/Application Support/Sublime Text 3/Packages/User/JSON.sublime-settings",
@@ -825,7 +863,6 @@
 		"/Users/krbalmryde/Dropbox/Class-Projects/cs594/SciVis2015/.gitignore",
 		"/Users/krbalmryde/Dropbox/Class-projects/cs594/SciVis2015/src/trackHalos.py",
 		"/Users/krbalmryde/Dropbox/Class-projects/cs594/SciVis2015/doc/examples/Animation.py",
-		"/Users/krbalmryde/.ipython/profile_default/startup/00-profile.py",
 		"/Users/krbalmryde/Dropbox/class-projects/cs594/SciVis2015/doc/examples/interactor_demo.py",
 		"/Users/krbalmryde/Dropbox/class-projects/cs594/topic8/MyNetCDF.py",
 		"/Users/krbalmryde/Dropbox/class-projects/cs594/SciVis2015/src/useful.py",
@@ -895,15 +932,7 @@
 		"/Users/krbalmryde/Dropbox/Class-Projects/cs594/SciVis2015/doc/Redshift_blueshift.svg",
 		"/Users/krbalmryde/Dropbox/Class-projects/cs594/SciVis2015/src/useful.py",
 		"/Users/krbalmryde/Dropbox/Class-Projects/cs594/SciVis2015/src/examples/yt/load_data_yt.py",
-		"/Users/krbalmryde/Dropbox/Class-projects/cs594/SciVis2015/data/ds14_scivis_0128/rockstar/out_97.list",
-		"/Users/krbalmryde/Dropbox/Class-projects/cs594/SciVis2015/data/ds14_scivis_0128/rockstar/outputs/dead_15.list",
-		"/Users/krbalmryde/Lorenzo_Is.txt",
-		"/Users/krbalmryde/Dropbox/Class-Projects/cs594/SciVis2015/src/ds14_cg_particle_velocity.py",
-		"/Users/krbalmryde/Dropbox/Class-projects/cs594/SciVis2015/src/examples/StreamlinesWithLineWidget.py",
-		"/Users/krbalmryde/Dropbox/Class-projects/cs594/SciVis2015/src/examples/StreamlinesVTK.py",
-		"/Users/krbalmryde/Dropbox/Class-projects/cs594/SciVis2015/src/examples/ColorIsosurface.py",
-		"/Users/krbalmryde/Dropbox/Class-projects/cs594/SciVis2015/Data/ds14_scivis_0128/cosmology.tbl",
-		"/Users/krbalmryde/Dropbox/Class-Projects/cs594/topic8/MyNetCDF.py"
+		"/Users/krbalmryde/Dropbox/Class-projects/cs594/SciVis2015/data/ds14_scivis_0128/rockstar/out_97.list"
 	],
 	"find":
 	{
@@ -923,6 +952,49 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"frame",
+			"vtkTimerCallback",
+			"addPoints",
+			"GetBounds",
+			"min",
+			"min()",
+			"Min",
+			"min",
+			"xyz",
+			"x",
+			"0",
+			"x",
+			"l2a",
+			"position",
+			"sdfdata.parameters.get",
+			"   ",
+			"intoTheVoid",
+			"CreateRepeatingTimer",
+			"timer_count",
+			"1.0",
+			".parameters",
+			"intoTheVoid",
+			"AdjustPoints2",
+			"->",
+			"mapOverlap",
+			"vtkDarkSkyFlow",
+			"vtkPolyData",
+			"vtkDepth",
+			"vtkTimerCallback",
+			"TimerCallbackFunction",
+			"HaloPath",
+			"intoTheVoid",
+			"__createLUT",
+			"__MakeLUT",
+			"vtkDarkSkyFlow",
+			"addPoints",
+			"            \n",
+			"__normalize",
+			"__scalar",
+			"__normalize",
+			"initVTK",
+			"vtkDarkSkyParticles",
+			"__scalar",
 			"particle.size",
 			"=*malloc",
 			"\\= * malloc",
@@ -1007,50 +1079,7 @@
 			"self",
 			"addPoints",
 			"Zoom",
-			"vtkTimerCallback",
-			"zhao2014fused",
-			"christ",
-			"temporal",
-			"Comparison",
-			"Plante",
-			"comparison",
-			"fsl",
-			"section 2",
-			"],",
-			"05",
-			"__MakeLUT",
-			"self.increment",
-			".3",
-			"1.01",
-			"timerId",
-			"vtkTimerCallback",
-			"vtkRenderWindow",
-			"frame_counter",
-			"window",
-			"base_name",
-			"-",
-			"vtkActor",
-			"__setMapper",
-			"linesPolyData",
-			"len(",
-			"Last_progenitor",
-			"Descid",
-			"fromfile",
-			"index",
-			"idex",
-			" \n        \n        ",
-			" \n        ",
-			") ",
-			"scale",
-			") ",
-			" ",
-			"glob",
-			"density",
-			"\"\"\"",
-			"gatherMeans",
-			"self.ytVelocity[:,0]",
-			"self.ytVelocity",
-			" points"
+			"vtkTimerCallback"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -1113,16 +1142,46 @@
 	"groups":
 	[
 		{
-			"selected": 3,
+			"selected": 4,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "DarkSkyVis/DarkSkyVis/SDFReader.h",
+					"file": "darksky/vtkExtractHaloContents.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1289,
+						"buffer_size": 4126,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								920,
+								920
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 4.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "darksky/utils/vtkDarkSkyUtilities.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 11471,
 						"regions":
 						{
 						},
@@ -1135,7 +1194,7 @@
 						],
 						"settings":
 						{
-							"syntax": "Packages/C++/C++.tmLanguage",
+							"syntax": "Packages/Python/Python.tmLanguage",
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
@@ -1143,139 +1202,178 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 4,
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "DarkSkyVis/DarkSkyVis/DarkSkyVis.mm",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 4811,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								3327,
-								3426
-							],
-							[
-								3781,
-								3834
-							],
-							[
-								4090,
-								4146
-							],
-							[
-								4442,
-								4496
-							],
-							[
-								4570,
-								4570
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Objective-C/Objective-C++.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 1370.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 3,
+					"stack_index": 6,
 					"type": "text"
 				},
 				{
 					"buffer": 2,
+					"file": "darksky/vtkDarkSkyTime.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2762,
+						"buffer_size": 10678,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1796,
-								1796
+								9639,
+								9639
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/C++/C++.tmLanguage",
+							"spell_check": true,
+							"syntax": "Packages/Python/Python.tmLanguage",
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 436.0,
+						"translation.y": 4853.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 2,
 					"type": "text"
 				},
 				{
 					"buffer": 3,
-					"semi_transient": false,
+					"file": "darksky/vtkDarkSkyParticles.py",
+					"semi_transient": true,
 					"settings":
 					{
-						"buffer_size": 1538,
+						"buffer_size": 11338,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1293,
-								1293
+								182,
+								187
+							],
+							[
+								9425,
+								9430
+							],
+							[
+								9496,
+								9520
+							],
+							[
+								9767,
+								9777
+							],
+							[
+								10338,
+								10347
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/Python/Python.tmLanguage"
+							"syntax": "Packages/Python/Python.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 582.0,
+						"translation.y": 4805.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3199,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2943,
+								3053
+							]
+						],
+						"settings":
+						{
+							"auto_name": "Provide a 100-200 word description of your resear",
+							"syntax": "Packages/Text/Plain text.tmLanguage",
+							"word_wrap": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 903.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
 					"type": "text"
 				},
 				{
-					"buffer": 4,
-					"file": "DarkSkyVis/DarkSkyVis/SDFReader.mm",
+					"buffer": 5,
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1230,
+						"buffer_size": 1458,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								693,
-								693
+								1039,
+								1089
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/Objective-C/Objective-C++.tmLanguage",
+							"syntax": "Packages/Python/Python.tmLanguage",
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 161.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 2,
+					"stack_index": 3,
+					"type": "text"
+				}
+			]
+		},
+		{
+			"selected": 0,
+			"sheets":
+			[
+				{
+					"buffer": 6,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1560,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								43,
+								43
+							]
+						],
+						"settings":
+						{
+							"auto_name": "A View Through Space and Time of a Dark Sky",
+							"spell_check": true,
+							"syntax": "Packages/Text/Plain text.tmLanguage",
+							"word_wrap": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
 					"type": "text"
 				}
 			]
@@ -1298,6 +1396,12 @@
 				0,
 				1,
 				1
+			],
+			[
+				0,
+				1,
+				1,
+				2
 			]
 		],
 		"cols":
@@ -1308,6 +1412,7 @@
 		"rows":
 		[
 			0.0,
+			0.499769590192,
 			1.0
 		]
 	},
@@ -1333,6 +1438,14 @@
 		"last_filter": "",
 		"selected_items":
 		[
+			[
+				"read",
+				"README.md"
+			],
+			[
+				"use",
+				"darksky/utils/vtkDarkSkyUtilities.py"
+			],
 			[
 				"utili",
 				"darksky/utils/vtkDarkSkyUtilities.py"
@@ -1372,10 +1485,6 @@
 			[
 				"str",
 				"darksky/VTKDarkSky-StreamLines.py"
-			],
-			[
-				"read",
-				"README.md"
 			],
 			[
 				"scivis",
@@ -1614,10 +1723,6 @@
 				"ISTA555/YouAreWhatYouEat/data/etc/emoji-codes.txt"
 			],
 			[
-				"use",
-				"ISTA555/YouAreWhatYouEat/src/useful.py"
-			],
-			[
 				"project2",
 				"ISTA555/GoodMovieOrBad/docs/project2_key.py"
 			],
@@ -1716,7 +1821,7 @@
 		[
 			[
 				"",
-				"~/Dropbox/Code-Projects/EVL/NiftiViewer-OLD/NiftiViewer.sublime-project"
+				"~/Dropbox/Code-Projects/EVL/LTG/ltg.sublime-project"
 			]
 		],
 		"width": 380.0

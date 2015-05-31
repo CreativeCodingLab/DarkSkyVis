@@ -42,7 +42,7 @@ def gatherHalos(fileList, ID, coords, n):
 
 
 def filter_sphere(pos, center, radius, domain_width):
-
+    pass
 
 
 
