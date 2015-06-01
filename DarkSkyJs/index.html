@@ -1,0 +1,51 @@
+<html>
+    <head>
+        <title>Step 1) Splines and Tubes</title>
+        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+        <style>
+            body {
+                margin: 0px;
+                overflow: hidden;
+                font-family: Monospace;
+                background-color: #f0f0f0;
+            }
+            canvas { width: 100%; height: 100%; }
+        </style>
+    </head>
+    <body>
+        <!-- Div Containers for our renderings
+        ================================================== -->
+        <div id="Step0"></div>
+        <div id="Step1"></div>
+        <div id="Step2"></div>
+        <div id="Example"></div>
+
+        <!-- JavaScript
+        ================================================== -->
+        <!-- jQuery -->
+        <script src="js/jquery.js"></script>
+
+        <!-- Three.js libs -->
+        <script src="js/three.min.js"></script>
+        <script src="js/Detector.js"></script>
+        <script src="js/stats.min.js"></script>
+        <script src="js/CurveExtras.js"></script>
+
+        <!-- Example Applications -->
+        <!--<script src="js/hilbert3D.js"></script>-->
+        <!--<script src="src/webgl_lines_spline.js"></script>-->
+        <!--<script src="src/webgl_geometry_extrude_splines.js"></script>-->
+
+        <!-- Application lib -->
+        <script src="src/Utils.js"></script>
+        <!--<script src="src/Step0.js"></script>-->
+        <!--<script src="src/Step1.js"></script>-->
+        <script src="src/Step2.js"></script>
+
+        <!-- Application calls -->
+        <script>
+            onCreate();
+            onFrame();
+        </script>
+    </body>
+</html>

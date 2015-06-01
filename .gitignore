@@ -14,6 +14,6 @@ data/*
 docs/papers/*
 docs/examples/*
 *.gif
-darksky/images/*
+DarkSkyPy/images/*
 .idea
 images/*
