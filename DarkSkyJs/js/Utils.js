@@ -2,6 +2,70 @@
  * Created by krbalmryde on 5/31/15.
  */
 
+// function setupCamera() {
+//     camera = new THREE.PerspectiveCamera(33, window.innerWidth / window.innerHeight, 1, 1000 );
+//     camera.position.z = 100;
+// }
+
+// function setupRenderer() {
+//     renderer = new THREE.WebGLRenderer( { antialias: true } );
+//     renderer.setPixelRatio( window.devicePixelRatio );
+//     renderer.setSize( window.innerWidth, window.innerHeight );
+//     renderer.gammaInput = true;
+//     renderer.gammaOutput = true;
+// }
+
+// function setupStats() {
+//     stats = new Stats();
+//     stats.domElement.style.position = 'absolute';
+//     stats.domElement.style.top = '0px';
+// }
+
+
+// function setupControls(camera, renderer) {
+//     controls = new THREE.OrbitControls( camera, renderer.domElement );
+//     controls.damping = 0.2;
+//     controls.addEventListener('change', onFrame);
+// }
+
+
+// function setupContainer(renderer, stats) {
+//     container = document.getElementById( 'Playground' );
+//     container.appendChild( renderer.domElement );
+//     container.appendChild( stats.domElement );
+// }
+
+
+function createSlider() {
+    slider = $('.tslider')
+    slider.noUiSlider({
+        start: [25, 75],
+        connect: true,  // shows areas of coverage
+        orientation: "vertical",
+        direction: "ltr",  //
+        behaviour: 'drag-tap',  // allows user to drag center around
+        step: 1,  // steps between values
+        format: wNumb({   // determines number format
+            decimals: 0
+        }),
+        range: {   // min and max of range
+            'min':[ 12 ],
+            '25%': [ 25 ],
+            '50%': [ 50 ],
+            '75%': [ 75 ],
+            'max': [ 100 ]
+        }
+    })
+
+    slider.noUiSlider_pips({
+        mode: 'count',
+        values: 5,
+        density: 3
+    })
+
+}
+
+
 function randPoint3D() {
     return [
         Math.floor(( Math.random() * window.innerWidth/2) ),
@@ -10,6 +74,7 @@ function randPoint3D() {
     ]
 
 }
+
 
 function randVec3D() {
     return new THREE.Vector3(

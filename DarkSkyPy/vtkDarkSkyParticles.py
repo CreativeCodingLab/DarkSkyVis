@@ -4,7 +4,7 @@ import time
 import numpy as np
 import random as rd
 import sdfpy as sdf
-from utils.vtkDarkSkyUtilities import l2a
+from vtkDarkSkyUtilities import l2a
 
 
 global ren

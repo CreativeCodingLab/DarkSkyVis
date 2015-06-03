@@ -169,3 +169,11 @@ function onKeyPress( event ) {
     }
     console.log(camera.position.z, rotatedX, rotatedY);
 }
+
+// ==========================================
+//              START OF MAIN
+// ==========================================
+function Start2() {
+    onCreate();
+    onFrame();
+}

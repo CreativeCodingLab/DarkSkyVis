@@ -10,6 +10,7 @@ Program: useful.py
 """
 import numpy as np
 import pandas as pd
+import sdfpy as sdf
 import thingking as tk
 
 
@@ -69,15 +70,35 @@ class HaloWrangler(object):
 
 class SDFLoader(object):
     """docstring for SDFLoader"""
-    def __init__(self, cMpc=False):
+    def __init__(self, filename, cMpc=True):
         super(SDFLoader, self).__init__()
         self.isCoMoving = cMpc
+        self.init(filename)
+        self.sdfSetDomain()
 
-    def __call__(self, filename):
-        self.initSDF(filename)
-        return self.sdfPosition
+        print "what the fuck?"
 
-    def initSDF(self, filename):
+    def get(self, radius=None, center=None):
+        """ Calls the instance of SDFLoader and gets data
+
+        Params:
+            filename -- String, required argument
+
+            If you give it a radius and a center, it will
+            filter those points that fall within the sphere
+            radius -- Float, Radius of a sphere
+            center -- center, Center of a sphere
+
+        Returns:
+            Returns either the raw particle positions, or it
+        """
+        if radius is None and center is None:
+            return self.sdfPosition
+        else:
+            return self.filter_sphere(center, radius)
+
+    def init(self, filename):
+        print "Lets get started"
         self.sdfParticles = sdf.load_sdf(filename)
         self.sdfHeader = self.sdfParticles.parameters
         self.sdfPosition = self.sdfGetXYZ()
@@ -134,7 +155,7 @@ class SDFLoader(object):
         kpc_to_Mpc = 1./1000
         return (proper + width/2.) * h_100 * kpc_to_Mpc / cosmo_a
 
-    def __shift_periodic(pos, left, right, domain_width):
+    def __shift_periodic(self, pos, left, right, domain_width):
         """
         Periodically shift positions that are right of left+domain_width to
         the left, and those left of right-domain_width to the right.
@@ -146,37 +167,37 @@ class SDFLoader(object):
             pos[mask, i] += domain_width[i]
         return
 
-    def filter_sphere(self, center, radius, myiter):
+    def filter_sphere(self, center, radius):
         """
         Filter data by masking out data outside of a sphere defined
         by a center and radius. Account for periodicity of data, allowing
         left/right to be outside of the domain.
         """
-
         # Get left/right for periodicity considerations
         left = center - radius
         right = center + radius
-        for data in myiter:
-            pos = np.array([data['x'].copy(), data['y'].copy(), data['z'].copy()]).T
+        pos = self.sdfPosition.copy()
 
-            DW = self.true_domain_width
-            _shift_periodic(pos, left, right, DW)
+        DW = self.true_domain_width
+        self._shift_periodic(pos, left, right, DW)
 
-            # Now get all particles that are within the sphere
-            mask = ((pos-center)**2).sum(axis=1)**0.5 < radius
+        # Now get all particles that are within the sphere
+        mask = ((pos-center)**2).sum(axis=1)**0.5 < radius
 
-            sdflog.debug("Filtering particles, returning %i out of %i" % (mask.sum(), mask.shape[0]))
+        sdflog.debug("Filtering particles, returning %i out of %i" % (mask.sum(), mask.shape[0]))
 
-            if not np.any(mask):
+        if not np.any(mask):
+            pass
+        print "mask is ", mask, mask.size
+        filtered = {ax: pos[:, i][mask] for i, ax in enumerate('xyz')}
+        print "filtered Before", filtered
+        filtered["id"] = self.sdfIdent[mask]
+        for f in data.keys():
+            if f in 'xyz':
                 continue
-
-            filtered = {ax: pos[:, i][mask] for i, ax in enumerate('xyz')}
-            for f in data.keys():
-                if f in 'xyz':
-                    continue
-                filtered[f] = data[f][mask]
-
-            yield filtered
+            filtered[f] = data[f][mask]
+            print "filtered After", filtered[f]
+        yield filtered
 
 
 class Particle(object):
@@ -197,7 +218,7 @@ class Halo(object):
     loadtxt(prefix+"rockstar/hlists/hlist_1.00000.list", unpack=True)
     """
     def __init__(self, data):
-        self.data = "hello";
+        # self.time = time; # The timepoint at which the halo exists
         self.scale = data[0] #Scale: Scale factor of halo.
         self.id = int(data[1]) #ID: ID of halo (unique across entire simulation).
         self.desc_scale = data[2] #Desc_Scale: Scale of descendant halo, if applicable.

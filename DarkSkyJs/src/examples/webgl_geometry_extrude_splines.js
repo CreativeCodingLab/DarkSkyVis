@@ -167,9 +167,6 @@ function animateCamera( toggle ) {
 }
 
 
-init();
-animate();
-
 function init() {
 
     container = document.createElement('div');
@@ -386,4 +383,12 @@ function render() {
 
     renderer.render( scene, animation === true ? splineCamera : camera );
 
+}
+
+// ==========================================
+//              START OF MAIN
+// ==========================================
+function Start() {
+    init();
+    animate();
 }

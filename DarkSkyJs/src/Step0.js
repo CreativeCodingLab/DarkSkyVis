@@ -125,3 +125,11 @@ function onKeyPress( event ) {
     }
     console.log(camera.position.z);
 }
+
+// ==========================================
+//              START OF MAIN
+// ==========================================
+function Start() {
+    onCreate();
+    onFrame();
+}

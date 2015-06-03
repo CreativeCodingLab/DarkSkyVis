@@ -9,9 +9,6 @@ var mouseX = 0, mouseY = 0,
     windowHalfY = window.innerHeight / 2,
     camera, scene, renderer, material;
 
-init();
-animate();
-
 function init() {
 
     var i, n_sub, container;
@@ -183,4 +180,12 @@ function render() {
 
     renderer.render( scene, camera );
 
+}
+
+// ==========================================
+//              START OF MAIN
+// ==========================================
+function Start() {
+    init();
+    animate();
 }

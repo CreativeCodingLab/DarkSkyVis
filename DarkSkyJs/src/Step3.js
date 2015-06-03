@@ -6,6 +6,7 @@
 var lineMesh;
 var container, stats;
 var camera, scene, renderer;
+var slider;
 
 /* ==========================================
  *              onCreate
@@ -16,26 +17,35 @@ var camera, scene, renderer;
  */
 function onCreate() {
 
-    // Setup THREE.js stuff
+    /* Setting up THREE.js stuff */
+
+    // Create our scene
     scene = new THREE.Scene();
+
+    // Get our Camera working
     camera = new THREE.PerspectiveCamera(33, window.innerWidth / window.innerHeight, 1, 1000 );
     camera.position.z = 100;
 
+    // Set up the Renderer
     renderer = new THREE.WebGLRenderer( { antialias: true } );
     renderer.setPixelRatio( window.devicePixelRatio );
     renderer.setSize( window.innerWidth, window.innerHeight );
     renderer.gammaInput = true;
     renderer.gammaOutput = true;
 
+    // Setup our slider
+    createSlider();
+
     // Setup Stats object
     stats = new Stats();
     stats.domElement.style.position = 'absolute';
     stats.domElement.style.top = '0px';
 
+    // Make some Spline Geometry
     createSplineGeometry(20);
 
     // Setup Container stuff
-    container = document.getElementById( 'Step1' );
+    container = document.getElementById( 'Sandbox' );
     container.appendChild( renderer.domElement );
     container.appendChild( stats.domElement );
 
@@ -43,6 +53,7 @@ function onCreate() {
     document.addEventListener( 'keypress', onKeyPress, false );
     window.addEventListener( 'resize', onReshape, false );
 }
+
 
 function createSplineGeometry( nDivisions ) {
     var segments = 10;
@@ -77,22 +88,30 @@ function createSplineGeometry( nDivisions ) {
  * ================================== */
 function onFrame() {
     requestAnimationFrame( onFrame );
-    drawStep1();
+    draw();
+    display();
     stats.update();
 }
 
-/*
+/* ===========================================================
  * Our draw function, will control modifications to the scene
  * Such as rotations etc. Updates the scene and camera
- */
-function drawStep1() {
-    var time = Date.now() * 0.001;
+ * ========================================================== */
+function draw() {
+    // var time = Date.now() * 0.001;
 
-    lineMesh.rotation.x = time * 0.25;
-    lineMesh.rotation.y = time * 0.5;
-
+    // lineMesh.rotation.x = time * 0.25;
+    // lineMesh.rotation.y = time * 0.5;
     renderer.render( scene, camera );
 }
+
+function display() {
+    console.log(slider.val())
+    slider.Link('lower').to($('#value-lower'))
+    slider.Link('upper').to($('#value-upper'))
+
+}
+
 
 // ==========================================
 //              onReshape
