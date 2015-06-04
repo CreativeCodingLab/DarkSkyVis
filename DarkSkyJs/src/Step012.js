@@ -40,7 +40,7 @@ function onCreate() {
     container.appendChild( stats.domElement );
 
     // Add listeners
-    document.addEventListener( 'keypress', onKeyPress, false );
+    document.addEventListener( 'keypress', handleKeys, false );
     window.addEventListener( 'resize', onReshape, false );
 }
 

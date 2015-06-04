@@ -14,10 +14,14 @@ function initScene() {
 
 function initCamera() {
     // Get our Camera working
-    camera = new THREE.PerspectiveCamera(33, window.innerWidth / window.innerHeight, 0.1, 1000 );
-    camera.position.set(40.5,23.5,39.5);
     //camera.lookAt(0,0,0);
+    camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 200 );
+    camera.position.set(58,32.5,53.5);
+    camera.rotateX(0.050);
+    camera.rotateY(-0.25);
+    camera.rotateZ(1.55);
 }
+
 
 function initRenderer() {
     // Set up the Renderer
@@ -49,7 +53,7 @@ function initContainer() {
     container.appendChild( stats.domElement );
 
     // Add listeners
-    document.addEventListener( 'keypress', onKeyPress, false );
+    document.addEventListener( 'keypress', handleKeys, false );
     window.addEventListener( 'resize', onReshape, false );
 }
 
@@ -57,7 +61,7 @@ function initContainer() {
 function initSlider() {
     slider = $('.tslider')
     slider.noUiSlider({
-        start: [25, 75],
+        start: [0, 50],
         connect: true,  // shows areas of coverage
         orientation: "vertical",
         direction: "ltr",  //
