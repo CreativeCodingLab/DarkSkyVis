@@ -2,41 +2,59 @@
  * Created by krbalmryde on 5/31/15.
  */
 
-// function setupCamera() {
-//     camera = new THREE.PerspectiveCamera(33, window.innerWidth / window.innerHeight, 1, 1000 );
-//     camera.position.z = 100;
-// }
+function initScene() {
+    // Create our scene
+    scene = new THREE.Scene();
 
-// function setupRenderer() {
-//     renderer = new THREE.WebGLRenderer( { antialias: true } );
-//     renderer.setPixelRatio( window.devicePixelRatio );
-//     renderer.setSize( window.innerWidth, window.innerHeight );
-//     renderer.gammaInput = true;
-//     renderer.gammaOutput = true;
-// }
-
-// function setupStats() {
-//     stats = new Stats();
-//     stats.domElement.style.position = 'absolute';
-//     stats.domElement.style.top = '0px';
-// }
+    // Adding our Group object
+    group = new THREE.Group();
+    scene.add( group );
+}
 
 
-// function setupControls(camera, renderer) {
-//     controls = new THREE.OrbitControls( camera, renderer.domElement );
-//     controls.damping = 0.2;
-//     controls.addEventListener('change', onFrame);
-// }
+function initCamera() {
+    // Get our Camera working
+    camera = new THREE.PerspectiveCamera(33, window.innerWidth / window.innerHeight, 0.1, 1000 );
+    camera.position.set(40.5,23.5,39.5);
+    //camera.lookAt(0,0,0);
+}
+
+function initRenderer() {
+    // Set up the Renderer
+    renderer = new THREE.WebGLRenderer( { antialias: true } );
+    renderer.setPixelRatio( window.devicePixelRatio );
+    renderer.setSize( window.innerWidth, window.innerHeight );
+    renderer.gammaInput = true;
+    renderer.gammaOutput = true;
+}
+
+function initStats() {
+    // Setup Stats object
+    stats = new Stats();
+    stats.domElement.style.position = 'absolute';
+    stats.domElement.style.top = '0px';
+}
+
+function initControls() {
+    controls = new THREE.OrbitControls( camera, renderer.domElement );
+    controls.damping = 0.2;
+    controls.addEventListener('change', onFrame);
+}
 
 
-// function setupContainer(renderer, stats) {
-//     container = document.getElementById( 'Playground' );
-//     container.appendChild( renderer.domElement );
-//     container.appendChild( stats.domElement );
-// }
+function initContainer() {
+    // Setup Container stuff
+    container = document.getElementById( 'Sandbox' );
+    container.appendChild( renderer.domElement );
+    container.appendChild( stats.domElement );
+
+    // Add listeners
+    document.addEventListener( 'keypress', onKeyPress, false );
+    window.addEventListener( 'resize', onReshape, false );
+}
 
 
-function createSlider() {
+function initSlider() {
     slider = $('.tslider')
     slider.noUiSlider({
         start: [25, 75],
@@ -49,11 +67,11 @@ function createSlider() {
             decimals: 0
         }),
         range: {   // min and max of range
-            'min':[ 12 ],
+            'min':[ 0 ],
             '25%': [ 25 ],
             '50%': [ 50 ],
             '75%': [ 75 ],
-            'max': [ 100 ]
+            'max': [ 88 ]
         }
     })
 
@@ -62,9 +80,7 @@ function createSlider() {
         values: 5,
         density: 3
     })
-
 }
-
 
 function randPoint3D() {
     return [
@@ -72,9 +88,7 @@ function randPoint3D() {
         Math.floor(( Math.random() * window.innerHeight/2) ),
         Math.floor(( Math.random() * 1000/2) )
     ]
-
 }
-
 
 function randVec3D() {
     return new THREE.Vector3(
@@ -84,6 +98,7 @@ function randVec3D() {
     )
 
 }
+
 
 function generatePoints(n) {
     var points = [];
@@ -100,6 +115,102 @@ function generateVecs(n) {
     }
     return points
 }
+
+
+function getHaloPos() {
+    return [
+        [57.75873, 30.51175, 50.67266],
+        [57.79088, 30.5159, 50.69601],
+        [57.83078, 30.52357, 50.71575],
+        [57.82203, 30.54809, 50.76583],
+        [57.87087, 30.58582, 50.83687],
+        [57.93389, 30.59735, 50.90918],
+        [57.98787, 30.63187, 50.95484],
+        [57.96375, 30.67236, 50.98038],
+        [57.95668, 30.67881, 51.00823],
+        [58.02142, 30.75831, 50.96286],
+        [58.07133, 30.85571, 50.9359],
+        [57.96853, 30.97486, 51.07055],
+        [57.90994, 31.1146, 51.21024],
+        [57.89844, 31.17443, 51.2174],
+        [57.97069, 31.21174, 51.11368],
+        [58.00572, 31.28487, 51.03929],
+        [57.95961, 31.38728, 51.07526],
+        [57.97475, 31.47992, 51.09749],
+        [58.01149, 31.51934, 51.02764],
+        [58.02086, 31.6022, 51.04963],
+        [57.96339, 31.76309, 51.09052],
+        [57.96178, 31.83946, 51.11997],
+        [57.94487, 31.91908, 51.14442],
+        [57.91059, 32.02015, 51.15498],
+        [57.89152, 32.16246, 51.24106],
+        [57.86091, 32.2483, 51.19536],
+        [57.85397, 32.36631, 51.22644],
+        [57.78991, 32.49715, 51.24912],
+        [57.80479, 32.60713, 51.27965],
+        [57.7815, 32.71111, 51.27673],
+        [57.79481, 32.80915, 51.33656],
+        [57.81707, 32.9567, 51.32062],
+        [57.83929, 33.05416, 51.31346],
+        [57.84676, 33.18587, 51.26931],
+        [57.87991, 33.25417, 51.20763],
+        [57.87494, 33.39693, 51.14116],
+        [57.90676, 33.54618, 51.09335],
+        [57.93448, 33.68033, 51.02179],
+        [57.92148, 33.82469, 50.99213],
+        [57.87834, 34.00926, 51.00136],
+        [57.88257, 34.20378, 50.97726],
+        [57.87118, 34.38932, 50.96254],
+        [57.87407, 34.45444, 50.95184],
+        [57.89493, 34.47562, 50.93322],
+        [57.92727, 34.46155, 50.89215],
+        [57.97128, 34.45876, 50.85232],
+        [58.03923, 34.43966, 50.82545],
+        [58.11383, 34.45456, 50.78511],
+        [58.14222, 34.46873, 50.798],
+        [58.14862, 34.50955, 50.79968],
+        [58.15957, 34.58863, 50.80075],
+        [58.193, 34.65878, 50.77924],
+        [58.20342, 34.72156, 50.75805],
+        [58.23159, 34.73777, 50.75689],
+        [58.25476, 34.71479, 50.74926],
+        [58.28796, 34.69894, 50.74698],
+        [58.3191, 34.69461, 50.74161],
+        [58.35324, 34.70192, 50.72529],
+        [58.36459, 34.72863, 50.71767],
+        [58.38504, 34.72575, 50.71696],
+        [58.4113, 34.71393, 50.7233],
+        [58.45222, 34.69444, 50.7271],
+        [58.46251, 34.67957, 50.74764],
+        [58.484, 34.66694, 50.75812],
+        [58.49901, 34.67278, 50.76255],
+        [58.52275, 34.67596, 50.76274],
+        [58.5481, 34.68735, 50.76994],
+        [58.57067, 34.67679, 50.77434],
+        [58.60401, 34.67899, 50.77319],
+        [58.62706, 34.66115, 50.7733],
+        [58.64311, 34.65017, 50.77291],
+        [58.67706, 34.6545, 50.76352],
+        [58.69662, 34.65685, 50.75561],
+        [58.72255, 34.67529, 50.74588],
+        [58.73161, 34.6875, 50.7517],
+        [58.74434, 34.69504, 50.75372],
+        [58.75072, 34.68461, 50.76976],
+        [58.76452, 34.69777, 50.76882],
+        [58.77621, 34.72059, 50.7731],
+        [58.79119, 34.71944, 50.76517],
+        [58.80458, 34.73164, 50.76913],
+        [58.8218, 34.74985, 50.76718],
+        [58.84008, 34.7614, 50.76452],
+        [58.85658, 34.77699, 50.75642],
+        [58.8681, 34.79439, 50.75819],
+        [58.88419, 34.80035, 50.76186],
+        [58.89342, 34.81076, 50.76558],
+        [58.90549, 34.81987, 50.76499],
+        [58.91978, 34.82618, 50.76717]
+    ]
+}
+
 
 function getPoints() {
     return [[39.58268, 43.89976, 24.72711],

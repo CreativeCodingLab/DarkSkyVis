@@ -6,7 +6,9 @@
 var lineMesh;
 var container, stats;
 var camera, scene, renderer;
-var slider;
+var slider, box;
+var head, tail;
+var sliderHasChanged = false;
 
 /* ==========================================
  *              onCreate
@@ -22,62 +24,90 @@ function onCreate() {
     // Create our scene
     scene = new THREE.Scene();
 
-    // Get our Camera working
-    camera = new THREE.PerspectiveCamera(33, window.innerWidth / window.innerHeight, 1, 1000 );
-    camera.position.z = 100;
+    // Adding our Group object
+    group = new THREE.Group();
+    scene.add( group );
 
-    // Set up the Renderer
-    renderer = new THREE.WebGLRenderer( { antialias: true } );
-    renderer.setPixelRatio( window.devicePixelRatio );
-    renderer.setSize( window.innerWidth, window.innerHeight );
-    renderer.gammaInput = true;
-    renderer.gammaOutput = true;
+    // Get our Camera working
+    initCamera();
 
     // Setup our slider
-    createSlider();
-
-    // Setup Stats object
-    stats = new Stats();
-    stats.domElement.style.position = 'absolute';
-    stats.domElement.style.top = '0px';
+    initSlider();
 
     // Make some Spline Geometry
     createSplineGeometry(20);
 
-    // Setup Container stuff
-    container = document.getElementById( 'Sandbox' );
-    container.appendChild( renderer.domElement );
-    container.appendChild( stats.domElement );
+    // Set up the Renderer
+    initRenderer();
 
-    // Add listeners
-    document.addEventListener( 'keypress', onKeyPress, false );
-    window.addEventListener( 'resize', onReshape, false );
+    // Setup Stats object
+    initStats();
+
+    // Setup Container stuff
+    initContainer();
 }
 
-
-function createSplineGeometry( nDivisions ) {
-    var segments = 10;
-    var colors = [];
-    var geometry = new THREE.Geometry();
-    var points = generatePoints(segments);
-    var spline = new THREE.Spline();
-        spline.initFromArray(points);
+function createSplineGeometry(nDivisions) {
+    head = slider.val()[0];
+    tail = slider.val()[1];
 
     var index, xyz;
+    var colors = [];
+    var geometry = new THREE.Geometry();
+    var points = getHaloPos();
+
+    var spline = new THREE.Spline();
+        spline.initFromArray(points.slice(head,tail));
+
+    var max = points.length * nDivisions;
     for (var i = 0; i < points.length * nDivisions ; i++ ) {
         index = i / (points.length * nDivisions);
         xyz = spline.getPoint(index);
 
         geometry.vertices[i] = new THREE.Vector3( xyz.x, xyz.y, xyz.z );
 
-        colors[ i ] = new THREE.Color((xyz.x / 100), (xyz.y / 100), (xyz.z / 100));
+        colors[ i ] = new THREE.Color((Math.random()), (i / max), (Math.random()));
     }
+
     geometry.colors = colors;
     var material = new THREE.LineBasicMaterial( { color: 0xffffff, opacity: 1, linewidth: 3, vertexColors: THREE.VertexColors } );
 
     lineMesh = new THREE.Line(geometry, material);
-    lineMesh.scale.x = lineMesh.scale.y = lineMesh.scale.z = 0.3*.15;
-    scene.add( lineMesh );
+    lineMesh.scale.x = lineMesh.scale.y = lineMesh.scale.z = 0.7;
+
+    box = new THREE.BoxHelper(lineMesh);
+    box.material.color.setHex( 0x080808 );
+    scene.add( box );
+    scene.add(lineMesh);
+
+}
+
+
+function updateGeometry(nDivisions) {
+    var verts = [];
+    var points = getHaloPos();
+    var spline = new THREE.Spline();
+
+    if ((tail - head) == 0) {
+        spline.initFromArray(points[head]);
+    } else {
+        spline.initFromArray(points.slice(head,tail));
+    }
+
+    colors = [];
+    var max = points.length * nDivisions;
+    for (var i = 0; i < points.length * nDivisions ; i++ ) {
+        index = i / (points.length * nDivisions);
+        xyz = spline.getPoint(index);
+
+        verts[i] = new THREE.Vector3( xyz.x, xyz.y, xyz.z );
+        colors[ i ] = new THREE.Color((Math.random()), (i / max), (Math.random()));
+    }
+    lineMesh.geometry.vertices = verts;
+    lineMesh.geometry.colors = colors;
+    lineMesh.geometry.verticesNeedUpdate = true;
+    lineMesh.geometry.colorsNeedUpdate = true;
+    box.update(lineMesh)
 }
 
 
@@ -87,10 +117,18 @@ function createSplineGeometry( nDivisions ) {
  *  associated draw function
  * ================================== */
 function onFrame() {
+    //lineMesh.geometry.vertices
+    if ((head !== slider.val()[0]) || (tail !== slider.val()[1])) {
+        console.log("they are different");
+        sliderHasChanged = true;
+        head = slider.val()[0];
+        tail = slider.val()[1];
+        updateGeometry(20);
+    }
+
     requestAnimationFrame( onFrame );
-    draw();
-    display();
     stats.update();
+    draw();
 }
 
 /* ===========================================================
@@ -98,17 +136,22 @@ function onFrame() {
  * Such as rotations etc. Updates the scene and camera
  * ========================================================== */
 function draw() {
-    // var time = Date.now() * 0.001;
+    display();
 
-    // lineMesh.rotation.x = time * 0.25;
-    // lineMesh.rotation.y = time * 0.5;
+    //var time = Date.now() * 0.001;
+    //lineMesh.rotation.x = time * 0.25;
+    //lineMesh.rotation.y = time * 0.5;
     renderer.render( scene, camera );
 }
 
 function display() {
-    console.log(slider.val())
-    slider.Link('lower').to($('#value-lower'))
-    slider.Link('upper').to($('#value-upper'))
+    slider.Link('lower').to($('#value-lower'));
+    slider.Link('upper').to($('#value-upper'));
+
+    var start = slider.val()[0];
+    var end = slider.val()[1];
+
+    // Halos.slice(start, end)
 
 }
 
@@ -125,20 +168,37 @@ function onReshape() {
     renderer.setSize( window.innerWidth, window.innerHeight );
 }
 
+var rotatedY = 0;
+var rotatedX = 0;
 function onKeyPress( event ) {
     var key = event.keyCode;
-    console.log(key)
-    switch(key) {
-        case 119:
+    console.log(key);
+    switch (key) {
+        case 119:  // w
             camera.position.z += 1;
             break;
-        case 115:
+        case 115: // s
             camera.position.z -= 1;
             break;
+        case 97: // a
+            camera.rotateY(0.05);
+            rotatedY += 0.05;
+            break;
+        case 100:  // d
+            camera.rotateY(-0.05);
+            rotatedY -= 0.05;
+            break;
+        case 113: // q
+            camera.rotateX(0.05);
+            rotatedX += 0.05;
+            break;
+        case 101: // e
+            camera.rotateX(-0.05);
+            rotatedX -= 0.05;
+            break;
     }
-    console.log(camera.position.z);
+    console.log(lineMesh.position, camera.position.z, rotatedX, rotatedY);
 }
-
 
 // ==========================================
 //              START OF MAIN
