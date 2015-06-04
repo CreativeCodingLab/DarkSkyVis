@@ -86,6 +86,21 @@ function initSlider() {
     })
 }
 
+
+
+function tweakPoints(points, offset) {
+    var newPoints = [];
+    for (var i = 0; i < points.length; i++) {
+        newPoints.push([
+            points[i][0] + offset,
+            points[i][1] + offset,
+            points[i][2] + offset
+        ]);
+    }
+    return newPoints;
+}
+
+
 function randPoint3D() {
     return [
         Math.floor(( Math.random() * window.innerWidth/2) ),
