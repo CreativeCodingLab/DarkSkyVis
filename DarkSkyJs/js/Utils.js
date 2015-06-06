@@ -92,9 +92,9 @@ function tweakPoints(points, offset) {
     var newPoints = [];
     for (var i = 0; i < points.length; i++) {
         newPoints.push([
-            points[i][0] + offset,
-            points[i][1] + offset,
-            points[i][2] + offset
+            points[i][0] + offset.x,
+            points[i][1] + offset.y,
+            points[i][2] + offse.zt
         ]);
     }
     return newPoints;
@@ -115,7 +115,30 @@ function randVec3D() {
         Math.floor(( Math.random() * window.innerHeight/2) ),
         Math.floor(( Math.random() * 1000/2) )
     )
+}
 
+
+function randXYZ() {
+    return [
+        Math.random() + 57,
+        Math.random() + 30,
+        Math.random() + 50
+    ]
+}
+
+function initPoints(n) {
+    haloPoints.push(getHaloPos());
+    haloPoints.push(getHaloPos2());
+    for (var i=0; i < getHaloPos().length; i++) {
+        var arr = [];
+        for (var j = 0; j < n; j++) {
+            var x=getHaloPos()[i][0] + Math.random(),
+                y=getHaloPos()[i][1] + Math.random(),
+                z=getHaloPos()[i][2] + Math.random();
+            arr.push([x,y,z])
+        }
+        haloPoints.push(arr)
+    }
 }
 
 
@@ -231,7 +254,7 @@ function getHaloPos() {
 }
 
 
-function getPoints() {
+function getHaloPos2() {
     return [[39.58268, 43.89976, 24.72711],
         [40.1916, 43.70065, 24.50798],
         [40.22467, 43.67676, 24.44666],

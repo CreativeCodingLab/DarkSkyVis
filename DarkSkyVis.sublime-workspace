@@ -4,6 +4,10 @@
 		"selected_items":
 		[
 			[
+				"halo",
+				"haloData"
+			],
+			[
 				"line",
 				"lineMesh"
 			],
@@ -360,50 +364,43 @@
 	"buffers":
 	[
 		{
-			"file": "DarkSkyJs/src/Step3.js",
+			"file": "DarkSkyPy/PrepProcDMH.py",
 			"settings":
 			{
-				"buffer_size": 4193,
+				"buffer_size": 7729,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "DarkSkyPy/extractHaloAndParticles.py",
+			"file": "DarkSkyPy/exampleSDF.py",
 			"settings":
 			{
-				"buffer_size": 13164,
+				"buffer_size": 6058,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "DarkSkyPy/Halo_257.0_t12.json",
+			"contents": "halo X 0.30641 61.7989\nhalo Y 3.90273 59.02258\n\nproper X -5450.08642578125 5450.0751953125\nproper Y -5450.09033203125 5450.08544921875\n\ncoming X 489.5834045410156 552.083251953125\ncoming Y 489.5833435058594 552.0833740234375\n\n",
 			"settings":
 			{
-				"buffer_size": 18155,
+				"buffer_size": 226,
+				"line_ending": "Unix",
+				"name": "halo X 0.30641 61.7989"
+			}
+		},
+		{
+			"contents": "# ./examples/load_data.py\n# Required libraries:\n# pip install sdfpy\n# pip install thingking\n\nimport sys\nimport numpy as np\nfrom sdfpy import load_sdf\nfrom thingking import loadtxt\n\n\nfor i in np.arange(0.12, 1.01, 0.01)[0:1]:\n    if len(str(i)) == 3:\n        time = str(i)+'0'\n    else:\n        time = str(i)\n\n    print time\n    prefix = \"http://darksky.slac.stanford.edu/scivis2015/data/ds14_scivis_0128/\"\n    # Load N-body particles from a = 1.0 dataset. Particles have positions with\n    # units of proper kpc, and velocities with units of km/s.\n    particles = load_sdf(prefix+\"ds14_scivis_0128_e4_dt04_\" + time + \"00\")\n\n    # Load the a=1 Rockstar hlist file. The header of the file lists the useful\n    # units/information.\n    scale, id, desc_scale, desc_id, num_prog, pid, upid, desc_pid, phantom, \\\n        sam_mvir, mvir, rvir, rs, vrms, mmp, scale_of_last_MM, vmax, x, y, z, \\\n        vx, vy, vz, Jx, Jy, Jz, Spin, Breadth_first_ID, Depth_first_ID, \\\n        Tree_root_ID, Orig_halo_ID, Snap_num, Next_coprogenitor_depthfirst_ID, \\\n        Last_progenitor_depthfirst_ID, Rs_Klypin, M_all, M200b, M200c, M500c, \\\n        M2500c, Xoff, Voff, Spin_Bullock, b_to_a, c_to_a, A_x, A_y, A_z, \\\n        b_to_a_500c, c_to_a_500c, A_x_500c, A_y_500c, A_z_500c, T_over_U, \\\n        M_pe_Behroozi, M_pe_Diemer, Macc, Mpeak, Vacc, Vpeak, Halfmass_Scale, \\\n        Acc_Rate_Inst, Acc_Rate_100Myr, Acc_Rate_Tdyn = \\\n        loadtxt(prefix+\"rockstar/hlists/hlist_\" + time + \"000.list\", unpack=True)\n\n    # Now we want to convert the proper kpc of the particle position to comoving\n    # Mpc/h, a common unit used in computational cosmology in general, but\n    # specifically is used as the output unit in the merger tree halo list loaded\n    # in above. First we get the Hubble parameter, here stored as 'h_100' in the\n    # SDF parameters. Then we load the simulation width, L0, which is also in\n    # proper kpc. Finally we load the scale factor, a, which for this particular\n    # snapshot is equal to 1 since we are loading the final snapshot from the\n    # simulation.\n    h_100 = particles.parameters['h_100']\n    width = particles.parameters['L0']\n    cosmo_a = particles.parameters['a']\n    kpc_to_Mpc = 1./1000\n    sl = slice(0,None)\n\n    # Define a simple function to convert proper to comoving Mpc/h.\n    # convert_to_cMpc = lambda proper: (proper + width/2.) * h_100 * kpc_to_Mpc / cosmo_a\n    # conversion2: convert_to_cMpc = lambda proper: proper * h_100 * kpc_to_Mpc / cosmo_a\n    # conversion3: convert_to_cMpc = lambda proper: (proper/2.) * h_100 * kpc_to_Mpc / 1.0\n    # conversion4: convert_to_cMpc = lambda proper: (proper + width/2.) * h_100 * kpc_to_Mpc\n    # conversion5: convert_to_cMpc = lambda proper: (proper ) * h_100 * kpc_to_Mpc\n    # conversion6: convert_to_cMpc = lambda proper: proper * h_100\n    # conversion7: convert_to_cMpc = lambda proper: (proper * h_100) * cosmo_a\n    # conversion8: convert_to_cMpc = lambda proper: (proper * h_100) * kpc_to_Mpc\n    # conversion9: convert_to_cMpc = lambda proper: (proper * h_100) * (kpc_to_Mpc / cosmo_a)\n    # conversion10: convert_to_cMpc = lambda proper: (kpc_to_Mpc /(proper * h_100)) * cosmo_a\n    # conversion12: convert_to_cMpc = lambda proper: proper * kpc_to_Mpc / cosmo_a\n    # conversion13:  convert_to_cMpc = lambda proper: proper * (kpc_to_Mpc / cosmo_a)\n    # convert_to_cMpc = lambda proper: (kpc_to_Mpc /(proper * h_100)) * cosmo_a\n    convert_to_cMpc = lambda proper: (proper + width) * h_100 * kpc_to_Mpc / cosmo_a\n\n    x_kpc_min = particles['x'].min()\n    y_kpc_min = particles['y'].min()\n    z_kpc_min = particles['z'].min()\n\n    x_kpc_max  = particles['x'].max()\n    y_kpc_max  = particles['y'].max()\n    z_kpc_max  = particles['z'].max()\n\n    x_mpc_min = convert_to_cMpc(x_kpc_min)\n    y_mpc_min = convert_to_cMpc(y_kpc_min)\n    z_mpc_min = convert_to_cMpc(z_kpc_min)\n\n    x_mpc_max = convert_to_cMpc(x_kpc_max)\n    y_mpc_max = convert_to_cMpc(y_kpc_max)\n    z_mpc_max = convert_to_cMpc(z_kpc_max)\n\n    x_halo_min, y_halo_min, z_halo_min = x.min(), y.min(), z.min()\n    x_halo_max, y_halo_max, z_halo_max = x.max(), y.max(), z.max()\n\n\n    print \"\\n\\nProper XYZ_Min, {0}, {1}, {2}\".format(x_kpc_min, y_kpc_min, z_kpc_min)\n    print \"Proper XYZ_Max, {0}, {1}, {2}\".format(x_kpc_max, y_kpc_max, z_kpc_max)\n    print \"\\ncomoving XYZ_Min, {0}, {1}, {2}\".format(x_mpc_min, y_mpc_min, z_mpc_min)\n    print \"comoving XYZ_Max, {0}, {1}, {2}\".format(x_mpc_max, y_mpc_max, z_mpc_max)\n    print \"\\nHalo XYZ min, {0}, {1}, {2}\".format(x_halo_min, y_halo_min, z_halo_min)\n    print \"Halo XYZ max, {0}, {1}, {2}\".format(x_halo_max, y_halo_max, z_halo_max)\n\n    # print \"Halo position, {0}, {1}, {2}\".format(x[0], y[0], z[0])\n    # Plot all the particles, adding a bit of alpha so that we see the density of\n    # points.\n    import matplotlib.pylab as pl\n    pl.figure(figsize=[10,10])\n\n    pl.scatter(convert_to_cMpc(particles['x'][sl]),\n               convert_to_cMpc(particles['y'][sl]), color='b', s=1.0, alpha=0.05)\n\n    # Plot all the halos in red.\n    pl.scatter(x, y, color='r', alpha=0.1)\n\n    # Add some labels\n    pl.xlabel('x [cMpc/h]')\n    pl.ylabel('y [cMpc/h]')\n    # pl.savefig(\"halos_and_particles_\"+time+\".png\", bbox_inches='tight')\n    pl.savefig(\"halos_and_particles_\"+time+\"_conversion.png\", bbox_inches='tight')\n\n    # Could now consider coloring halos by any of the various quantities above.\n    # Perhaps mvir would be nice to show the virial Mass of the halo, or we could\n    # scale the points by the virial radius, rvir.",
+			"settings":
+			{
+				"buffer_size": 5524,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"contents": "\ndef _shift_periodic(pos, left, right, domain_width):\n    \"\"\"\n    Periodically shift positions that are right of left+domain_width to\n    the left, and those left of right-domain_width to the right.\n    \"\"\"\n    for i in range(3):\n        mask = pos[:,i] >= left[i] + domain_width[i]\n        pos[mask, i] -= domain_width[i]\n        mask = pos[:,i] < right[i] - domain_width[i]\n        pos[mask, i] += domain_width[i]\n    return\n\ndef filter_sphere(self, center, radius, myiter):\n    \"\"\"\n    Filter data by masking out data outside of a sphere defined\n    by a center and radius. Account for periodicity of data, allowing\n    left/right to be outside of the domain.\n    \"\"\"\n\n    # Get left/right for periodicity considerations\n    left = center - radius\n    right = center + radius\n    for data in myiter:\n        pos = np.array([data['x'].copy(), data['y'].copy(), data['z'].copy()]).T\n\n        DW = self.true_domain_width\n        _shift_periodic(pos, left, right, DW)\n\n        # Now get all particles that are within the sphere\n        mask = ((pos-center)**2).sum(axis=1)**0.5 < radius\n\n        sdflog.debug(\"Filtering particles, returning %i out of %i\" % (mask.sum(), mask.shape[0]))\n\n        if not np.any(mask):\n            continue\n\n        filtered = {ax: pos[:, i][mask] for i, ax in enumerate('xyz')}\n        for f in data.keys():\n            if f in 'xyz':\n                continue\n            filtered[f] = data[f][mask]\n\n        yield filtered\n\n\nxyz2 = np.array([ds['x'].copy(), ds['y'].copy(), ds['z'].copy()]).T",
+			"file": "data/rockstar/hlists/hlist_1.00000.list",
 			"settings":
 			{
-				"buffer_size": 1523,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "DarkSkyJs/index.html",
-			"settings":
-			{
-				"buffer_size": 1960,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "DarkSkyJs/js/Utils.js",
-			"settings":
-			{
-				"buffer_size": 5391,
+				"buffer_size": 4216557,
 				"line_ending": "Unix"
 			}
 		},
@@ -412,6 +409,30 @@
 			"settings":
 			{
 				"buffer_size": 37228,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "DarkSkyJs/src/example_drawCalls.js",
+			"settings":
+			{
+				"buffer_size": 7710,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "DarkSkyJs/js/Utils.js",
+			"settings":
+			{
+				"buffer_size": 10966,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "DarkSkyPy/extractHaloAndParticles.py",
+			"settings":
+			{
+				"buffer_size": 13164,
 				"line_ending": "Unix"
 			}
 		}
@@ -423,10 +444,18 @@
 	"build_varint": "",
 	"command_palette":
 	{
-		"height": 305.0,
-		"last_filter": "for",
+		"height": 373.0,
+		"last_filter": "ja",
 		"selected_items":
 		[
+			[
+				"ja",
+				"Set Syntax: JavaScript"
+			],
+			[
+				"css",
+				"Set Syntax: CSS"
+			],
 			[
 				"for",
 				"Format: Javascript"
@@ -776,7 +805,7 @@
 				"Package Control: Install Package"
 			]
 		],
-		"width": 457.0
+		"width": 583.0
 	},
 	"console":
 	{
@@ -797,14 +826,25 @@
 	},
 	"expanded_folders":
 	[
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/js"
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyPy"
 	],
 	"file_history":
 	[
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/js/Utils.js",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/src/Step1.js",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyPy/exampleSDF.py",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/src/Step3a.js",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/index.html",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/src/Step3.js",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/js/Utils.js",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/assets/Halo_257.0_t12.json",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/css/style.css",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/css/jquery.nouislider.css",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/data/rockstar/hlists/hlist_0.12000.list",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/css/jquery.nouislider.pips.css",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/css/jquery.nouislider.min.css",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyPy/Halo_257.0_t12.json",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyPy/extractHaloAndParticles.py",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyPy/__forlater.py",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/src/Step1.js",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/LTG/processing-poster-client/src/main/resources/closeQT.sh",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/js/dat.gui.min.js",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/js/dat.gui.js",
@@ -814,7 +854,6 @@
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyPy/vtkDarkSkyUtilities.py",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyPy/vtkDarkSkyParticles.py",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyPy/utils/vtkDarkSkyUtilities.py",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/index.html",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/src/Step2.js",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyVis.sublime-project",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyVis.xcodeproj/project.pbxproj",
@@ -822,7 +861,6 @@
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/vtkExtractHaloContents.py",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/utils/vtkDarkSkyUtilities.py",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/vtkDarkSkyTime.py",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/data/rockstar/hlists/hlist_0.12000.list",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/vtkDarkSkyParticles.py",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/vtkDarkSkyFlow.py",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/vtkDarkSkyHalosPaths.py",
@@ -919,21 +957,11 @@
 		"/Users/krbalmryde/Dropbox/Class-projects/cs524/Journal/TextRendering/src/TextRender.py",
 		"/Users/krbalmryde/Dropbox/Class-Projects/ISTA555/AnalyzeHappiness/Project1.py",
 		"/Users/krbalmryde/Dropbox/Class-Projects/ISTA555/YouAreWhatYouEat/src/Project4.py",
-		"/Users/krbalmryde/Dropbox/Class-Projects/cs524/Journal/TextRendering/src/util/WordPolarityVectorized.py",
-		"/Users/krbalmryde/Dropbox/Class-projects/cs594/topic9/ReadMe.txt",
-		"/Users/krbalmryde/Dropbox/Class-projects/cs594/topic9/scriptT1",
-		"/Users/krbalmryde/Dropbox/Class-projects/cs594/topic9/Topic9-Task1.py",
-		"/Users/krbalmryde/Dropbox/Class-Projects/cs594/topic9/mpiPY/e4/scatter.py",
-		"/Users/krbalmryde/Dropbox/Class-Projects/cs594/topic9/script",
-		"/Users/krbalmryde/Dropbox/Class-projects/cs594/topic9/script",
-		"/Users/krbalmryde/Desktop/WebGL Export.html",
-		"/Users/krbalmryde/Dropbox/Class-projects/cs594/topic9/func.sh",
-		"/Users/krbalmryde/Dropbox/Class-Projects/cs594/topic9/mpiPY/e1/helloworld.py",
-		"/Users/krbalmryde/Dropbox/Class-Projects/cs594/topic9/mpiPY/e1/script"
+		"/Users/krbalmryde/Dropbox/Class-Projects/cs524/Journal/TextRendering/src/util/WordPolarityVectorized.py"
 	],
 	"find":
 	{
-		"height": 38.0
+		"height": 23.0
 	},
 	"find_in_files":
 	{
@@ -949,6 +977,62 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"i)",
+			"i",
+			"(proper + width/2.) * h_100 * kpc_to_Mpc / cosmo_a",
+			"(proper + width) * h_100 * kpc_to_Mpc / cosmo_a",
+			"particles.parameters",
+			"(proper + width) * h_100 * kpc_to_Mpc / cosmo_a",
+			"x",
+			"particles",
+			"_kpc_min",
+			"particles",
+			"min",
+			"[0]",
+			"min",
+			"[0]",
+			"(kpc_to_Mpc /(proper * h_100)) * cosmo_a",
+			"(proper + width) * h_100 * kpc_to_Mpc / cosmo_a",
+			"mpc",
+			"kpc_",
+			"_proper",
+			"x_proper",
+			".min()",
+			"min",
+			"proper",
+			"convert_to_cMpc(particles",
+			"particles",
+			"pos",
+			"),",
+			"toCoMoving(",
+			"particleFN",
+			"id",
+			"ID",
+			"id",
+			"ID",
+			"id",
+			"ID",
+			"self.",
+			"true_",
+			"self.",
+			"particleCount",
+			"particlesData",
+			"halosJson",
+			"halos",
+			"json",
+			"pMaterial",
+			"tail",
+			"pointCloud",
+			"PointCloud",
+			"pointCloud",
+			"function",
+			"setup",
+			"scene",
+			"particles",
+			"helper",
+			"particles.",
+			"particles",
+			"drawStep1",
 			"src",
 			"filter_sphere",
 			"__toCoMoving",
@@ -1020,63 +1104,7 @@
 			"__scalar",
 			"__normalize",
 			"initVTK",
-			"vtkDarkSkyParticles",
-			"__scalar",
-			"particle.size",
-			"=*malloc",
-			"\\= * malloc",
-			"= * malloc",
-			"malloc",
-			"types",
-			"hdr",
-			"ParticleLoaderSDF",
-			"vtkScalars",
-			"sdfPosition",
-			"parameters",
-			"sdfGet",
-			"SDFWrangler",
-			"setMinMaxRange",
-			"dk.",
-			"darkSky",
-			"self.sdf",
-			"sdfPosition",
-			"particles",
-			"__normalize",
-			"__setMinMaxRange",
-			"__toCoMoving",
-			"self.",
-			"vtkDepth",
-			"4",
-			"vtkDarkSkyFlow",
-			"Cell",
-			"vtkScalar",
-			"self.vtkStructuredGrid.",
-			"vtkPolyData",
-			"->",
-			"512",
-			"derer->",
-			"->",
-			"HedgeHod",
-			"initHedgeHog",
-			"vtkFlowActor",
-			"__setMapper",
-			"__getMagnitude",
-			"=",
-			"__getUVW",
-			"self.yt",
-			"vtkVelocity",
-			"__getMagnitude",
-			"= self.sdfParticles['",
-			"__getUVW",
-			"sdfGetXYZ",
-			"vtkStreamActor",
-			"vtkHedgHogActor",
-			"filename",
-			"vtkDarkSkyParticles",
-			"VtkDarkSky",
-			"__setMinMaxRange",
-			"resetPoints",
-			"sdfIdent"
+			"vtkDarkSkyParticles"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -1139,113 +1167,24 @@
 	"groups":
 	[
 		{
-			"selected": 0,
+			"selected": 1,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "DarkSkyJs/src/Step3.js",
+					"file": "DarkSkyPy/PrepProcDMH.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 4193,
+						"buffer_size": 7729,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								4191,
-								4191
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 2060.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 0,
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "DarkSkyPy/extractHaloAndParticles.py",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 13164,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								10633,
-								10633
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Python/Python.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 1667.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 3,
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "DarkSkyPy/Halo_257.0_t12.json",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 18155,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								4083,
-								4083
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JSON.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 2629.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 4,
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1523,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								426,
-								0
+								156,
+								156
 							]
 						],
 						"settings":
@@ -1258,77 +1197,126 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 5,
-					"type": "text"
-				}
-			]
-		},
-		{
-			"selected": 0,
-			"sheets":
-			[
-				{
-					"buffer": 4,
-					"file": "DarkSkyJs/index.html",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1960,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								885,
-								885
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/HTML/HTML.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 25.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 1,
+					"stack_index": 4,
 					"type": "text"
 				},
 				{
-					"buffer": 5,
-					"file": "DarkSkyJs/js/Utils.js",
+					"buffer": 1,
+					"file": "DarkSkyPy/exampleSDF.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 5391,
+						"buffer_size": 6058,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1093,
-								1093
+								373,
+								373
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"syntax": "Packages/Python/Python.tmLanguage",
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 94.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 226,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								224,
+								224
+							]
+						],
+						"settings":
+						{
+							"auto_name": "halo X 0.30641 61.7989",
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 5524,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3455,
+								3502
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 532.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 2,
 					"type": "text"
 				},
 				{
-					"buffer": 6,
+					"buffer": 4,
+					"file": "data/rockstar/hlists/hlist_1.00000.list",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 4216557,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								933,
+								933
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
 					"file": "data/rockstar/hlists/hlist_0.12000.list",
 					"semi_transient": false,
 					"settings":
@@ -1340,8 +1328,8 @@
 						"selection":
 						[
 							[
-								1864,
-								1904
+								874,
+								874
 							]
 						],
 						"settings":
@@ -1349,10 +1337,107 @@
 							"syntax": "Packages/Text/Plain text.tmLanguage"
 						},
 						"translation.x": 0.0,
-						"translation.y": 201.0,
+						"translation.y": 670.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 7,
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "DarkSkyJs/src/example_drawCalls.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 7710,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1770,
+								1770
+							]
+						],
+						"settings":
+						{
+							"history_list_is_closing": true,
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 823.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 6,
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "DarkSkyJs/js/Utils.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 10966,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3316,
+								3316
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1653.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 8,
+					"type": "text"
+				}
+			]
+		},
+		{
+			"selected": 0,
+			"sheets":
+			[
+				{
+					"buffer": 8,
+					"file": "DarkSkyPy/extractHaloAndParticles.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 13164,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								187,
+								152
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 2071.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
 					"type": "text"
 				}
 			]
@@ -1360,7 +1445,7 @@
 	],
 	"incremental_find":
 	{
-		"height": 25.0
+		"height": 23.0
 	},
 	"input":
 	{
@@ -1386,7 +1471,7 @@
 		"cols":
 		[
 			0.0,
-			0.462391148589,
+			0.5,
 			1.0
 		],
 		"rows":
@@ -1408,7 +1493,7 @@
 	"project": "DarkSkyVis.sublime-project",
 	"replace":
 	{
-		"height": 46.0
+		"height": 42.0
 	},
 	"save_all_on_build": true,
 	"select_file":
@@ -1418,8 +1503,28 @@
 		"selected_items":
 		[
 			[
+				"hli",
+				"DarkSkyVis/data/rockstar/hlists/hlist_0.12000.list"
+			],
+			[
+				"hl1.",
+				"DarkSkyVis/data/rockstar/hlists/hlist_1.00000.list"
+			],
+			[
+				"ext",
+				"DarkSkyPy/extractHaloAndParticles.py"
+			],
+			[
 				"ut",
 				"DarkSkyJs/js/Utils.js"
+			],
+			[
+				"step3a",
+				"DarkSkyJs/src/Step3a.js"
+			],
+			[
+				"dra",
+				"DarkSkyJs/src/example_drawCalls.js"
 			],
 			[
 				"step1",
@@ -1812,7 +1917,7 @@
 		[
 			[
 				"",
-				"~/Dropbox/Code-Projects/EVL/LTG/ltg.sublime-project"
+				"~/Dropbox/class-projects/Class.sublime-project"
 			]
 		],
 		"width": 380.0

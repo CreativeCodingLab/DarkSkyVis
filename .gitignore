@@ -17,3 +17,7 @@ docs/examples/*
 DarkSkyPy/images/*
 .idea
 images/*
+*.json
+conversion_images
+gotit_images
+other_images

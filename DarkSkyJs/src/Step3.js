@@ -10,6 +10,7 @@ var slider, box;
 var head, tail;
 var nDivisions = 5;
 var haloObjs = [], offsets = [];
+var haloPoints = [];
 /* ==========================================
  *              onCreate
  *   Initialize WebGL context, as well as
@@ -35,6 +36,10 @@ function onCreate() {
 
     // Setup our slider
     initSlider();
+
+    // creates some random and some predetermined
+    // points
+    initPoints(5);
 
     // Make some Spline Geometry
     //createSplineGeometry(nDivisions);
@@ -196,8 +201,7 @@ function createLotsOfLines(nDivisions) {
     for (var i = 0; i < 10; i++) {
 
         var colors = [];
-        offsets.push(i * Math.random());
-        var points = tweakPoints(getHaloPos(), offsets[i]);
+        var points = haloPoints[i];
         var spline = new THREE.Spline();
         console.log("points", points);
         spline.initFromArray(points.slice(head,tail));
@@ -208,8 +212,6 @@ function createLotsOfLines(nDivisions) {
             xyz = spline.getPoint(index);
 
             splineGeomentry.vertices[j] = new THREE.Vector3( xyz.x, xyz.y, xyz.z );
-             
-
             colors[ j ] = new THREE.Color((Math.random()), (j / (points.length * nDivisions)), (Math.random()));
         }
         splineGeomentry.computeLineDistances();
@@ -252,7 +254,7 @@ function updateGeometry(nDivisions) {
 
 function updateAllTheGeometry(nDivisions) {
     for (var i = 0; i < 10; i++) {
-        var points = tweakPoints(getHaloPos(), offsets[i]);
+        var points = haloPoints[i];
         var spline = new THREE.Spline();
 
         if ((tail - head) == 0) {
