@@ -1,42 +1,79 @@
 ## Important Notes
 Particle position data is listed in `proper kpc/h` while the halo data is in `comoving Mpc/h` in order
 to change this the following function can be used:
+
 ```python
-def convert_to_cMpc(proper):
-    h_100 = particles.parameters['h_100']
-    width = particles.parameters['L0']
-    cosmo_a = particles.parameters['a']
-    kpc_to_Mpc = 1./1000
-    return (proper + width/2.) * h_100 * kpc_to_Mpc / cosmo_a
+
+h_100 = particles.parameters['h_100']
+width = particles.parameters['L0']
+cosmo_a = particles.parameters['a']
+kpc_to_Mpc = 1. / 1000
+sl = slice(0, None)
+
+convert_to_cMpc = lambda proper: (proper + width/2.) * h_100 * kpc_to_Mpc / cosmo_a
 ```
+Except this turns out the equation **is wrong**
+
+For the very last timepoint, t 1.00, the Particle data lines up nicely with the
+provided Halo data when using the above equation. However for the rest of the
+data, its steadily veers off course. To correct this, modified the equation a
+bit by not dividing the width by 2. Then I pulled the min values of
+each axis for the entire halo dataset and the same for the converted particle dataset,
+computed the difference, and subtracted that value from the particle datas positons
+
+
+```python
+import numpy as np
+
+h_100 = particles.parameters['h_100']
+width = particles.parameters['L0']
+cosmo_a = particles.parameters['a']
+kpc_to_Mpc = 1. / 1000
+sl = slice(0, None)
+
+convert_to_cMpc = lambda proper: ((proper + width) * h_100 * kpc_to_Mpc / cosmo_a)
+
+x_min = convert_to_cMpc(particles['x'][sl]).min()
+y_min = convert_to_cMpc(particles['y'][sl]).min()
+z_min = convert_to_cMpc(particles['z'][sl]).min()
+
+x_offset = abs(halo_xyz_mins[0] - x_min);
+y_offset = abs(halo_xyz_mins[1] - y_min);
+z_offset = abs(halo_xyz_mins[2] - z_min);
+
+positions = np.dstack([
+        convert_to_cMpc(particles['x'][sl]) - x_offset,
+        convert_to_cMpc(particles['y'][sl]) - y_offset,
+        convert_to_cMpc(particles['z'][sl]) - z_offset
+])[0]
+```
+
+
+
 
 Halo radius, __rvir__, is in kpc/h and must be converted to Mpc/h in order to correctly extract the
 surrounding particles. This is as simple as doing `rvir * (1/1000.)`
 
 ## Stuff to look up later
+The extract particles surrounding the halos radius get large very quickly as we
+progress through time, this is probably a function of the halos getting larger
+over time due to expansion, etc.
+
+For early time points, its not a huge deal as the number of particles extracted
+for the halo is small (only 7 at time 0) while for the last time point it spikes
+to over 23,000! For the moment we dont care, we can just trace the particles
+we care about and ignore the rest, Eventually we will need to do something about
+it. For there [Oboe.js](http://oboejs.com/) may be an option.
+
 coyote universe
+
 which partilces move the most in the beginning
 
 redshit approximation at time 0
 
 
 ## Things I am working on
-Presently I am working on tracking a Halo and its descendants through time and extracting its corresponding Particles that make up the halo in question. My approach to this problem is to do the following:
 
-1) Identify a halo at time-0
-    a) get its xyz coords
-    b) get its mass
-    c) get its radius
-    d) get its child-id
-
-2) Identify particles which surround Identified Halo at time-0
-    a) Filter particles that do not fall within the radius of the halo
-    b) get their xyz coords
-    c) get their id
-    d) get their phi (gravitational potential) scalar
-    e) get their uvw coords
-    f) get their acceleration vector
-    f) compute their uvw magnitude
 
 
 ---
