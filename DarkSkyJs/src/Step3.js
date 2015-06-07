@@ -39,7 +39,7 @@ function onCreate() {
 
     // creates some random and some predetermined
     // points
-    initPoints(5);
+    initPointsH257();
 
     // Make some Spline Geometry
     //createSplineGeometry(nDivisions);
@@ -156,6 +156,75 @@ function handleKeys( event ) {
     console.log( camera.position, camera.rotation);
 }
 
+
+function createLotsOfLines(nDivisions) {
+    head = slider.val()[0];
+    tail = slider.val()[1];
+
+    var index, xyz;
+    for (var i = 0; i < haloPoints.length; i++) {
+
+        var colors = [];
+        var points = haloPoints[i];
+        var spline = new THREE.Spline();
+        console.log("points", points);
+        spline.initFromArray(points.slice(head,tail));
+        var splineGeomentry = new THREE.Geometry();
+
+        for (var j = 0; j < points.length * nDivisions ; j++ ) {
+            index = j / (points.length * nDivisions);
+            xyz = spline.getPoint(index);
+
+            splineGeomentry.vertices[j] = new THREE.Vector3( xyz.x, xyz.y, xyz.z );
+            if (i === 0)
+                colors[ j ] = new THREE.Color(1.0, 1.0, 1.0);
+            else
+                colors[ j ] = new THREE.Color((Math.random() * offsets[i]), (j / (points.length * nDivisions)), (Math.random()));
+                //colors[ j ] = new THREE.Color((Math.random()), (j / (points.length * nDivisions)), (Math.random()));
+        }
+        splineGeomentry.computeLineDistances();
+        splineGeomentry.colors = colors;
+        var material = new THREE.LineBasicMaterial( { color: 0xffffff, opacity: 1, linewidth: 3, vertexColors: THREE.VertexColors } );
+        var mesh = new THREE.Line(splineGeomentry, material);
+        haloObjs.push(mesh);
+        scene.add(mesh);
+    }
+}
+
+
+function updateAllTheGeometry(nDivisions) {
+    for (var i = 0; i < haloPoints.length; i++) {
+        var points = haloPoints[i];
+        var spline = new THREE.Spline();
+
+        if ((tail - head) == 0) {
+            spline.initFromArray(points[head]);
+        } else {
+            spline.initFromArray(points.slice(head,tail));
+        }
+
+        var verts = [], colors = [];
+        for (var j = 0; j < points.length * nDivisions ; j++ ) {
+            var index = j / (points.length * nDivisions);
+            var xyz = spline.getPoint(index);
+            verts[ j ] = new THREE.Vector3( xyz.x, xyz.y, xyz.z );
+            if (i === 0)
+                colors[ j ] = new THREE.Color(1.0, 1.0, 1.0);
+            else
+                colors[ j ] = new THREE.Color((Math.random() * offsets[i]), (j / (points.length * nDivisions)), (Math.random()));
+                //colors[ j ] = new THREE.Color((Math.random()), (j / (points.length * nDivisions)), (Math.random()));
+
+        }
+        haloObjs[i].geometry.vertices = verts;
+        haloObjs[i].geometry.colors = colors;
+        haloObjs[i].geometry.verticesNeedUpdate = true;
+        haloObjs[i].geometry.colorsNeedUpdate = true;
+
+    }
+}
+
+
+
 // Initialization function which creates our
 // Geometry for the first time
 function createSplineGeometry(nDivisions) {
@@ -168,7 +237,7 @@ function createSplineGeometry(nDivisions) {
     var points = getHaloPos();
 
     var spline = new THREE.Spline();
-        spline.initFromArray(points.slice(head,tail));
+    spline.initFromArray(points.slice(head,tail));
 
     var max = points.length * nDivisions;
     for (var i = 0; i < points.length * nDivisions ; i++ ) {
@@ -192,36 +261,6 @@ function createSplineGeometry(nDivisions) {
 
 }
 
-
-function createLotsOfLines(nDivisions) {
-    head = slider.val()[0];
-    tail = slider.val()[1];
-
-    var index, xyz;
-    for (var i = 0; i < 10; i++) {
-
-        var colors = [];
-        var points = haloPoints[i];
-        var spline = new THREE.Spline();
-        console.log("points", points);
-        spline.initFromArray(points.slice(head,tail));
-        var splineGeomentry = new THREE.Geometry();
-
-        for (var j = 0; j < points.length * nDivisions ; j++ ) {
-            index = j / (points.length * nDivisions);
-            xyz = spline.getPoint(index);
-
-            splineGeomentry.vertices[j] = new THREE.Vector3( xyz.x, xyz.y, xyz.z );
-            colors[ j ] = new THREE.Color((Math.random()), (j / (points.length * nDivisions)), (Math.random()));
-        }
-        splineGeomentry.computeLineDistances();
-        splineGeomentry.colors = colors;
-        var material = new THREE.LineBasicMaterial( { color: 0xffffff, opacity: 1, linewidth: 3, vertexColors: THREE.VertexColors } );
-        var mesh = new THREE.Line(splineGeomentry, material);
-        haloObjs.push(mesh);
-        scene.add(mesh);
-    }
-}
 
 // Update function which updates our
 // Geometry for subsequent passes
@@ -252,31 +291,6 @@ function updateGeometry(nDivisions) {
 }
 
 
-function updateAllTheGeometry(nDivisions) {
-    for (var i = 0; i < 10; i++) {
-        var points = haloPoints[i];
-        var spline = new THREE.Spline();
-
-        if ((tail - head) == 0) {
-            spline.initFromArray(points[head]);
-        } else {
-            spline.initFromArray(points.slice(head,tail));
-        }
-
-        var verts = [], colors = [];
-        for (var j = 0; j < points.length * nDivisions ; j++ ) {
-            var index = j / (points.length * nDivisions);
-            var xyz = spline.getPoint(index);
-            verts[ j ] = new THREE.Vector3( xyz.x, xyz.y, xyz.z );
-            colors[ j ] = new THREE.Color((Math.random() * offsets[i]), (j / (points.length * nDivisions)), (Math.random()));
-        }
-        haloObjs[i].geometry.vertices = verts;
-        haloObjs[i].geometry.colors = colors;
-        haloObjs[i].geometry.verticesNeedUpdate = true;
-        haloObjs[i].geometry.colorsNeedUpdate = true;
-
-    }
-}
 
 
 // ==========================================
