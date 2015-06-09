@@ -103,22 +103,7 @@ function onMouseMove( event ) {
 }
 
 
-// function onMouseClick( event ) {
-
-// }
-
-/* ================================== *
- *          onFrame
- *  Our Main rendering loop with
- *  associated draw function
- * ================================== */
-function onFrame() {
-    if ((head !== parseInt(slider.val()[0])) || (tail !== parseInt(slider.val()[1]))) {
-        head = parseInt(slider.val()[0]);
-        tail = parseInt(slider.val()[1]);
-        updateAllTheGeometry(nDivisions);
-    }
-
+function onMouseDown( event ) {
     // update the picking ray with the camera and mouse position
     raycaster.setFromCamera( mouse, camera );
 
@@ -132,6 +117,21 @@ function onFrame() {
         target.object.material.color.set( 0xff0000 );
         controls.target = target.object.position;
     };
+
+}
+
+/* ================================== *
+ *          onFrame
+ *  Our Main rendering loop with
+ *  associated draw function
+ * ================================== */
+function onFrame() {
+    if ((head !== parseInt(slider.val()[0])) || (tail !== parseInt(slider.val()[1]))) {
+        head = parseInt(slider.val()[0]);
+        tail = parseInt(slider.val()[1]);
+        updateAllTheGeometry(nDivisions);
+    }
+
     requestAnimationFrame( onFrame );
     renderer.render( scene, camera );
 }
