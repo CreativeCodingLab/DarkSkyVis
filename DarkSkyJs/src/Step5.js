@@ -7,15 +7,17 @@ if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 var container;
 var scene, renderer;
 var camera, slider;
+var mouse, raycaster;
 var head, tail;
 var linesMesh;
 var nDivisions = 10;
-var numTimePoints = 89;
+var NUMTIMEPOINTS = 89;
 var haloObjs = [];
 var haloLines = [];
 var haloStats = [];
 var haloSpheres = [];
-var numPoints = numTimePoints * nDivisions;
+var numPoints = NUMTIMEPOINTS * nDivisions;
+
 
 /* ==========================================
  *              onCreate
@@ -31,12 +33,18 @@ function onCreate() {
     scene = new THREE.Scene();
 
     // Adding our Group object
-    group = new THREE.Object3D();
-    scene.add( group );
+    linesGroup = new THREE.Object3D();
+    sphereGroup = new THREE.Object3D();
+    scene.add( linesGroup );
+    scene.add( sphereGroup );
 
     // Get our Camera working
     camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
     camera.position.set(58,32.5,53.5);
+
+    // Setup our Raycasting stuff
+    raycaster = new THREE.Raycaster();
+    mouse = new THREE.Vector2();
 
     // Setup our slider
     initSlider();
@@ -46,7 +54,7 @@ function onCreate() {
     initPointsH257();
 
     // Make some Spline Geometry
-    //createBufferGeometry(nDivisions);
+    // createBufferGeometry(nDivisions);
     createSplineGeometry(nDivisions);
 
     // Set up the Renderer
@@ -60,13 +68,15 @@ function onCreate() {
     container = document.getElementById( 'Sandbox' );
     container.appendChild( renderer.domElement );
 
-    // Add listeners
-    window.addEventListener( 'resize', onReshape, false );
-
     // Create controls
     controls = new THREE.OrbitControls( camera, container );
     controls.target = new THREE.Vector3(57.877390714719766, 32.202756939204875, 51.225539800452616);
-    //controls.addEventListener('change', onFrame);
+
+
+    // Add listeners
+    window.addEventListener( 'resize', onReshape, false );
+    window.addEventListener( 'mousemove', onMouseMove, false );
+
 
 }
 
@@ -82,17 +92,44 @@ function onReshape() {
 }
 
 
+// ==========================================
+//              onMouseMove
+// And associated Event Listeners
+// ==========================================
+function onMouseMove( event ) {
+    // calculate mouse position in normalized device coordinates
+    // (-1 to +1) for both components
+    event.preventDefault();
+    mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+    mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+}
+
+
 /* ================================== *
  *          onFrame
  *  Our Main rendering loop with
  *  associated draw function
  * ================================== */
 function onFrame() {
-    if ((head !== slider.val()[0]) || (tail !== slider.val()[1])) {
-        head = slider.val()[0];
-        tail = slider.val()[1];
+    if ((head !== parseInt(slider.val()[0])) || (tail !== parseInt(slider.val()[1]))) {
+        head = parseInt(slider.val()[0]);
+        tail = parseInt(slider.val()[1]);
         updateAllTheGeometry(nDivisions);
     }
+
+    // update the picking ray with the camera and mouse position
+    raycaster.setFromCamera( mouse, camera );
+
+    // calculate objects intersecting the picking ray
+    var intersects = raycaster.intersectObjects( sphereGroup.children );
+
+    if (intersects.length > 0) {
+        console.log("camera", camera, "control", controls, "intersects",intersects);
+        for ( var i = 0; i < intersects.length; i++ ) {
+            intersects[ i ].object.material.color.set( 0xff0000 );
+
+        }
+    };
     requestAnimationFrame( onFrame );
     renderer.render( scene, camera );
 }
@@ -141,19 +178,18 @@ function createBufferGeometry(nDivisions) {
         //blending: THREE.AdditiveBlending,
         //transparent: true,
         color: 0xffffff,
-        opacity: 1,
+        opacity: 0.3,
         linewidth: 1
     } );
     linesMesh = new THREE.Line( splineGeometryBuffer, material );
     console.log(splineGeometryBuffer);
-    group.add( linesMesh );
-    console.log(camera);
+    linesGroup.add( linesMesh );
 }
 
 
 function createSplineGeometry(nDivisions) {
-    head = slider.val()[0];
-    tail = slider.val()[1];
+    head = parseInt(slider.val()[0]);
+    tail = parseInt(slider.val()[1]);
 
     var index, xyz;
     for (var i = 0; i < haloLines.length; i++) {
@@ -165,23 +201,28 @@ function createSplineGeometry(nDivisions) {
         var splineGeomentry = new THREE.Geometry();
 
         if ( i === 0 ){
-            for (var s = 0; s < controlPoints.length; s++) {
-                var hl = controlPoints[s];
-                console.log(haloStats);
-                var halo = haloStats[s];
-                console.log("what it got", halo);
-                var sphereGeometry = new THREE.SphereGeometry(halo.radius/ halo.rScale * 3 );
-                sphereGeometry.color = new THREE.Color((Math.random() ), (s / (numPoints)), (Math.random()));
-                var sphereMesh = new THREE.Mesh(
-                    sphereGeometry,
-                    new THREE.MeshBasicMaterial({ color: 0xffffff, vertexColors: THREE.VertexColors })
-                );
+            addSpheres(spline);
+            // for (var s = 0; s < controlPoints.length; s++) {
+            //     var hl = controlPoints[s];
+            //     console.log(haloStats);
+            //     var halo = haloStats[s];
+            //     console.log("what it got", halo);
+            //     var sphereGeometry = new THREE.SphereGeometry(halo.radius / halo.rScale * 3 );
+            //     sphereGeometry.color = new THREE.Color((Math.random() ), (s / (numPoints)), (Math.random()));
+            //     var sphereMesh = new THREE.Mesh(
+            //         sphereGeometry,
+            //         new THREE.MeshBasicMaterial({
+            //             color: 0xffffff,
+            //             vertexColors: THREE.FaceColors,
+            //             opacity: 0.3
+            //         })
+            //     );
 
-                sphereMesh.position.set( hl[0], hl[1], hl[2]);
-                sphereMesh.updateMatrix();
-                haloSpheres.push(sphereMesh);
-                scene.add(sphereMesh)
-            }
+            //     sphereMesh.position.set( hl[0], hl[1], hl[2]);
+            //     sphereMesh.updateMatrix();
+            //     haloSpheres.push(sphereMesh);
+            //     sphereGroup.add(sphereMesh)
+            // }
         }
 
         for (var j = 0; j < numPoints ; j++ ) {
@@ -202,7 +243,7 @@ function createSplineGeometry(nDivisions) {
         var mesh = new THREE.Line(splineGeomentry, material);
         mesh.updateMatrix();
         haloObjs.push(mesh);
-        scene.add(mesh);
+        linesGroup.add(mesh);
     }
 }
 
@@ -218,10 +259,20 @@ function updateAllTheGeometry(nDivisions) {
         }
 
         if ( i === 0 ){
+            updateSpheres(spline);
             // This needs some work!
-            console.log(haloSpheres);
-            haloSpheres[0].geometry.vertices = spline.getControlPointsArray().slice(head,tail);
-            haloSpheres[0].geometry.verticesNeedUpdate = true;
+            // var controlPoints = spline.getControlPointsArray();
+            // for (var s = 0; s < haloSpheres.length; s++) {
+            //     console.log(haloSpheres[i]);
+            //     sphereGroup.remove(haloSpheres[i]);
+            //     if (s <= head || s>=tail) {
+            //         var sphere = haloSpheres[s];
+            //         sphereGroup.remove(sphere);
+            //     } else {
+            //         haloSpheres[s].geometry.vertices = controlPoints;
+            //         haloSpheres[s].geometry.verticesNeedUpdate = true;
+            //     }
+            // }
         }
 
         var verts = [], colors = [];
@@ -243,6 +294,39 @@ function updateAllTheGeometry(nDivisions) {
     }
 }
 
+function addSpheres(spline) {
+    var controlPoints = spline.getControlPointsArray();
+
+    for (var i = 0; i < controlPoints.length; i++) {
+        var hl = controlPoints[i];
+        var halo = haloStats[head + i];
+        console.log(typeof(head),i,haloStats, haloStats[head + i]);
+        console.log("what it got", halo);
+        var sphereGeometry = new THREE.SphereGeometry(halo.radius / halo.rScale * 5);
+        sphereGeometry.color = new THREE.Color((Math.random() ), (i / (numPoints)), (Math.random()));
+        var sphereMesh = new THREE.Mesh(
+            sphereGeometry,
+            new THREE.MeshBasicMaterial({
+                color: 0xffffff,
+                vertexColors: THREE.VertexColors,
+            })
+        );
+
+        sphereMesh.position.set( hl[0], hl[1], hl[2]);
+        sphereMesh.updateMatrix();
+        haloSpheres.push(sphereMesh);
+        sphereGroup.add(sphereMesh)
+    }
+}
+
+function updateSpheres(spline) {
+    // First, remove all of our sphere objects
+            // This needs some work!
+    for (var i = 0; i < haloSpheres.length; i++) sphereGroup.remove(haloSpheres[i]);
+    haloSpheres.slice(0, haloSpheres.length);
+    addSpheres(spline);
+
+}
 
 function initPointsH257() {
     var haloPath = [];
@@ -285,7 +369,7 @@ function initSlider() {
     // console.log("\t initSlider()");
     slider = $('.tslider');
     slider.noUiSlider({
-        start: [0, 50],
+        start: [25, 50],
         connect: true,  // shows areas of coverage
         orientation: "vertical",
         direction: "ltr",  //

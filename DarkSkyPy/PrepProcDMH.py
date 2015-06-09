@@ -221,7 +221,9 @@ def extract_particle_path():
     PARTICLES = op.join(RAW, "ds14_scivis_0128", "ds14_scivis_0128_e4_dt04_[0-1].[0-9][0-9]00")
 
     HALO_FILES = l2a(glob(ROCKSTAR))
-    PARTICLE_FILES = l2a(glob(PARTICLES)[])
+    PARTICLE_FILES = l2a(glob(PARTICLES)[10:])
+
+    for i in range( )
 
 
 if __name__ == '__main__':
