@@ -4,6 +4,10 @@
 		"selected_items":
 		[
 			[
+				"y",
+				"y_min"
+			],
+			[
 				"halo",
 				"haloData"
 			],
@@ -364,75 +368,37 @@
 	"buffers":
 	[
 		{
+			"contents": "import json\nimport numpy as np\nimport sdfpy as sdf\nimport os.path as op\nfrom glob import glob\n\ndef a2l(a):\n    return list(a)\n\ndef l2a(l):\n    return np.array(l)\n\n\n\ndef main():\n    RAW = \"../data\"\n    PARTICLES = op.join(RAW, \"ds14_scivis_0128\", \"ds14_scivis_0128_e4_dt04_[0-1].[0-9][0-9]00\")\n    PARTICLE_FILES = l2a(glob(PARTICLES))\n\n    pIDS = { \n        \"1565818\": [], \"1566041\": [],\n        \"1565821\": [], \"1566042\": [],\n        \"1565822\": [], \"1566145\": [],\n        \"1565928\": [], \"1566149\": [] \n    }\n\n\n    for i, fn in enumerate(PARTICLE_FILES):\n        if i < 11:\n            pass\n        else:\n            particles = sdf.load_sdf(fn)\n            particles['ident'].index\n\n\nif __name__ == '__main__':\n    main()\n\n\n\"\"\"\nt 0 -------  t 0 -------  t 0 -------  t 0 -------  t 0 -------  t 0 -------\nt 1 1566041  t 1 1565928  t 1 1565821  t 1 1566145  t 1 1565822  t 1 1566042  \nt 2 1566041  t 2 1565928  t 2 1565821  t 2 1566145  t 2 1565822  t 2 1566042  \nt 3 1566041  t 3 1565928  t 3 1565821  t 3 1566145  t 3 -------  t 3 -------  t 3 1565818 t 3 1566149\nt 4 1566041  t 4 1565928  t 4 1565821  t 4 1566145  t 4 -------  t 4 -------\nt 5 1566041  t 5 1565928  t 5 1565821  t 5 1566145  t 5 1565822  t 5 1566042               \nt 6 1566041  t 6 1565928  t 6 1565821  t 6 -------  t 6 1565822  t 6 1566042    \n\n\"\"\"",
+			"settings":
+			{
+				"buffer_size": 1319,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "import json\nimport numpy as np\nimport sdfpy as sdf\nimport os.path as op\nfrom glob import glob\nimport thingking as tk\nfrom vtkDarkSkyUtilities import Halo\n\n\ndef l2a(l):\n    return np.array(l)\n\n\ndef getDomainWidth(sdfPosition):\n    print \"\\tgetDomainWidth\"\n    rmin = l2a([sdfPosition[:, 0].min(),\n                sdfPosition[:, 1].min(),\n                sdfPosition[:, 2].min()])\n\n    rmax = l2a([sdfPosition[:, 0].max(),\n                sdfPosition[:, 1].max(),\n                sdfPosition[:, 2].max()])\n\n    # true_domain_left = rmin.copy()\n    # true_domain_right = rmax.copy()\n    true_domain_width = rmax - rmin\n    return true_domain_width\n\n\ndef shift_periodic(pos, left, right, domain_width):\n    \"\"\"\n    Periodically shift positions that are right of left+domain_width to\n    the left, and those left of right-domain_width to the right.\n    \"\"\"\n    print \"\\tshift_periodic\"\n    for i in range(3):\n        mask = pos[:, i] >= left[i] + domain_width[i]\n        pos[mask, i] -= domain_width[i]\n        mask = pos[:, i] < right[i] - domain_width[i]\n        pos[mask, i] += domain_width[i]\n    return\n\n\ndef alignParticlesToHalos(time, particles, halo_xyz_mins):\n    print \"\\talignParticlesToHalos:\"\n    h_100 = particles.parameters['h_100']\n    width = particles.parameters['L0']\n    cosmo_a = particles.parameters['a']\n    kpc_to_Mpc = 1. / 1000\n    sl = slice(0, None)\n\n    convert_to_cMpc = lambda proper: ((proper + width) * h_100 * kpc_to_Mpc / cosmo_a)\n\n    x_min = convert_to_cMpc(particles['x'][sl]).min()\n    y_min = convert_to_cMpc(particles['y'][sl]).min()\n    z_min = convert_to_cMpc(particles['z'][sl]).min()\n\n    x_offset = abs(halo_xyz_mins[0] - x_min);\n    y_offset = abs(halo_xyz_mins[1] - y_min);\n    z_offset = abs(halo_xyz_mins[2] - z_min);\n\n    if time == \"0.13\":\n        print \"\\ttime is\", time\n        print \"\\tOld offsets were,\", x_offset, y_offset, z_offset\n        x_offset, y_offset, z_offset = 449.188867109, 449.153197109, 449.131007109\n    elif time == \"0.12\":\n        print \"\\ttime is\", time\n        print \"\\tOld offsets were,\", x_offset, y_offset, z_offset\n        x_offset, y_offset, z_offset = 489.276994541, 489.276994541, 489.276994541\n    else:\n        pass\n\n    print \"\\t\\toffsets are\", x_offset, y_offset, z_offset\n    positions = np.dstack([\n        convert_to_cMpc(particles['x'][sl]) - x_offset,\n        convert_to_cMpc(particles['y'][sl]) - y_offset,\n        convert_to_cMpc(particles['z'][sl]) - z_offset\n    ])[0]  # fyi, dstack spits out a tuple with an extra dimension. We need to decouple it\n    print \"\\t\\t\", positions.shape\n    return positions\n\n\ndef filter_sphere(time, center, radius, xyz_mins):\n    \"\"\"\n    Filter data by masking out data outside of a sphere defined\n    by a center and radius. Account for periodicity of data, allowing\n    left/right to be outside of the domain.\n    \"\"\"\n    print \"filter_sphere\", time, center, radius, xyz_mins\n\n    # Load relevant particle data file\n    pfn = \"../data/ds14_scivis_0128/ds14_scivis_0128_e4_dt04_\" + time + \"00\"\n    particles = sdf.load_sdf(pfn)\n\n    # Get left/right for periodicity considerations\n    left = center - radius\n    right = center + radius\n\n    # Align the particle data with the halo data\n    positions = alignParticlesToHalos(time, particles, xyz_mins)\n\n    # Determine the domain width\n    domain_width = getDomainWidth(positions)\n\n    # Account for periodicity of the particle data...I guess?\n    shift_periodic(positions, left, right, domain_width)\n\n    # Now get all particles that are within the sphere\n    mask = ((positions - center) ** 2).sum(axis=1) ** 0.5 < radius\n    print \"\\tFiltering particles, returning %i out of %i\" % (mask.sum(), mask.shape[0])\n\n    if not np.any(mask):\n        pass\n    print \"\\tmask is\", mask, mask.size\n\n    # Build a dictionary with each axis as a key\n    filtered = {ax: list(positions[:, i][mask]) for i, ax in enumerate('xyz')}\n    print \"\\tfiltered Before: {x}\", len(filtered['x'])\n\n    # add the particles ID to the dictionary, mosly so that we have it\n    filtered[\"id\"] = list(particles['ident'][mask])\n    filtered = [{'x': float(ax[0]), 'y': float(ax[1]), 'z': float(ax[2]), 'id': ax[3]} for ax in\n                zip(filtered[\"x\"], filtered[\"y\"], filtered[\"z\"], filtered[\"id\"])]\n    print \"\\tfiltered After\", filtered[:3]\n    return filtered\n\n\ndef getHaloMinMaxXYZ(Halos):\n    '''\n    Loads the Halo file, extracts the x,y,z coords for all halos, then computes\n    the min of each axis. Used for scaling the dark matter particles\n    '''\n    # Load the a=1 Rockstar hlist file. The header of the file lists the useful\n    # units/information.\n    x_min = l2a([hl.position[0] for hl in Halos]).min()\n    y_min = l2a([hl.position[1] for hl in Halos]).min()\n    z_min = l2a([hl.position[2] for hl in Halos]).min()\n    return (x_min, y_min, z_min)\n\n\ndef intoTheVoid(fileList, TargetID, pID, coords, n):\n    \"\"\"\n    The name is silly, but the role it serves in not\n\n    Recursive Halo tracker which follows the parent/descendant Targetid of a Halo\n    across a set of Halo-Files/Time Points.\n\n    Returns a set of coordinates of a Halo's position over time\n    \"\"\"\n    print len(fileList), TargetID, pID, len(coords), n\n    if len(fileList) == 0:\n        print \"file is empty\"\n        return coords, n\n\n    hfn = fileList[0]\n    time = hfn[-12:-8]\n    halosObjs = l2a([Halo(hl) for hl in tk.loadtxt(hfn)])\n    halo_xyz_mins = getHaloMinMaxXYZ(halosObjs)\n    haloIDList = l2a([halo.id for halo in halosObjs])\n    if TargetID is None:\n        print TargetID, \"is None\"\n        TargetID = haloIDList[0]\n    index = (haloIDList == TargetID).nonzero()[0][0]\n    if index < 0 or index is []:\n        print \"its -1!\"\n        return coords, n\n    elif index > -1:\n        tHl = halosObjs[index]\n        halo = {\n            \"time\": n,\n            \"xyz\": list(tHl.position),\n            \"rvir\": tHl.rvir * (1. / 1000),  # radius, in mpc rather than kpc\n            \"rs\": tHl.rs,  # scale radius\n            \"id\": tHl.id,\n            \"child\": tHl.desc_id,\n            \"particles\": filter_sphere(\n                            time,\n                            tHl.position,\n                            tHl.rvir * (1. / 1000),\n                            halo_xyz_mins\n                        )\n        }\n        coords.append(halo)\n        return intoTheVoid(fileList[1:], tHl.desc_id, tHl.id, coords, n + 1)\n\n\ndef extract_haloPath_and_particles():\n    RAW = \"../data\"\n    ROCKSTAR = op.join(RAW, \"rockstar\", \"hlists\", \"hlist_[0-1].[0-9][0-9]000.*\")\n    HALO_FILES = l2a(glob(ROCKSTAR))\n    # PARTICLES = op.join(RAW, \"ds14_scivis_0128\", \"ds14_scivis_0128_e4_dt04_[0-1].[0-9][0-9]00\")\n    # PARTICLE_FILES = l2a(glob(PARTICLES))\n\n    HALO_ID_LIST = [257., 259., 260., 263., 265., 129., 131., 132., 133.,\n                    228., 224., 248., 335., 135., 125., 184., 121., 113.,\n                    318., 300., 75., 76., 5., 340., 80., 82., 245.,\n                    178., 169., 37., 226., 65., 64., 102., 284., 289.,\n                    286., 126., 62., 22., 174., 163., 341., 342., 69.,\n                    72., 151., 321., 137., 31., 78., 79., 4., 180.,\n                    74., 179., 272., 283., 247., 36., 71., 199., 290.]\n\n\n    # Get a list of coordinates starting with a halo at time \"zero\".\n\n    for i, haloID in enumerate(HALO_ID_LIST[0:1]):  # Limiting our list to just one HALO\n        # haloFileIndex = i + 0\n        HaloObjs, time = intoTheVoid(HALO_FILES, haloID, -1, [], 0)\n        print \"\\nwe have a total of\", len(HaloObjs), \"Halos\"\n        for j, halo in enumerate(HaloObjs):\n            print i, halo['id'], haloID\n            print \"Halo has\", len(halo['particles']), \"particles\"\n            outFileName = \"_\".join([\"Halo\", str(haloID), 't' + str(j + 12)]) + \".json\"\n            print \"our output file is\", outFileName\n            with open(outFileName, 'w') as outfile:\n                outfile.write(json.dumps(halo))\n\n\ndef extract_particle_path():\n    RAW = \"../data\"\n    ROCKSTAR = op.join(RAW, \"rockstar\", \"hlists\", \"hlist_[0-1].[0-9][0-9]000.*\")\n    PARTICLES = op.join(RAW, \"ds14_scivis_0128\", \"ds14_scivis_0128_e4_dt04_[0-1].[0-9][0-9]00\")\n\n    HALO_FILES = l2a(glob(ROCKSTAR))\n    PARTICLE_FILES = l2a(glob(PARTICLES)[10:])\n\n    for i in range( )\n\n\nif __name__ == '__main__':\n    extract_haloPath_and_particles()\n",
 			"file": "DarkSkyPy/PrepProcDMH.py",
+			"file_size": 8269,
+			"file_write_time": 130782789670000000,
 			"settings":
 			{
-				"buffer_size": 7729,
+				"buffer_size": 8295,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "DarkSkyPy/exampleSDF.py",
+			"file": "DarkSkyJs/js/utils/Utils.js",
 			"settings":
 			{
-				"buffer_size": 6058,
+				"buffer_size": 11783,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"contents": "halo X 0.30641 61.7989\nhalo Y 3.90273 59.02258\n\nproper X -5450.08642578125 5450.0751953125\nproper Y -5450.09033203125 5450.08544921875\n\ncoming X 489.5834045410156 552.083251953125\ncoming Y 489.5833435058594 552.0833740234375\n\n",
-			"settings":
-			{
-				"buffer_size": 226,
-				"line_ending": "Unix",
-				"name": "halo X 0.30641 61.7989"
-			}
-		},
-		{
-			"contents": "# ./examples/load_data.py\n# Required libraries:\n# pip install sdfpy\n# pip install thingking\n\nimport sys\nimport numpy as np\nfrom sdfpy import load_sdf\nfrom thingking import loadtxt\n\n\nfor i in np.arange(0.12, 1.01, 0.01)[0:1]:\n    if len(str(i)) == 3:\n        time = str(i)+'0'\n    else:\n        time = str(i)\n\n    print time\n    prefix = \"http://darksky.slac.stanford.edu/scivis2015/data/ds14_scivis_0128/\"\n    # Load N-body particles from a = 1.0 dataset. Particles have positions with\n    # units of proper kpc, and velocities with units of km/s.\n    particles = load_sdf(prefix+\"ds14_scivis_0128_e4_dt04_\" + time + \"00\")\n\n    # Load the a=1 Rockstar hlist file. The header of the file lists the useful\n    # units/information.\n    scale, id, desc_scale, desc_id, num_prog, pid, upid, desc_pid, phantom, \\\n        sam_mvir, mvir, rvir, rs, vrms, mmp, scale_of_last_MM, vmax, x, y, z, \\\n        vx, vy, vz, Jx, Jy, Jz, Spin, Breadth_first_ID, Depth_first_ID, \\\n        Tree_root_ID, Orig_halo_ID, Snap_num, Next_coprogenitor_depthfirst_ID, \\\n        Last_progenitor_depthfirst_ID, Rs_Klypin, M_all, M200b, M200c, M500c, \\\n        M2500c, Xoff, Voff, Spin_Bullock, b_to_a, c_to_a, A_x, A_y, A_z, \\\n        b_to_a_500c, c_to_a_500c, A_x_500c, A_y_500c, A_z_500c, T_over_U, \\\n        M_pe_Behroozi, M_pe_Diemer, Macc, Mpeak, Vacc, Vpeak, Halfmass_Scale, \\\n        Acc_Rate_Inst, Acc_Rate_100Myr, Acc_Rate_Tdyn = \\\n        loadtxt(prefix+\"rockstar/hlists/hlist_\" + time + \"000.list\", unpack=True)\n\n    # Now we want to convert the proper kpc of the particle position to comoving\n    # Mpc/h, a common unit used in computational cosmology in general, but\n    # specifically is used as the output unit in the merger tree halo list loaded\n    # in above. First we get the Hubble parameter, here stored as 'h_100' in the\n    # SDF parameters. Then we load the simulation width, L0, which is also in\n    # proper kpc. Finally we load the scale factor, a, which for this particular\n    # snapshot is equal to 1 since we are loading the final snapshot from the\n    # simulation.\n    h_100 = particles.parameters['h_100']\n    width = particles.parameters['L0']\n    cosmo_a = particles.parameters['a']\n    kpc_to_Mpc = 1./1000\n    sl = slice(0,None)\n\n    # Define a simple function to convert proper to comoving Mpc/h.\n    # convert_to_cMpc = lambda proper: (proper + width/2.) * h_100 * kpc_to_Mpc / cosmo_a\n    # conversion2: convert_to_cMpc = lambda proper: proper * h_100 * kpc_to_Mpc / cosmo_a\n    # conversion3: convert_to_cMpc = lambda proper: (proper/2.) * h_100 * kpc_to_Mpc / 1.0\n    # conversion4: convert_to_cMpc = lambda proper: (proper + width/2.) * h_100 * kpc_to_Mpc\n    # conversion5: convert_to_cMpc = lambda proper: (proper ) * h_100 * kpc_to_Mpc\n    # conversion6: convert_to_cMpc = lambda proper: proper * h_100\n    # conversion7: convert_to_cMpc = lambda proper: (proper * h_100) * cosmo_a\n    # conversion8: convert_to_cMpc = lambda proper: (proper * h_100) * kpc_to_Mpc\n    # conversion9: convert_to_cMpc = lambda proper: (proper * h_100) * (kpc_to_Mpc / cosmo_a)\n    # conversion10: convert_to_cMpc = lambda proper: (kpc_to_Mpc /(proper * h_100)) * cosmo_a\n    # conversion12: convert_to_cMpc = lambda proper: proper * kpc_to_Mpc / cosmo_a\n    # conversion13:  convert_to_cMpc = lambda proper: proper * (kpc_to_Mpc / cosmo_a)\n    # convert_to_cMpc = lambda proper: (kpc_to_Mpc /(proper * h_100)) * cosmo_a\n    convert_to_cMpc = lambda proper: (proper + width) * h_100 * kpc_to_Mpc / cosmo_a\n\n    x_kpc_min = particles['x'].min()\n    y_kpc_min = particles['y'].min()\n    z_kpc_min = particles['z'].min()\n\n    x_kpc_max  = particles['x'].max()\n    y_kpc_max  = particles['y'].max()\n    z_kpc_max  = particles['z'].max()\n\n    x_mpc_min = convert_to_cMpc(x_kpc_min)\n    y_mpc_min = convert_to_cMpc(y_kpc_min)\n    z_mpc_min = convert_to_cMpc(z_kpc_min)\n\n    x_mpc_max = convert_to_cMpc(x_kpc_max)\n    y_mpc_max = convert_to_cMpc(y_kpc_max)\n    z_mpc_max = convert_to_cMpc(z_kpc_max)\n\n    x_halo_min, y_halo_min, z_halo_min = x.min(), y.min(), z.min()\n    x_halo_max, y_halo_max, z_halo_max = x.max(), y.max(), z.max()\n\n\n    print \"\\n\\nProper XYZ_Min, {0}, {1}, {2}\".format(x_kpc_min, y_kpc_min, z_kpc_min)\n    print \"Proper XYZ_Max, {0}, {1}, {2}\".format(x_kpc_max, y_kpc_max, z_kpc_max)\n    print \"\\ncomoving XYZ_Min, {0}, {1}, {2}\".format(x_mpc_min, y_mpc_min, z_mpc_min)\n    print \"comoving XYZ_Max, {0}, {1}, {2}\".format(x_mpc_max, y_mpc_max, z_mpc_max)\n    print \"\\nHalo XYZ min, {0}, {1}, {2}\".format(x_halo_min, y_halo_min, z_halo_min)\n    print \"Halo XYZ max, {0}, {1}, {2}\".format(x_halo_max, y_halo_max, z_halo_max)\n\n    # print \"Halo position, {0}, {1}, {2}\".format(x[0], y[0], z[0])\n    # Plot all the particles, adding a bit of alpha so that we see the density of\n    # points.\n    import matplotlib.pylab as pl\n    pl.figure(figsize=[10,10])\n\n    pl.scatter(convert_to_cMpc(particles['x'][sl]),\n               convert_to_cMpc(particles['y'][sl]), color='b', s=1.0, alpha=0.05)\n\n    # Plot all the halos in red.\n    pl.scatter(x, y, color='r', alpha=0.1)\n\n    # Add some labels\n    pl.xlabel('x [cMpc/h]')\n    pl.ylabel('y [cMpc/h]')\n    # pl.savefig(\"halos_and_particles_\"+time+\".png\", bbox_inches='tight')\n    pl.savefig(\"halos_and_particles_\"+time+\"_conversion.png\", bbox_inches='tight')\n\n    # Could now consider coloring halos by any of the various quantities above.\n    # Perhaps mvir would be nice to show the virial Mass of the halo, or we could\n    # scale the points by the virial radius, rvir.",
-			"settings":
-			{
-				"buffer_size": 5524,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "data/rockstar/hlists/hlist_1.00000.list",
-			"settings":
-			{
-				"buffer_size": 4216557,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "data/rockstar/hlists/hlist_0.12000.list",
-			"settings":
-			{
-				"buffer_size": 37228,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "DarkSkyJs/src/example_drawCalls.js",
+			"file": "DarkSkyJs/src/examples/example_drawCalls.js",
 			"settings":
 			{
 				"buffer_size": 7710,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "DarkSkyJs/js/Utils.js",
-			"settings":
-			{
-				"buffer_size": 10966,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "DarkSkyPy/extractHaloAndParticles.py",
-			"settings":
-			{
-				"buffer_size": 13164,
 				"line_ending": "Unix"
 			}
 		}
@@ -444,10 +410,30 @@
 	"build_varint": "",
 	"command_palette":
 	{
-		"height": 373.0,
-		"last_filter": "ja",
+		"height": 400.0,
+		"last_filter": "fo",
 		"selected_items":
 		[
+			[
+				"fo",
+				"Format: Javascript"
+			],
+			[
+				"p",
+				"Set Syntax: Python"
+			],
+			[
+				"bash",
+				"Set Syntax: Shell Script (Bash)"
+			],
+			[
+				"forma",
+				"Format: Javascript"
+			],
+			[
+				"py",
+				"Set Syntax: Python"
+			],
 			[
 				"ja",
 				"Set Syntax: JavaScript"
@@ -459,10 +445,6 @@
 			[
 				"for",
 				"Format: Javascript"
-			],
-			[
-				"py",
-				"Set Syntax: Python"
 			],
 			[
 				"pyt",
@@ -485,10 +467,6 @@
 				"Set Syntax: Python"
 			],
 			[
-				"bash",
-				"Set Syntax: Shell Script (Bash)"
-			],
-			[
 				"te",
 				"Set Syntax: LaTeX"
 			],
@@ -507,10 +485,6 @@
 			[
 				"ba",
 				"Set Syntax: Shell Script (Bash)"
-			],
-			[
-				"p",
-				"Set Syntax: Python"
 			],
 			[
 				"mark",
@@ -805,7 +779,7 @@
 				"Package Control: Install Package"
 			]
 		],
-		"width": 583.0
+		"width": 457.0
 	},
 	"console":
 	{
@@ -826,23 +800,59 @@
 	},
 	"expanded_folders":
 	[
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/src",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/src/examples",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyPy",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/data",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/data/rockstar",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/data/rockstar/hlists",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyPy"
 	],
 	"file_history":
 	[
+		"/Users/krbalmryde/.bash_aliases",
+		"/Users/krbalmryde/.bash_functions",
+		"/Users/krbalmryde/.bash_profile",
+		"/Users/krbalmryde/.ipython/profile_default/startup/00-profile.py",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/data/rockstar/hlists/hlist_0.13000.list",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/data/rockstar/hlists/hlist_0.12000.list",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyPy/vtkDarkSkyHalos.py",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/.gitignore",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/README.md",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyPy/PrepProcDMH.py",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/assets/FilterCoords.py",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/assets/pretty_Halo_257.0_tAll.json",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/assets/pretty_Halo_257.0_t12.json",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/assets/aggregate_Halo_257_tALL.json",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyPy/extractHaloAndParticles.py",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/assets/Halo_257.0_t12.json",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/assets/Halo_257.0_t100.json",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyPy/Halo_257.0_t99.json",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyPy/Halo_257.0_t15.json",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyPy/Halo_257.0_t16.json",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyPy/Halo_257.0_t17.json",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyPy/Halo_257.0_t18.json",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyPy/Halo_257.0_t19.json",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyPy/Halo_257.0_t20.json",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyPy/Halo_257.0_t14.json",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyPy/Halo_257.0_t12.json",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyPy/Halo_257.0_t13.json",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyPy/exampleSDF.py",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyPy/offsets_times.py",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyPy/correct_function.txt",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyPy/conversion.txt",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/js/Utils.js",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/src/example_drawCalls.js",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/data/rockstar/hlists/hlist_1.00000.list",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/src/Step3a.js",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/index.html",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/src/Step3.js",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/js/Utils.js",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/assets/Halo_257.0_t12.json",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/css/style.css",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/css/jquery.nouislider.css",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/data/rockstar/hlists/hlist_0.12000.list",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/css/jquery.nouislider.pips.css",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/css/jquery.nouislider.min.css",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyPy/Halo_257.0_t12.json",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyPy/extractHaloAndParticles.py",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyPy/__forlater.py",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/src/Step1.js",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/LTG/processing-poster-client/src/main/resources/closeQT.sh",
@@ -857,27 +867,21 @@
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/src/Step2.js",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyVis.sublime-project",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyVis.xcodeproj/project.pbxproj",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/.gitignore",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/vtkExtractHaloContents.py",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/utils/vtkDarkSkyUtilities.py",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/vtkDarkSkyTime.py",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/vtkDarkSkyParticles.py",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/vtkDarkSkyFlow.py",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/vtkDarkSkyHalosPaths.py",
-		"/Users/krbalmryde/.ipython/profile_default/startup/00-profile.py",
 		"/Users/krbalmryde/Library/Application Support/Sublime Text 3/Packages/User/Preferences.sublime-settings",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/README.md",
 		"/Users/krbalmryde/Downloads/DataAnimation/DataAnimation.cxx",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyVis/DarkSkyVis/SDFReader.mm",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyVis/DarkSkyVis/SDFReader.h",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyVis/DarkSkyVis/DarkSkyVis.mm",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/docs/notes_and_musings.txt",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/vtkTest.py",
-		"/Users/krbalmryde/.bash_aliases",
-		"/Users/krbalmryde/.bash_functions",
 		"/Users/Shared/adi/adi.pb",
 		"/Users/krbalmryde/Downloads/UnityPackages/install.ini",
-		"/Users/krbalmryde/.bash_profile",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/VTKDarkSkyFlow.py",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/utils/DarkSkyUtilities.py",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/vtkHedgeHog.py",
@@ -935,33 +939,11 @@
 		"/Users/krbalmryde/Dropbox/Class-Projects/cs594/SciVis2015/src/ToBeParallel.py",
 		"/Users/krbalmryde/Dropbox/Class-projects/cs594/SciVis2015/src/ToBeParallel.py",
 		"/Users/krbalmryde/Dropbox/Class-Projects/cs594/SciVis2015/src/examples/yt/load_data.py",
-		"/Users/krbalmryde/Dropbox/Class-Projects/cs594/SciVis2015/src/VtkPointCloud.py",
-		"/Users/krbalmryde/Dropbox/Class-Projects/cs594/niiPy/src/NiftiVTK.py",
-		"/Users/krbalmryde/Dropbox/Class-projects/cs594/SciVis2015/util/color_circle_Ajj.pal",
-		"/Users/krbalmryde/Dropbox/Class-Projects/cs594/SciVis2015/src/ds14_cg_particle_velocity_to_VTK.py",
-		"/Users/krbalmryde/Dropbox/Class-Projects/cs524/Journal/TextRendering/src/doc/lowlevel.py",
-		"/Users/krbalmryde/Dropbox/Class-projects/cs594/SciVis2015/src/ContourWidget.py",
-		"/Users/krbalmryde/Dropbox/Class-projects/cs594/SciVis2015/src/foo.py",
-		"/Users/krbalmryde/Dropbox/Class-Projects/cs594/SciVis2015/README.md",
-		"/Users/krbalmryde/Dropbox/Class-Projects/cs594/SciVis2015/src/useful.py",
-		"/Users/krbalmryde/Dropbox/Class-projects/cs594/SciVis2015/src/testYTvr.py",
-		"/Users/krbalmryde/Dropbox/Class-Projects/cs594/SciVis2015/src/explore.py",
-		"/Users/krbalmryde/Dropbox/Class-Projects/cs594/topic9/ReadMe.txt",
-		"/Users/krbalmryde/Dropbox/Class-projects/cs594/topic9/TestT2.py",
-		"/Users/krbalmryde/Dropbox/Class-Projects/cs594/topic9/Topic9-Task1.py",
-		"/Users/krbalmryde/Topic9-Task2.py",
-		"/Users/krbalmryde/Dropbox/Class-Projects/cs594/topic9/scriptT2",
-		"/Users/krbalmryde/Dropbox/Class-Projects/cs594/topic9/mpiPY/e2/sendRecv.py",
-		"/Users/krbalmryde/Dropbox/Class-Projects/cs594/topic6/MyNetCDF.py",
-		"/Users/krbalmryde/Dropbox/Class-Projects/cs524/Journal/TextRendering/src/SynestheticRenderer.py",
-		"/Users/krbalmryde/Dropbox/Class-projects/cs524/Journal/TextRendering/src/TextRender.py",
-		"/Users/krbalmryde/Dropbox/Class-Projects/ISTA555/AnalyzeHappiness/Project1.py",
-		"/Users/krbalmryde/Dropbox/Class-Projects/ISTA555/YouAreWhatYouEat/src/Project4.py",
-		"/Users/krbalmryde/Dropbox/Class-Projects/cs524/Journal/TextRendering/src/util/WordPolarityVectorized.py"
+		"/Users/krbalmryde/Dropbox/Class-Projects/cs594/SciVis2015/src/VtkPointCloud.py"
 	],
 	"find":
 	{
-		"height": 23.0
+		"height": 38.0
 	},
 	"find_in_files":
 	{
@@ -977,6 +959,44 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"root",
+			"console.log(\"\\t ",
+			"main",
+			"dict()",
+			",",
+			"1565818",
+			"1566145",
+			"1566042",
+			"1566041",
+			"1565928",
+			"1565822",
+			"1565821",
+			"Halo257_path.js:30      Made a fix! ",
+			"Scale",
+			"scale",
+			"desc_scale",
+			"1566149",
+			"DarkSkyPy/",
+			"id",
+			"rs",
+			"679582",
+			"791067",
+			"2001085",
+			"2021731",
+			"823681",
+			"_offset",
+			"shift_periodic",
+			"pos",
+			"][:,",
+			"_min",
+			"fn",
+			".min()",
+			" ",
+			"h_",
+			"y",
+			"]-",
+			"convert_to_cMpc",
+			"print ",
 			"i)",
 			"i",
 			"(proper + width/2.) * h_100 * kpc_to_Mpc / cosmo_a",
@@ -1066,45 +1086,7 @@
 			"frame",
 			"vtkTimerCallback",
 			"addPoints",
-			"GetBounds",
-			"min",
-			"min()",
-			"Min",
-			"min",
-			"xyz",
-			"x",
-			"0",
-			"x",
-			"l2a",
-			"position",
-			"sdfdata.parameters.get",
-			"   ",
-			"intoTheVoid",
-			"CreateRepeatingTimer",
-			"timer_count",
-			"1.0",
-			".parameters",
-			"intoTheVoid",
-			"AdjustPoints2",
-			"->",
-			"mapOverlap",
-			"vtkDarkSkyFlow",
-			"vtkPolyData",
-			"vtkDepth",
-			"vtkTimerCallback",
-			"TimerCallbackFunction",
-			"HaloPath",
-			"intoTheVoid",
-			"__createLUT",
-			"__MakeLUT",
-			"vtkDarkSkyFlow",
-			"addPoints",
-			"            \n",
-			"__normalize",
-			"__scalar",
-			"__normalize",
-			"initVTK",
-			"vtkDarkSkyParticles"
+			"GetBounds"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -1112,6 +1094,7 @@
 		"regex": true,
 		"replace_history":
 		[
+			",",
 			". Neuroimaging",
 			" neuroimaging",
 			"neuroimaging",
@@ -1167,89 +1150,28 @@
 	"groups":
 	[
 		{
-			"selected": 1,
+			"selected": 3,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "DarkSkyPy/PrepProcDMH.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 7729,
+						"buffer_size": 1319,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								156,
-								156
+								126,
+								126
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/Python/Python.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 4,
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "DarkSkyPy/exampleSDF.py",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 6058,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								373,
-								373
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Python/Python.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 0,
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 226,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								224,
-								224
-							]
-						],
-						"settings":
-						{
-							"auto_name": "halo X 0.30641 61.7989",
-							"syntax": "Packages/Text/Plain text.tmLanguage"
+							"syntax": "Packages/Python/Python.tmLanguage"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
@@ -1259,19 +1181,20 @@
 					"type": "text"
 				},
 				{
-					"buffer": 3,
+					"buffer": 1,
+					"file": "DarkSkyPy/PrepProcDMH.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 5524,
+						"buffer_size": 8295,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								3455,
-								3502
+								8227,
+								8227
 							]
 						],
 						"settings":
@@ -1281,72 +1204,70 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 532.0,
+						"translation.y": 2808.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 2,
 					"type": "text"
 				},
 				{
-					"buffer": 4,
-					"file": "data/rockstar/hlists/hlist_1.00000.list",
+					"buffer": 2,
+					"file": "DarkSkyJs/js/utils/Utils.js",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 4216557,
+						"buffer_size": 11783,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								933,
-								933
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Text/Plain text.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 5,
-					"type": "text"
-				},
-				{
-					"buffer": 5,
-					"file": "data/rockstar/hlists/hlist_0.12000.list",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 37228,
-						"regions":
-						{
-						},
-						"selection":
-						[
+								76,
+								92
+							],
 							[
-								874,
-								874
+								316,
+								332
+							],
+							[
+								667,
+								683
+							],
+							[
+								1515,
+								1531
+							],
+							[
+								1855,
+								1871
+							],
+							[
+								2063,
+								2079
+							],
+							[
+								2872,
+								2888
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/Text/Plain text.tmLanguage"
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
 						},
-						"translation.x": 0.0,
-						"translation.y": 670.0,
+						"translation.x": -0.0,
+						"translation.y": 1337.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 7,
+					"stack_index": 1,
 					"type": "text"
 				},
 				{
-					"buffer": 6,
-					"file": "DarkSkyJs/src/example_drawCalls.js",
-					"semi_transient": false,
+					"buffer": 3,
+					"file": "DarkSkyJs/src/examples/example_drawCalls.js",
+					"semi_transient": true,
 					"settings":
 					{
 						"buffer_size": 7710,
@@ -1356,39 +1277,8 @@
 						"selection":
 						[
 							[
-								1770,
-								1770
-							]
-						],
-						"settings":
-						{
-							"history_list_is_closing": true,
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 823.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 6,
-					"type": "text"
-				},
-				{
-					"buffer": 7,
-					"file": "DarkSkyJs/js/Utils.js",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 10966,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								3316,
-								3316
+								0,
+								0
 							]
 						],
 						"settings":
@@ -1397,47 +1287,11 @@
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
-						"translation.x": 0.0,
-						"translation.y": 1653.0,
+						"translation.x": -0.0,
+						"translation.y": 1063.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 8,
-					"type": "text"
-				}
-			]
-		},
-		{
-			"selected": 0,
-			"sheets":
-			[
-				{
-					"buffer": 8,
-					"file": "DarkSkyPy/extractHaloAndParticles.py",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 13164,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								187,
-								152
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Python/Python.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 2071.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 1,
+					"stack_index": 0,
 					"type": "text"
 				}
 			]
@@ -1460,18 +1314,11 @@
 				0,
 				1,
 				1
-			],
-			[
-				1,
-				0,
-				2,
-				1
 			]
 		],
 		"cols":
 		[
 			0.0,
-			0.5,
 			1.0
 		],
 		"rows":
@@ -1493,7 +1340,7 @@
 	"project": "DarkSkyVis.sublime-project",
 	"replace":
 	{
-		"height": 42.0
+		"height": 72.0
 	},
 	"save_all_on_build": true,
 	"select_file":
@@ -1502,6 +1349,18 @@
 		"last_filter": "",
 		"selected_items":
 		[
+			[
+				"utils.js",
+				"DarkSkyJs/js/utils/Utils.js"
+			],
+			[
+				"pre",
+				"DarkSkyPy/PrepProcDMH.py"
+			],
+			[
+				"ex",
+				"DarkSkyPy/exampleSDF.py"
+			],
 			[
 				"hli",
 				"DarkSkyVis/data/rockstar/hlists/hlist_0.12000.list"
@@ -1629,10 +1488,6 @@
 			[
 				"hlist_0.65000.list",
 				"cs594/SciVis2015/data/ds14_scivis_0128/rockstar/hlists/hlist_0.65000.list"
-			],
-			[
-				"ex",
-				"cs594/SciVis2015/src/explore.py"
 			],
 			[
 				"sen",

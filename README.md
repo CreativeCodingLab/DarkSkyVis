@@ -14,13 +14,6 @@ convert_to_cMpc = lambda proper: (proper + width/2.) * h_100 * kpc_to_Mpc / cosm
 ```
 Except this turns out the equation **is wrong**
 
-For the very last timepoint, t 1.00, the Particle data lines up nicely with the
-provided Halo data when using the above equation. However for the rest of the
-data, its steadily veers off course. To correct this, modified the equation a
-bit by not dividing the width by 2. Then I pulled the min values of
-each axis for the entire halo dataset and the same for the converted particle dataset,
-computed the difference, and subtracted that value from the particle datas positons
-
 
 ```python
 import numpy as np

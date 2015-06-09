@@ -1,7 +1,7 @@
 import vtk
 import numpy as np
 import thingking as tk  # loadtxt
-from useful import Halo
+from vtkDarkSkyUtilities import Halo
 # from darksky.utils import Halo
 
 
@@ -34,11 +34,11 @@ class vtkDarkSkyParticles(object):
     """docstring for VtkDarkSky"""
     def __init__(self, filename, key, useSDF=True, cMpc=False):
         super(vtkDarkSkyParticles, self).__init__()
-        self.start = time.clock()
-        self.filename = filename
-        self.isCoMoving = cMpc
-        self.vtkPolyData = vtk.vtkPolyData()
         self.useSDF = useSDF
+        self.isCoMoving = cMpc
+        self.filename = filename
+        self.start = time.clock()
+        self.vtkPolyData = vtk.vtkPolyData()
         # Only do one of these
         # ======================
         if self.useSDF:
@@ -49,12 +49,18 @@ class vtkDarkSkyParticles(object):
         self.initVTK(key)
         self.vtkActor = vtk.vtkActor()
         self.vtkActor.SetMapper(self.__setMapper())
+        self.write(filename)
+
+    def initROCKSTAR(self):
+        self.tkHalos = tk.load_txt
 
     def initSDF(self):
         self.sdfParticles = sdf.load_sdf(self.filename)
         self.sdfHeader = self.sdfParticles.parameters
         self.sdfPosition = self.sdfGetXYZ()
-        self.sdfVelocity = self.__getUVW()
+        self.sdfVelocity = self.sdfGetUVW()
+        self.sdfMagnitude = self.sdfGetMagnitude()
+        self.sdfAcceleration = self.sdfGetAcceleration()
         self.sdfPhi = self.sdfParticles['phi']
         self.sdfIdent = self.sdfParticles['ident']
 
@@ -83,13 +89,13 @@ class vtkDarkSkyParticles(object):
     def resetPoints(self):
         self.vtkPoints = vtk.vtkPoints()
         self.vtkCells = vtk.vtkCellArray()
-        self.vtkIntesity = vtk.vtkDoubleArray()
-        self.vtkIntesity.SetName("Mass")
+        self.vtkScalars = vtk.vtkDoubleArray()
+        self.vtkScalars.SetName("DarkMatter_Phi")
 
         self.vtkPolyData.SetPoints(self.vtkPoints)
         self.vtkPolyData.SetVerts(self.vtkCells)
-        self.vtkPolyData.GetPointData().SetScalars(self.vtkIntesity)
-        self.vtkPolyData.GetPointData().SetActiveScalars('Mass')
+        self.vtkPolyData.GetPointData().SetScalars(self.vtkScalars)
+        self.vtkPolyData.GetPointData().SetActiveScalars('DarkMatter_Phi')
 
     def addPoints(self, index, key):
         x, y, z = self.sdfPosition[index]
@@ -99,10 +105,10 @@ class vtkDarkSkyParticles(object):
         self.vtkCells.InsertCellPoint(pID)
 
         v = self.__scalar(index, key)
-        self.vtkIntesity.InsertNextValue(v)
+        self.vtkScalars.InsertNextValue(v)
 
         self.vtkPoints.Modified()
-        self.vtkIntesity.Modified()
+        self.vtkScalars.Modified()
         self.vtkCells.Modified()
 
     def write(self, fn):
@@ -139,16 +145,26 @@ class vtkDarkSkyParticles(object):
         else:
             return xyz
 
-    def __getUVW(self):
+    def sdfGetUVW(self):
         u = self.sdfParticles['vx']
         v = self.sdfParticles['vy']
         w = self.sdfParticles['vz']
         return np.dstack((u, v, w))[0]
 
+    def sdfGetMagnitude(self):
+        return abs(np.sqrt(self.sdfVelocity[:, 0]**2 +
+                           self.sdfVelocity[:, 1]**2 +
+                           self.sdfVelocity[:, 2]**+2))
+    def sdfGetAcceleration(self):
+        a = self.sdfParticles['ax']
+        b = self.sdfParticles['ay']
+        c = self.sdfParticles['az']
+        return np.dstack((a,b,c))[0]
+
     def __toCoMoving(self, proper):
         h_100 = self.sdfHeader['h_100']
-        width = self.sdfHeader.parameters['L0']
-        cosmo_a = self.sdfHeader.parameters['a']
+        width = self.sdfHeader['L0']
+        cosmo_a = self.sdfHeader['a']
         kpc_to_Mpc = 1./1000
         return (proper + width/2.) * h_100 * kpc_to_Mpc / cosmo_a
 
@@ -202,11 +218,11 @@ class vtkDarkSkyParticles(object):
             elif key is 'mag':
                 self.sdfMagnitude/self.factor
             elif key is 'velx':
-                self.sdfVelocity[:, 0] = self.sdfVelocity[:, 0]/self.factor
+                self.sdfVelocity[:, 0] = abs(self.sdfVelocity[:, 0])/self.factor
             elif key is 'vely':
-                self.sdfVelocity[:, 1] = self.sdfVelocity[:, 1]/self.factor
+                self.sdfVelocity[:, 1] = abs(self.sdfVelocity[:, 1]/self.factor)
             elif key is 'velz':
-                self.sdfVelocity[:, 2] = self.sdfVelocity[:, 2]/self.factor
+                self.sdfVelocity[:, 2] = abs(self.sdfVelocity[:, 2])/self.factor
             self.__setMinMaxRange(key)
         else:
             pass
@@ -227,3 +243,87 @@ class vtkDarkSkyParticles(object):
         mapper.SetScalarRange(self.dMin, self.dMax)
         mapper.SetScalarVisibility(1)
         return mapper
+
+
+def print_camera_settings():
+    global ren
+    # ---------------------------------------------------------------
+    # Print out the current settings of the camera
+    # ---------------------------------------------------------------
+    camera = ren.GetActiveCamera()
+    print "Camera settings:"
+    print "  * position:        %s" % (camera.GetPosition(),)
+    print "  * focal point:     %s" % (camera.GetFocalPoint(),)
+    print "  * up vector:       %s" % (camera.GetViewUp(),)
+    print "  * clipping range:  %s" % (camera.GetViewUp(),)
+
+
+def Smile_For_the_Camera():
+    global frame
+    global ren
+    global renWin
+    file_name = "darkSky" + str(frame).zfill(5) + ".png"
+    image = vtk.vtkWindowToImageFilter()
+    image.SetInput(renWin)
+    png_writer = vtk.vtkPNGWriter()
+    png_writer.SetInputConnection(image.GetOutputPort())
+    png_writer.SetFileName(file_name)
+    renWin.Render()
+    png_writer.Write()
+    frame += 1
+    print file_name + " has been successfully exported"
+
+
+def key_pressed_callback(obj, event):
+    # ---------------------------------------------------------------
+    # Attach actions to specific keys
+    # ---------------------------------------------------------------
+    key = obj.GetKeySym()
+    camera = ren.GetActiveCamera()
+
+    if key == "c":
+        print_camera_settings()
+    if key == "s":
+        Smile_For_the_Camera()
+    if key == "i":
+        camera.Zoom(1.5)
+    if key == "o":
+        camera.Zoom(0.95)
+
+
+if __name__ == '__main__':
+
+    frame = 0
+    # DarkSky
+    start = time.clock()
+    # fn = "../data/BlueWater/1.0000"
+    fn = "../data/ds14_scivis_0128/ds14_scivis_0128_e4_dt04_0.1200"
+    dk = vtkDarkSkyParticles(fn, 'phi')
+    # Renderer
+    # Create the Renderer
+    ren = vtk.vtkRenderer()
+    ren.AddActor(dk.vtkActor)
+    ren.SetBackground(0.0, 0.0, 0.0)  # Set background to white
+    ren.ResetCamera()
+
+    # Create the RendererWindow
+    renWin = vtk.vtkRenderWindow()
+    renWin.SetSize(2560, 1600)
+    renWin.AddRenderer(ren)
+
+    # Interactor
+    iren = vtk.vtkRenderWindowInteractor()
+    iren.AddObserver("KeyPressEvent", key_pressed_callback)
+    iren.SetRenderWindow(renWin)
+
+    # Begin Interaction
+    print "We drawing stuffs! {}".format(time.clock() - start)
+    renWin.Render()
+    iren.Initialize()
+
+    # Sign up to receive TimerEvent
+    cb = vtkTimerCallback(dk.vtkActor, ren.GetActiveCamera())
+    iren.AddObserver('TimerEvent', cb.execute)
+    timerId = iren.CreateRepeatingTimer(100)
+
+    iren.Start()

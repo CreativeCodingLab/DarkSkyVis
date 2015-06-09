@@ -3,63 +3,33 @@
  */
 
 function initScene() {
+    // console.log("\t intiScene");
     // Create our scene
     scene = new THREE.Scene();
 
     // Adding our Group object
-    group = new THREE.Group();
+    group = new THREE.Object3D();
     scene.add( group );
+
 }
 
 
 function initCamera() {
+    // console.log("\t initCamera()");
     // Get our Camera working
-    //camera.lookAt(0,0,0);
-    camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 200 );
+    camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
     camera.position.set(58,32.5,53.5);
-    camera.rotateX(0.050);
-    camera.rotateY(-0.25);
-    camera.rotateZ(1.55);
+    //camera.lookAt(57.877390714719766, 32.202756939204875, 51.225539800452616);
+    //camera.rotateX(0.050);
+    //camera.rotateY(-0.25);
+    //camera.rotateZ(1.55);
 }
 
-
-function initRenderer() {
-    // Set up the Renderer
-    renderer = new THREE.WebGLRenderer( { antialias: true } );
-    renderer.setPixelRatio( window.devicePixelRatio );
-    renderer.setSize( window.innerWidth, window.innerHeight );
-    renderer.gammaInput = true;
-    renderer.gammaOutput = true;
-}
-
-function initStats() {
-    // Setup Stats object
-    stats = new Stats();
-    stats.domElement.style.position = 'absolute';
-    stats.domElement.style.top = '0px';
-}
-
-function initControls() {
-    controls = new THREE.OrbitControls( camera, renderer.domElement );
-    controls.damping = 0.2;
-    controls.addEventListener('change', onFrame);
-}
-
-
-function initContainer() {
-    // Setup Container stuff
-    container = document.getElementById( 'Sandbox' );
-    container.appendChild( renderer.domElement );
-    container.appendChild( stats.domElement );
-
-    // Add listeners
-    document.addEventListener( 'keypress', handleKeys, false );
-    window.addEventListener( 'resize', onReshape, false );
-}
 
 
 function initSlider() {
-    slider = $('.tslider')
+    // console.log("\t initSlider()");
+    slider = $('.tslider');
     slider.noUiSlider({
         start: [0, 50],
         connect: true,  // shows areas of coverage
@@ -77,13 +47,74 @@ function initSlider() {
             '75%': [ 75 ],
             'max': [ 88 ]
         }
-    })
+    });
 
     slider.noUiSlider_pips({
         mode: 'count',
         values: 5,
         density: 3
-    })
+    });
+
+    slider.Link('lower').to($('#value-lower'));
+    slider.Link('upper').to($('#value-upper'));
+}
+
+function initRenderer() {
+    // console.log("\t initRenderer()");
+    // Set up the Renderer
+    renderer = new THREE.WebGLRenderer( { antialias: true } );
+    renderer.setPixelRatio( window.devicePixelRatio );
+    renderer.setSize( window.innerWidth, window.innerHeight );
+    renderer.gammaInput = true;
+    renderer.gammaOutput = true;
+}
+
+function initStats() {
+    // console.log("\t initRenderer()");
+    // Setup Stats object
+    stats = new Stats();
+    stats.domElement.style.position = 'absolute';
+    stats.domElement.style.top = '0px';
+}
+
+function initOrbit() {
+    // console.log("\t initOrbit()");
+    var len = haloObjs[0].geometry.vertices.length;
+    var index = parseInt(len/2);
+    var focus = haloObjs[0].geometry.vertices[index];
+    controls = new THREE.OrbitControls( camera, container );
+    controls.damping = 0.2;
+    controls.target = focus;
+}
+
+
+function initTrackBall() {
+    controls = new THREE.TrackballControls( camera, renderer.domElement );
+
+    controls.rotateSpeed = 0.10;
+    controls.zoomSpeed = 1.2;
+    controls.panSpeed = 0.8;
+
+    controls.noZoom = false;
+    controls.noPan = false;
+    controls.target = new THREE.Vector3(57.877390714719766, 32.202756939204875, 51.225539800452616);
+
+    controls.staticMoving = true;
+    controls.dynamicDampingFactor = 0.3;
+
+    controls.keys = [ 65, 83, 68 ];
+
+    controls.addEventListener( 'change', onFrame );
+
+}
+
+function initContainer() {
+    // Setup Container stuff
+    container = document.getElementById( 'Sandbox' );
+    container.appendChild( renderer.domElement );
+
+    // Add listeners
+    window.addEventListener( 'resize', onReshape, false );
 }
 
 
@@ -127,8 +158,8 @@ function randXYZ() {
 }
 
 function initPoints(n) {
-    haloPoints.push(getHaloPos());
-    haloPoints.push(getHaloPos2());
+    haloLines.push(getHaloPos());
+    haloLines.push(getHaloPos2());
     for (var i=0; i < getHaloPos().length; i++) {
         var arr = [];
         for (var j = 0; j < n; j++) {
@@ -137,7 +168,7 @@ function initPoints(n) {
                 z=getHaloPos()[i][2] + Math.random();
             arr.push([x,y,z])
         }
-        haloPoints.push(arr)
+        haloLines.push(arr)
     }
 }
 

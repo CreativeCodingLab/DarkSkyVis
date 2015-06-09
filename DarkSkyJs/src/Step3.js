@@ -23,13 +23,7 @@ function onCreate() {
     /* Setting up THREE.js stuff */
 
     // Create our scene
-    scene = new THREE.Scene();
-
-    // Adding our Group object
-    group = new THREE.Group();
-    scene.add( group );
-
-    root = new THREE.Object3D();
+    initScene();
 
     // Get our Camera working
     initCamera();
@@ -150,8 +144,6 @@ function handleKeys( event ) {
         case 111: // o
             camera.rotateX(-0.05);
             break;
-
-
     }
     console.log( camera.position, camera.rotation);
 }

@@ -184,7 +184,7 @@ def intoTheVoid(fileList, TargetID, pID, coords, n):
         return intoTheVoid(fileList[1:], tHl.desc_id, tHl.id, coords, n + 1)
 
 
-def main():
+def extract_haloPath_and_particles():
     RAW = "../data"
     ROCKSTAR = op.join(RAW, "rockstar", "hlists", "hlist_[0-1].[0-9][0-9]000.*")
     HALO_FILES = l2a(glob(ROCKSTAR))
@@ -204,7 +204,6 @@ def main():
 
     for i, haloID in enumerate(HALO_ID_LIST[0:1]):  # Limiting our list to just one HALO
         # haloFileIndex = i + 0
-        partileFileIndex = i + 11  # since the first timepoint for halos is 12
         HaloObjs, time = intoTheVoid(HALO_FILES, haloID, -1, [], 0)
         print "\nwe have a total of", len(HaloObjs), "Halos"
         for j, halo in enumerate(HaloObjs):
@@ -216,5 +215,14 @@ def main():
                 outfile.write(json.dumps(halo))
 
 
+def extract_particle_path():
+    RAW = "../data"
+    ROCKSTAR = op.join(RAW, "rockstar", "hlists", "hlist_[0-1].[0-9][0-9]000.*")
+    PARTICLES = op.join(RAW, "ds14_scivis_0128", "ds14_scivis_0128_e4_dt04_[0-1].[0-9][0-9]00")
+
+    HALO_FILES = l2a(glob(ROCKSTAR))
+    PARTICLE_FILES = l2a(glob(PARTICLES)[])
+
+
 if __name__ == '__main__':
-    main()
+    extract_haloPath_and_particles()

@@ -4,14 +4,14 @@
  * Contains the path for
  */
 
-
 HALO257 = [
     {
     "rs": 31.047,
     "xyz": [57.75873, 30.51175, 50.67266],
     "child": 533,
     "rvir": 0.20225700000000002,
-    "particles": [{
+    "particles": [
+        {
         "y": 30.424407958984375,
         "x": 57.771270751953125,
         "z": 50.545257568359375,
@@ -4114,42 +4114,3 @@ HALO257 = [
     "time": 88,
     "id": 679582
 }];
-
-
-function initPointsH257() {
-    var haloPath = [];
-    var particlePaths = {};
-    var pIDS = [ 1565818,  1565821, 1565822, 1565928, 1566041, 1566042, 1566145, 1566149 ];
-    for (var i = 0; i < HALO257.length; i++){
-        var halo = HALO257[i];
-        haloPath.push(halo.xyz);
-        for (var j = 0; j < halo.particles.length; j++){
-            var part = halo.particles[j];
-
-            if (part.id in particlePaths)
-                particlePaths[part.id].push([part.x, part.y, part.z]);
-            else
-                particlePaths[part.id] = [[part.x, part.y, part.z]];
-        }
-        // Check to make sure the arrays are all the same length.
-        if (halo.particles.length < pIDS.length) {
-            for (var k = 0; k < pIDS.length; k++) {
-                id = pIDS[k];
-                // The logic here is that if we are missing any entries, due to the particle moving outside the
-                // bounds of the halos influence, then replace the missing value with the current Halos xyz
-                if (particlePaths[id].length < i + 1) {
-                    console.log("Made a fix!", id);
-                    particlePaths[id].push(halo.xyz)
-                }
-            }
-        }
-        //console.log("particlePaths", particlePaths);
-        //console.log('haloPath', haloPath.length, haloPath);
-    }
-    haloPoints.push(haloPath);
-    for (var k = 0; k < pIDS.length; k++) {
-        id = pIDS[k];
-        haloPoints.push(particlePaths[id]);
-    }
-    console.log('haloPoints', haloPoints.length, haloPoints);
-}
