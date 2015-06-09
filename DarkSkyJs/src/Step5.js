@@ -9,13 +9,10 @@ var scene, renderer;
 var camera, slider;
 var mouse, raycaster;
 var head, tail;
-var linesMesh;
-var nDivisions = 10;
-var NUMTIMEPOINTS = 89;
-var haloObjs = [];
-var haloLines = [];
-var haloStats = [];
-var haloSpheres = [];
+var target, linesMesh;
+var haloObjs = [], haloStats = [];
+var haloLines = [], haloSpheres = [];
+var nDivisions = 10, NUMTIMEPOINTS = 89;
 var numPoints = NUMTIMEPOINTS * nDivisions;
 
 
@@ -76,6 +73,7 @@ function onCreate() {
     // Add listeners
     window.addEventListener( 'resize', onReshape, false );
     window.addEventListener( 'mousemove', onMouseMove, false );
+    window.addEventListener( 'mousedown', onMouseDown, false );
 
 
 }
@@ -105,6 +103,10 @@ function onMouseMove( event ) {
 }
 
 
+// function onMouseClick( event ) {
+
+// }
+
 /* ================================== *
  *          onFrame
  *  Our Main rendering loop with
@@ -120,15 +122,15 @@ function onFrame() {
     // update the picking ray with the camera and mouse position
     raycaster.setFromCamera( mouse, camera );
 
+    // reset the previous element
+    if (target) target.object.material.color.set( 0xffffff );
     // calculate objects intersecting the picking ray
-    var intersects = raycaster.intersectObjects( sphereGroup.children );
+    target = raycaster.intersectObjects( sphereGroup.children )[0];
 
-    if (intersects.length > 0) {
-        console.log("camera", camera, "control", controls, "intersects",intersects);
-        for ( var i = 0; i < intersects.length; i++ ) {
-            intersects[ i ].object.material.color.set( 0xff0000 );
-
-        }
+    if (target) {
+        console.log("camera", camera, "control", controls, "intersects", target);
+        target.object.material.color.set( 0xff0000 );
+        controls.target = target.object.position;
     };
     requestAnimationFrame( onFrame );
     renderer.render( scene, camera );
