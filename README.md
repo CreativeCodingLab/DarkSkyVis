@@ -1,3 +1,6 @@
+## See it in Action
+[Halos in a DarkSky](https://www.evl.uic.edu/krbalmryde/projects/DarkSky/index.html)
+
 ## Important Notes
 Particle position data is listed in `proper kpc/h` while the halo data is in `comoving Mpc/h` in order
 to change this the following function can be used:
