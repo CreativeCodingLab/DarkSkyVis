@@ -78,10 +78,41 @@ function onCreate() {
     {
 
         // **** position the camera near the first halo; ***
-        var pos = sphereGroup.children[0].position;
-        camera.position.set(pos.x, pos.y+0.1, pos.z-0.3);
-        camera.lookAt(new THREE.Vector3(57.877390714719766, 32.202756939204875, 51.225539800452616));
+        var pos = sphereGroup.children[3].position;
+        camera.position.set(pos.x, pos.y+0.1, pos.z-(pos.z*0.05));
+
+
+        //controls = new THREE.MouseControls(camera);
+        // // Orbig Controls
+        //controls = new THREE.OrbitControls( camera, container );
+        //{
+        //    controls.target.set(pos.x, pos.y, pos.z);
+        //    controls.update();
+        //}
+        //
+        // **** Create controls ***
+         // Trackball control
+         controls = new THREE.TrackballControls( camera );
+         {
+
+             controls.rotateSpeed = 4.0;
+             controls.zoomSpeed = 5.2;
+             controls.panSpeed = 3.8;
+
+             controls.noZoom = false;
+             controls.noPan = false;
+
+             controls.staticMoving = true;
+             controls.dynamicDampingFactor = 0.3;
+
+             controls.keys = [ 65, 83, 68 ];
+             //controls.addEventListener( 'change', draw );
+             controls.enabled = true;
+         }
+        camera.lookAt(pos);
         camera.updateMatrix();
+        controls.target.set(pos.x, pos.y, pos.z);
+        controls.update();
 
     }
 
@@ -99,45 +130,16 @@ function onCreate() {
     container.appendChild( renderer.domElement );
 
 
-
-    // **** Create controls ***
-    // // Trackball control
-    // controls = new THREE.TrackballControls( camera );
-    // {
-
-    //     controls.rotateSpeed = 1.0;
-    //     controls.zoomSpeed = 1.2;
-    //     controls.panSpeed = 0.8;
-
-    //     controls.noZoom = false;
-    //     controls.noPan = false;
-
-    //     controls.staticMoving = true;
-    //     controls.dynamicDampingFactor = 0.3;
-
-    //     controls.keys = [ 65, 83, 68 ];
-    //     controls.addEventListener( 'change', onFrame );
-    // }
-
-
-    // // Orbig Controls
-    controls = new THREE.OrbitControls( camera, container );
-    {
-        // un-elegant setting of the first sphere.
-        controls.target.set(57.877390714719766, 32.202756939204875, 51.225539800452616);
-        controls.update();
-    }
-
     // **** Add listeners *** //
     window.addEventListener( 'resize', onReshape, false );
     window.addEventListener( 'mousemove', onMouseMove, false );
-    window.addEventListener( 'mousedown', onMouseDown, false );
-    document.addEventListener( 'keypress', onKeyPress, false );
+    window.addEventListener( 'mousedown', onMouseClick, true );
+    //document.addEventListener( 'keypress', onKeyPress, false );
 
 }
 
 // ==========================================
-//              onReshape
+//              onReshape, onMouseMove
 // And associated Event Listeners
 // ==========================================
 function onReshape() {
@@ -148,20 +150,17 @@ function onReshape() {
 }
 
 
-// ==========================================
-//              onMouseMove
-// And associated Event Listeners
-// ==========================================
 function onMouseMove( event ) {
     // calculate mouse position in normalized device coordinates
     // (-1 to +1) for both components
     event.preventDefault();
     mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
     mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
 }
 
 
-function onMouseDown( event ) {
+function onMouseClick( event ) {
     console.log(controls);
     // update the picking ray with the camera and mouse position
     raycaster.setFromCamera( mouse, camera );
@@ -196,6 +195,13 @@ function onFrame() {
         tail = parseInt(slider.val()[1]);
         updateAllTheGeometry(nDivisions);
     }
+
+    requestAnimationFrame( onFrame );
+    draw();
+}
+
+
+function draw() {
     raycaster.setFromCamera( mouse, camera );
 
     // This loop is to set the captured moused over halos back to their
@@ -228,64 +234,9 @@ function onFrame() {
 
         }
     }
-
-    requestAnimationFrame( onFrame );
+    controls.update();
     renderer.render( scene, camera );
-
 }
-
-
-/* ===========================================================
- * Our handleKeys function. Rudimentary camera controls meant
- * primarily for debugging purposes
- * ========================================================== */
-function createBufferGeometry(nDivisions) {
-    head = slider.val()[0];
-    tail = slider.val()[1];
-
-    var index, xyz;
-    var splineGeometryBuffer = new THREE.BufferGeometry();
-    var positions = new Float32Array(numPoints * 3 * haloLines.length);
-    var colors = new Float32Array(numPoints * 3 * haloLines.length);
-
-    console.log("positions: ", positions.length);
-    var pos = 0, start = 0;
-    //for (var i = 0; i < haloLines.length; i++) {
-    for (var i = 0; i < 1; i++) {
-        var points = haloLines[i];
-        var spline = new THREE.Spline();
-        spline.initFromArray(points);
-
-        for (var j = 0; j < numPoints ; j++ ) {
-            index = j /numPoints;
-            xyz = spline.getPoint(index);
-
-            positions[pos++] = xyz.x; colors[pos] = (i === 0) ? 1.0 : Math.random();
-            positions[pos++] = xyz.y; colors[pos] = (i === 0) ? 1.0 : (j / (numPoints));
-            positions[pos++] = xyz.z; colors[pos] = (i === 0) ? 1.0 : Math.random();
-
-        }
-        console.log("start: ", start);
-        splineGeometryBuffer.addDrawCall(start, numPoints, 0);
-        start += numPoints * 3;
-    }
-    splineGeometryBuffer.addAttribute( 'position', new THREE.DynamicBufferAttribute( positions, 3 ) );
-    splineGeometryBuffer.addAttribute( 'color', new THREE.DynamicBufferAttribute( colors, 3 ) );
-    splineGeometryBuffer.computeBoundingSphere();
-
-    var material = new THREE.LineBasicMaterial( {
-        vertexColors: THREE.VertexColors,
-        //blending: THREE.AdditiveBlending,
-        //transparent: true,
-        color: 0xffffff,
-        opacity: 0.3,
-        linewidth: 1
-    } );
-    linesMesh = new THREE.Line( splineGeometryBuffer, material );
-    console.log(splineGeometryBuffer);
-    linesGroup.add( linesMesh );
-}
-
 
 function createSplineGeometry(nDivisions) {
     head = parseInt(slider.val()[0]);
@@ -487,18 +438,18 @@ function onKeyPress( event ) {
     var key = event.keyCode;
     console.log(key);
     switch (key) {
-        case 119:  // w
-            camera.position.z += 0.1;
-            break;
-        case 115: // s
-            camera.position.z -= 0.1;
-            break;
-        case 97: // a
-            camera.position.x += 0.1;
-            break;
-        case 100: // d
-            camera.position.x -= 0.1;
-            break;
+        //case 119:  // w
+        //    camera.position.z += 0.1;
+        //    break;
+        //case 115: // s
+        //    camera.position.z -= 0.1;
+        //    break;
+        //case 97: // a
+        //    camera.position.x += 0.1;
+        //    break;
+        //case 100: // d
+        //    camera.position.x -= 0.1;
+        //    break;
         case 113:  // q
             camera.position.y += 0.1;
             break;
@@ -526,14 +477,16 @@ function onKeyPress( event ) {
             camera.rotateZ(-0.05);
             break;
         case 48: //0
-            //camera.position.set(0.0,0.0,0.0);
-            //camera.lookAt(scene.position);
-            var pos = sphereGroup.children[0].position;
-            var pos2 = curTarget.object.position;
-            console.log(pos, pos2)
-            camera.lookAt(pos2);
-
+            camera.lookAt(scene.position);
+            var pos = sphereGroup.children[3].position;
+            //var pos2 = curTarget.object.position;
+            //console.log(pos, pos2)
+            camera.position.set(pos.x, pos.y, pos.z);
+            camera.lookAt(pos);
+            controls.update();
             console.log(controls);
     }
+    controls.k
+
     console.log( camera, camera.position, camera.rotation);
 }

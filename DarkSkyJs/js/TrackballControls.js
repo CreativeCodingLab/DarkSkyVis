@@ -33,6 +33,8 @@ THREE.TrackballControls = function ( object, domElement ) {
 	this.minDistance = 0;
 	this.maxDistance = Infinity;
 
+
+	//this.keys = [ 37, 38, 39 ];
 	this.keys = [ 65 /*A*/, 83 /*S*/, 68 /*D*/ ];
 
 	// internals
@@ -351,7 +353,6 @@ THREE.TrackballControls = function ( object, domElement ) {
 	// listeners
 
 	function keydown( event ) {
-
 		if ( _this.enabled === false ) return;
 
 		window.removeEventListener( 'keydown', keydown );
@@ -379,7 +380,6 @@ THREE.TrackballControls = function ( object, domElement ) {
 	}
 
 	function keyup( event ) {
-
 		if ( _this.enabled === false ) return;
 
 		_state = _prevState;
@@ -389,7 +389,6 @@ THREE.TrackballControls = function ( object, domElement ) {
 	}
 
 	function mousedown( event ) {
-
 		if ( _this.enabled === false ) return;
 
 		event.preventDefault();
