@@ -125,7 +125,7 @@ function onMouseDown( event ) {
         }
         prevTarget.object.material.color.set( rgbToHex(255,255,255) );
         curTarget.object.material.color.set( rgbToHex(0,255,0) );
-        var pos = curTarget.object.position
+        var pos = curTarget.object.position;
         controls.target.set(pos.x, pos.y, pos.z);
         controls.update();
     }
@@ -149,9 +149,11 @@ function onFrame() {
         for (var i = 0; i < hits.length; i++) {
             if (hits[i].object.position !== curTarget.object.position) {
                 // console.log("\tdont match! 0");
-                hits[i].object.material.color.set( rgbToHex(255, 255, 255) );  // sky blue
+                hits[i].object.material.color.set( rgbToHex(255, 255, 255) );
+                hits[i].object.material.opacity = 0.1;
             } else if (hits[i].object.position === curTarget.object.position) {
                 curTarget.object.material.color.set( rgbToHex(0,255,0) );  // line green
+                hits[i].object.material.opacity = 0.1;
                 console.log("matched! 0!")
             }
         }
@@ -160,13 +162,15 @@ function onFrame() {
     hits = raycaster.intersectObjects( sphereGroup.children );
 
     if (hits.length > 0) {
-        console.log("we got hits!", hits)
+        console.log("we got hits!", hits);
         for (var i = 0; i < hits.length; i++) {
             if (hits[i].object.position !== curTarget.object.position){
                 // console.log("\tdont match! 1");
                 hits[i].object.material.color.set( rgbToHex(255, 255, 0) ); // yellow
+                hits[i].object.material.opacity = 0.8;
             } else if (hits[i].object.position === curTarget.object.position) {
                 curTarget.object.material.color.set( rgbToHex(0,255,0) );
+                hits[i].object.material.opacity = 0.8;
                 console.log("matched 1")
             }
 
@@ -263,7 +267,7 @@ function createSplineGeometry(nDivisions) {
         splineGeomentry.colors = colors;
         splineGeomentry.computeBoundingSphere();
         var material = new THREE.LineBasicMaterial({
-            color: 0xffffff, opacity: 1.0, linewidth: 1, vertexColors: THREE.VertexColors
+            color: 0xffffff, linewidth: 1, vertexColors: THREE.VertexColors
         });
         var mesh = new THREE.Line(splineGeomentry, material);
         mesh.updateMatrix();
@@ -280,13 +284,15 @@ function createSphereGeometry(spline) {
         var halo = haloStats[head + i];
         console.log(typeof(head),controlPoints.length, head, haloStats, haloStats[head + i]);
         // console.log("what it got", halo);
-        var sphereGeometry = new THREE.SphereGeometry(halo.radius / halo.rScale * 3);
+        var sphereGeometry = new THREE.SphereGeometry(halo.radius / halo.rScale * 6);
         sphereGeometry.color = new THREE.Color((Math.random() ), (i / (numPoints)), (Math.random()));
         var sphereMesh = new THREE.Mesh(
             sphereGeometry,
             new THREE.MeshBasicMaterial({
                 color: rgbToHex(255, 255, 255) ,
                 vertexColors: THREE.VertexColors,
+                transparent: true,
+                opacity: 0.1
             })
         );
 
