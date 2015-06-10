@@ -5,15 +5,25 @@
 if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 var container;
+var head, tail;
 var scene, renderer;
 var camera, slider;
-var mouse, raycaster;
-var head, tail;
-var hits = [], curTarget, prevTarget;
+var mouse, raycaster, ambient;
 var haloObjs = [], haloStats = [];
 var haloLines = [], haloSpheres = [];
+var hits = [], curTarget, prevTarget;
 var nDivisions = 10, NUMTIMEPOINTS = 89;
 var numPoints = NUMTIMEPOINTS * nDivisions;
+
+// ==========================================
+//              Start
+//    Main entry point into the application
+//    Gets called by index.html
+// ==========================================
+function Start() {
+    onCreate();
+    onFrame();
+}
 
 
 /* ==========================================
@@ -26,62 +36,103 @@ var numPoints = NUMTIMEPOINTS * nDivisions;
 function onCreate() {
     /* Setting up THREE.js stuff */
 
-    // Create our scene
+    // **** Create our scene ***
     scene = new THREE.Scene();
 
-    // Adding our Group object
-    linesGroup = new THREE.Object3D();
-    sphereGroup = new THREE.Object3D();
-    scene.add( linesGroup );
-    scene.add( sphereGroup );
+    // **** Adding our Group object ***
+    {
+        linesGroup = new THREE.Object3D();
+        sphereGroup = new THREE.Object3D();
 
-    // Get our Camera working
-    camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 1000 );
+        scene.add( linesGroup );
+        scene.add( sphereGroup );
+    }
 
-    // Setup our Raycasting stuff
+    // **** Lights! ***
+    ambient = new THREE.AmbientLight(0x404040); //rgbToHex(197, 176, 255)
+    scene.add(ambient);
+
+    // **** Setup our Raycasting stuff ***
     raycaster = new THREE.Raycaster();
-    mouse = new THREE.Vector2();
+    {
+        mouse = new THREE.Vector2();
 
-    // Have to set this so it doesn complain!
-    curTarget = {object: {position: null, material: {color: null }}};
+        // **** Have to set this so it doesnt complain! ***
+        curTarget = {object: {position: null, material: {color: null }}};
+    }
 
-    // Setup our slider
+    // **** Setup our slider ***
     initSlider();
 
-    // creates some random and some predetermined
+    // **** creates some random and some predetermined ***
     // points
     initPointsH257();
 
-    // Make some Spline Geometry
+    // **** Make some Spline Geometry ***
     // createBufferGeometry(nDivisions);
     createSplineGeometry(nDivisions);
 
-    // position the camera near the first halo;
-    var pos = sphereGroup.children[0].position;
-    camera.position.set(pos.x, pos.y+0.1, pos.z-0.3);
-    camera.updateMatrix();
 
-    // Set up the Renderer
+    // **** Get our Camera working ***
+    camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 1000 );
+    {
+
+        // **** position the camera near the first halo; ***
+        var pos = sphereGroup.children[0].position;
+        camera.position.set(pos.x, pos.y+0.1, pos.z-0.3);
+        camera.lookAt(new THREE.Vector3(57.877390714719766, 32.202756939204875, 51.225539800452616));
+        camera.updateMatrix();
+
+    }
+
+    // **** Set up the Renderer ***
     renderer = new THREE.WebGLRenderer( { antialias: true } );
-    renderer.setPixelRatio( window.devicePixelRatio );
-    renderer.setSize( window.innerWidth, window.innerHeight );
-    renderer.gammaInput = true;
-    renderer.gammaOutput = true;
+    {
+        renderer.setPixelRatio( window.devicePixelRatio );
+        renderer.setSize( window.innerWidth, window.innerHeight );
+        renderer.gammaInput = true;
+        renderer.gammaOutput = true;
+    }
 
-    // Setup Container stuff
+    // **** Setup Container stuff ***
     container = document.getElementById( 'Sandbox' );
     container.appendChild( renderer.domElement );
 
-    // Create controls
-    controls = new THREE.OrbitControls( camera, container );
-    controls.target.set(57.877390714719766, 32.202756939204875, 51.225539800452616);
-    controls.update();
 
-    // Add listeners
+
+    // **** Create controls ***
+    // // Trackball control
+    // controls = new THREE.TrackballControls( camera );
+    // {
+
+    //     controls.rotateSpeed = 1.0;
+    //     controls.zoomSpeed = 1.2;
+    //     controls.panSpeed = 0.8;
+
+    //     controls.noZoom = false;
+    //     controls.noPan = false;
+
+    //     controls.staticMoving = true;
+    //     controls.dynamicDampingFactor = 0.3;
+
+    //     controls.keys = [ 65, 83, 68 ];
+    //     controls.addEventListener( 'change', onFrame );
+    // }
+
+
+    // // Orbig Controls
+    controls = new THREE.OrbitControls( camera, container );
+    {
+        // un-elegant setting of the first sphere.
+        controls.target.set(57.877390714719766, 32.202756939204875, 51.225539800452616);
+        controls.update();
+    }
+
+    // **** Add listeners *** //
     window.addEventListener( 'resize', onReshape, false );
     window.addEventListener( 'mousemove', onMouseMove, false );
     window.addEventListener( 'mousedown', onMouseDown, false );
-
+    document.addEventListener( 'keypress', onKeyPress, false );
 
 }
 
@@ -111,12 +162,13 @@ function onMouseMove( event ) {
 
 
 function onMouseDown( event ) {
+    console.log(controls);
     // update the picking ray with the camera and mouse position
     raycaster.setFromCamera( mouse, camera );
     // calculate objects intersecting the picking ray
     var hit = raycaster.intersectObjects( sphereGroup.children )[0];
     if (hit) {
-        console.log("we got something!", hit)
+        console.log("we got something!", hit);
         if (!prevTarget)
             prevTarget = curTarget = hit;
         else {
@@ -124,10 +176,12 @@ function onMouseDown( event ) {
             curTarget = hit;
         }
         prevTarget.object.material.color.set( rgbToHex(255,255,255) );
-        curTarget.object.material.color.set( rgbToHex(0,255,0) );
+        prevTarget.object.material.opacity = 0.1;
+        curTarget.object.material.color.set( rgbToHex(255,0,0) );
         var pos = curTarget.object.position;
         controls.target.set(pos.x, pos.y, pos.z);
         controls.update();
+        console.log(controls);
     }
 }
 
@@ -144,34 +198,32 @@ function onFrame() {
     }
     raycaster.setFromCamera( mouse, camera );
 
+    // This loop is to set the captured moused over halos back to their
+    // original color once we have moved the mouse away
     if (hits.length > 0) {
-        console.log("prev round", hits);
         for (var i = 0; i < hits.length; i++) {
             if (hits[i].object.position !== curTarget.object.position) {
-                // console.log("\tdont match! 0");
                 hits[i].object.material.color.set( rgbToHex(255, 255, 255) );
                 hits[i].object.material.opacity = 0.1;
             } else if (hits[i].object.position === curTarget.object.position) {
-                curTarget.object.material.color.set( rgbToHex(0,255,0) );  // line green
-                hits[i].object.material.opacity = 0.1;
-                console.log("matched! 0!")
+                curTarget.object.material.color.set( rgbToHex(255,0,0) );  // line green
+                hits[i].object.material.opacity = 0.8;
             }
         }
     }
 
     hits = raycaster.intersectObjects( sphereGroup.children );
 
+    // This loop is to set the captured moused over halos to yellow to highlight
+    // that weve moved over them
     if (hits.length > 0) {
-        console.log("we got hits!", hits);
         for (var i = 0; i < hits.length; i++) {
             if (hits[i].object.position !== curTarget.object.position){
-                // console.log("\tdont match! 1");
                 hits[i].object.material.color.set( rgbToHex(255, 255, 0) ); // yellow
                 hits[i].object.material.opacity = 0.8;
             } else if (hits[i].object.position === curTarget.object.position) {
-                curTarget.object.material.color.set( rgbToHex(0,255,0) );
+                curTarget.object.material.color.set( rgbToHex(255,0,0) );
                 hits[i].object.material.opacity = 0.8;
-                console.log("matched 1")
             }
 
         }
@@ -427,11 +479,61 @@ function rgbToHex(R,G,B){
     return "#" + toHex(R) + toHex(G) + toHex(B)
 }
 
+/* ===========================================================
+ * Our onKeyPress function. Rudimentary camera controls meant
+ * primarily for debugging purposes
+ * ========================================================== */
+function onKeyPress( event ) {
+    var key = event.keyCode;
+    console.log(key);
+    switch (key) {
+        case 119:  // w
+            camera.position.z += 0.1;
+            break;
+        case 115: // s
+            camera.position.z -= 0.1;
+            break;
+        case 97: // a
+            camera.position.x += 0.1;
+            break;
+        case 100: // d
+            camera.position.x -= 0.1;
+            break;
+        case 113:  // q
+            camera.position.y += 0.1;
+            break;
+        case 101: // e
+            camera.position.y -= 0.1;
+            break;
 
-// ==========================================
-//              START OF MAIN
-// ==========================================
-function Start() {
-    onCreate();
-    onFrame();
+        case 105:  // i
+            camera.rotateX(0.05);
+
+            break;
+        case 107: // k
+            camera.rotateX(-0.05);
+            break;
+        case 106: // j
+            camera.rotateY(0.05);
+            break;
+        case 108:  // l
+            camera.rotateY(-0.05);
+            break;
+        case 117: //u
+            camera.rotateZ(0.05);
+            break;
+        case 111: // o
+            camera.rotateZ(-0.05);
+            break;
+        case 48: //0
+            //camera.position.set(0.0,0.0,0.0);
+            //camera.lookAt(scene.position);
+            var pos = sphereGroup.children[0].position;
+            var pos2 = curTarget.object.position;
+            console.log(pos, pos2)
+            camera.lookAt(pos2);
+
+            console.log(controls);
+    }
+    console.log( camera, camera.position, camera.rotation);
 }
