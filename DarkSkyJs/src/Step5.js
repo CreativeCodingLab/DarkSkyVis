@@ -78,7 +78,7 @@ function onCreate() {
     {
 
         // **** position the camera near the first halo; ***
-        var pos = sphereGroup.children[3].position;
+        var pos = sphereGroup.children[30].position;
         camera.position.set(pos.x, pos.y+0.1, pos.z-(pos.z*0.05));
 
 
@@ -166,7 +166,7 @@ function onMouseClick( event ) {
     raycaster.setFromCamera( mouse, camera );
     // calculate objects intersecting the picking ray
     var hit = raycaster.intersectObjects( sphereGroup.children )[0];
-    if (hit) {
+    if (hit && hit.object.material.opacity !== 0.0) {
         console.log("we got something!", hit);
         if (!prevTarget)
             prevTarget = curTarget = hit;
@@ -208,12 +208,12 @@ function draw() {
     // original color once we have moved the mouse away
     if (hits.length > 0) {
         for (var i = 0; i < hits.length; i++) {
-            if (hits[i].object.position !== curTarget.object.position) {
+            if (hits[i].object.position !== curTarget.object.position && hits[i].object.material.opacity !== 0.0) {
                 hits[i].object.material.color.set( rgbToHex(255, 255, 255) );
                 hits[i].object.material.opacity = 0.1;
-            } else if (hits[i].object.position === curTarget.object.position) {
+            } else if (hits[i].object.position === curTarget.object.position && hits[i].object.material.opacity !== 0.0) {
                 curTarget.object.material.color.set( rgbToHex(255,0,0) );  // line green
-                hits[i].object.material.opacity = 0.8;
+                curTarget.object.material.opacity = 0.8;
             }
         }
     }
@@ -224,10 +224,10 @@ function draw() {
     // that weve moved over them
     if (hits.length > 0) {
         for (var i = 0; i < hits.length; i++) {
-            if (hits[i].object.position !== curTarget.object.position){
+            if (hits[i].object.position !== curTarget.object.position && hits[i].object.material.opacity !== 0.0){
                 hits[i].object.material.color.set( rgbToHex(255, 255, 0) ); // yellow
                 hits[i].object.material.opacity = 0.8;
-            } else if (hits[i].object.position === curTarget.object.position) {
+            } else if (hits[i].object.position === curTarget.object.position && hits[i].object.material.opacity !== 0.0) {
                 curTarget.object.material.color.set( rgbToHex(255,0,0) );
                 hits[i].object.material.opacity = 0.8;
             }
@@ -248,11 +248,10 @@ function createSplineGeometry(nDivisions) {
         var points = haloLines[i];
         var spline = new THREE.Spline();
         spline.initFromArray(points.slice(head,tail));
-        var controlPoints = spline.getControlPointsArray().slice(head,tail);
         var splineGeomentry = new THREE.Geometry();
 
         if ( i === 0 ){
-            createSphereGeometry(spline);
+            createSphereGeometry();
         }
 
         for (var j = 0; j < numPoints ; j++ ) {
@@ -279,13 +278,17 @@ function createSplineGeometry(nDivisions) {
     }
 }
 
-function createSphereGeometry(spline) {
+function createSphereGeometry() {
+    // Halo Lines [0] is the main halopath
+    var points = haloLines[0];
+    var spline = new THREE.Spline();
+    spline.initFromArray(points);
     var controlPoints = spline.getControlPointsArray();
-
+    console.log(points, controlPoints )
     for (var i = 0; i < controlPoints.length; i++) {
         var hl = controlPoints[i];
-        var halo = haloStats[head + i];
-        console.log(typeof(head),controlPoints.length, head, haloStats, haloStats[head + i]);
+        var halo = haloStats[i];
+        console.log(typeof(head),controlPoints.length, head, haloStats);
         // console.log("what it got", halo);
         var sphereGeometry = new THREE.SphereGeometry(halo.radius / halo.rScale * 6);
         sphereGeometry.color = new THREE.Color((Math.random() ), (i / (numPoints)), (Math.random()));
@@ -295,7 +298,7 @@ function createSphereGeometry(spline) {
                 color: rgbToHex(255, 255, 255) ,
                 vertexColors: THREE.VertexColors,
                 transparent: true,
-                opacity: 0.1
+                opacity: (i < head || i > tail) ? 0.0 : 0.1
             })
         );
 
@@ -345,9 +348,10 @@ function updateAllTheGeometry(nDivisions) {
 function updateSpheres(spline) {
     // First, remove all of our sphere objects
             // This needs some work!
-    for (var i = 0; i < haloSpheres.length; i++) sphereGroup.remove(haloSpheres[i]);
-    haloSpheres.slice(0, haloSpheres.length);
-    createSphereGeometry(spline);
+    for (var i = 0; i < haloSpheres.length; i++) {
+        haloSpheres[i].material.opacity = (i < head || i > tail) ? 0.0 : 0.1;
+    }
+    //createSphereGeometry(spline);
 
 }
 
