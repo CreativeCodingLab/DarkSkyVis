@@ -51,15 +51,6 @@ function onCreate() {
     ambient = new THREE.AmbientLight(0x404040); //rgbToHex(197, 176, 255)
     scene.add(ambient);
 
-    // **** Setup our Raycasting stuff ***
-    raycaster = new THREE.Raycaster();
-    {
-        mouse = new THREE.Vector2();
-
-        // **** Have to set this so it doesnt complain! ***
-        curTarget = {object: {position: null, material: {color: null }}};
-    }
-
     // **** Setup our slider ***
     initSlider();
 
@@ -74,7 +65,19 @@ function onCreate() {
     // **** Get our Camera working ***
     initCamera();
 
-    initGUI();
+    //initGUI();
+
+    // **** Setup our Raycasting stuff ***
+    raycaster = new THREE.Raycaster();
+    {
+        mouse = new THREE.Vector2();
+
+        // **** Have to set this so it doesnt complain! ***
+        curTarget = {object: haloSpheres[head]};
+        curTarget.object.material.color.set( rgbToHex(255,0,0) );  // red
+        curTarget.object.material.opacity = 0.8;
+        tweenToPosition(250, 250);
+    }
 
     // **** Set up the Renderer ***
     renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -109,7 +112,6 @@ function initCamera() {
 
         controls = new THREE.TrackballControls( camera );
         {
-            controls.minDistance
             controls.rotateSpeed = 4.0;
             controls.zoomSpeed = 5.2;
             controls.panSpeed = 3.8;
@@ -121,7 +123,6 @@ function initCamera() {
             controls.dynamicDampingFactor = 0.3;
 
             controls.keys = [ 65, 83, 68 ];
-            //controls.addEventListener( 'change', draw );
             controls.enabled = true;
         }
         camera.lookAt(pos);
@@ -166,21 +167,26 @@ function onMouseClick() {
             prevTarget = curTarget;
             curTarget = hit;
         }
+
         prevTarget.object.material.color.set( rgbToHex(255,255,255) );
         prevTarget.object.material.opacity = 0.1;
         curTarget.object.material.color.set( rgbToHex(255,0,0) );
-        //var pos = curTarget.object.position
-        //controls.target.set(pos.x, pos.y, pos.z);
+
         tweenToPosition();
     }
 }
 
 
-function tweenToPosition() {
+function tweenToPosition(durationA, durationB) {
     TWEEN.removeAll();
+
+    durationA = (durationA) ? durationA: 1500;
+    durationB = (durationB) ? durationB : 500;
+
+    console.log("durations:", durationA, durationB);
+
     var cameraPosition = camera.position;  // The current Camera position
     var currentLookAt = controls.target;   // The current lookAt position
-
 
     var haloDestination = {   // Our destination
         x: curTarget.object.position.x,
@@ -195,28 +201,23 @@ function tweenToPosition() {
         z: haloDestination.z - (haloDestination.z * .03)  // put us a little bit away from the point
     };
 
-    console.log("0: moveToPosition: \cameraPosition ",cameraPosition , "\haloPosition:", haloDestination, "\currentLookAt:", currentLookAt);
-
     // Frist we position the camera so it is looking at our Halo of interest
     var tweenLookAt = new TWEEN.Tween(currentLookAt)
-        .to(haloDestination, 1500)
+        .to(haloDestination, durationA)
         .onUpdate(function() {
             controls.target.set(currentLookAt.x, currentLookAt.y, currentLookAt.z);
         });
 
     // Then we zoom in
     var tweenPosition = new TWEEN.Tween(cameraPosition)
-        .to(zoomDestination, 500)
+        .to(zoomDestination, durationB)
         .onUpdate(function() {
-            console.log(cameraPosition);
             camera.position.set(cameraPosition.x, cameraPosition.y, cameraPosition.z);
             controls.update();
         });
 
     tweenLookAt.chain(tweenPosition);
     tweenLookAt.start();
-
-    console.log("1: moveToPosition: \cameraPosition ",cameraPosition , "\haloPosition:", haloDestination, "\currentLookAt:", currentLookAt);
 }
 
 /* ================================== *
@@ -225,18 +226,21 @@ function tweenToPosition() {
  *  associated draw function
  * ================================== */
 function onFrame() {
-    if ((head !== parseInt(slider.val()[0])) || (tail !== parseInt(slider.val()[1]))) {
-        head = parseInt(slider.val()[0]);
-        tail = parseInt(slider.val()[1]);
+    var sliderVal0 = parseInt(slider.val()[0]);
+    var sliderVal1 = parseInt(slider.val()[1]);
+
+    if ((head !== sliderVal0) || (tail !== sliderVal1)) {
+        head = sliderVal0;
+        tail = sliderVal1;
         updateAllTheGeometry(nDivisions);
     }
     requestAnimationFrame( onFrame );
     TWEEN.update();
-    draw();
+    render();
 }
 
 
-function draw() {
+function render() {
     raycaster.setFromCamera( mouse, camera );
 
     // This loop is to set the captured moused over halos back to their
@@ -245,7 +249,7 @@ function draw() {
         for (var i = 0; i < hits.length; i++) {
             if (hits[i].object.position !== curTarget.object.position && hits[i].object.material.opacity !== 0.0) {
                 hits[i].object.material.color.set( rgbToHex(255, 255, 255) );
-                hits[i].object.material.opacity = 0.1;
+                hits[i].object.material.opacity = 0.2;
             } else if (hits[i].object.position === curTarget.object.position && hits[i].object.material.opacity !== 0.0) {
                 curTarget.object.material.color.set( rgbToHex(255,0,0) );  // line green
                 curTarget.object.material.opacity = 0.8;
@@ -276,6 +280,7 @@ function draw() {
 function createSplineGeometry(nDivisions) {
     head = parseInt(slider.val()[0]);
     tail = parseInt(slider.val()[1]);
+    var color = d3.scale.category10();
 
     var index, xyz;
     for (var i = 0; i < haloLines.length; i++) {
@@ -297,13 +302,14 @@ function createSplineGeometry(nDivisions) {
             if (i === 0)
                 colors[ j ] = new THREE.Color(1.0, 1.0, 1.0);
             else
-                colors[ j ] = new THREE.Color( 0.0 , (j / (numPoints)), (Math.random()));
+                //colors[ j ] = new THREE.Color( 0.0 , (j / (numPoints)), (Math.random()));
+                colors[ j ] = new THREE.Color( color(i) );
         }
         splineGeomentry.colors = colors;
         splineGeomentry.computeBoundingSphere();
         var material = new THREE.LineBasicMaterial({
             color: 0xffffff,
-            linewidth: 2.5,
+            linewidth: (i === 0)? 2 : 1.5,
             vertexColors: THREE.VertexColors
         });
         var mesh = new THREE.Line(splineGeomentry, material);
@@ -333,7 +339,7 @@ function createSphereGeometry() {
                 color: rgbToHex(255, 255, 255) ,
                 vertexColors: THREE.VertexColors,
                 transparent: true,
-                opacity: (i < head || i > tail) ? 0.0 : 0.1
+                opacity: (i < head || i > tail) ? 0.0 : 0.2
             })
         );
 
@@ -346,6 +352,8 @@ function createSphereGeometry() {
 
 
 function updateAllTheGeometry(nDivisions) {
+    var color = d3.scale.category10();
+
     for (var i = 0; i < haloLines.length; i++) {
         var points = haloLines[i];
         var spline = new THREE.Spline();
@@ -368,26 +376,33 @@ function updateAllTheGeometry(nDivisions) {
             if (i === 0)
                 colors[j] = new THREE.Color(1.0, 1.0, 1.0);
             else
-                colors[ j ] = new THREE.Color( 0.0, (j / (numPoints)), (Math.random()));
+                colors[ j ] = new THREE.Color( color(i) );
+                //colors[ j ] = new THREE.Color( 0.0, (j / (numPoints)), (Math.random()));
 
         }
         haloObjs[i].geometry.vertices = verts;
         haloObjs[i].geometry.colors = colors;
-        haloObjs[i].geometry.computeBoundingSphere();
+        haloObjs[i].geometry.computeBoundingSphere();  // wonder what this is for?
         haloObjs[i].geometry.verticesNeedUpdate = true;
         haloObjs[i].geometry.colorsNeedUpdate = true;
     }
 }
 
-
 function updateSpheres() {
-    // First, remove all of our sphere objects
-            // This needs some work!
+    //Adjust the sphere's opacity!
+    var index;
     for (var i = 0; i < haloSpheres.length; i++) {
-        haloSpheres[i].material.opacity = (i < head || i >= tail) ? 0.0 : 0.1;
+        haloSpheres[i].material.opacity = (i < head || i >= tail) ? 0.0 : 0.2;
     }
-    //createSphereGeometry(spline);
-
+    if ((tail - head) == 0)
+        curTarget.object = haloSpheres[head];
+    else {
+        index = parseInt(head + (tail - head)/2);
+        curTarget.object = haloSpheres[index];
+    }
+    curTarget.object.material.color.set( rgbToHex(255,0,0) );  // line green
+    curTarget.object.material.opacity = 0.8;
+    tweenToPosition();
 }
 
 function initPointsH257() {
@@ -460,20 +475,6 @@ function initSlider() {
 }
 
 
-function initGUI() {
-    var options = {
-        message: "Halos in a Dark Sky",
-        reset: function() { controls.reset(); controls.update() }
-    };
-
-    var gui = new dat.GUI();
-    gui.add(options, "message");
-    gui.add(options, "reset");
-
-}
-
-
-
 function rgbToHex(R,G,B){
     function toHex(c) {
         var hex = c.toString(16);
@@ -539,4 +540,19 @@ function onKeyPress( event ) {
 
     }
     console.log( camera, camera.position, camera.rotation);
+}
+
+
+function initGUI() {
+    var options = {
+        message: "Halos in a Dark Sky",
+        reset: function() {
+
+        }
+    };
+
+    var gui = new dat.GUI();
+    gui.add(options, "message");
+    gui.add(options, "reset");
+
 }
