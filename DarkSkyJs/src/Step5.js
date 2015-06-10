@@ -37,7 +37,6 @@ function onCreate() {
 
     // Get our Camera working
     camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 1000 );
-    camera.position.set(58,32.5,53.5);
 
     // Setup our Raycasting stuff
     raycaster = new THREE.Raycaster();
@@ -56,6 +55,10 @@ function onCreate() {
     // Make some Spline Geometry
     // createBufferGeometry(nDivisions);
     createSplineGeometry(nDivisions);
+    // position the camera near the first halo;
+    var pos = sphereGroup.children[0].position
+    camera.position.set(pos.x, pos.y+0.1, pos.z-0.3);
+    camera.updateMatrix();
 
     // Set up the Renderer
     renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -252,13 +255,15 @@ function createSplineGeometry(nDivisions) {
             if (i === 0)
                 colors[ j ] = new THREE.Color(1.0, 1.0, 1.0);
             else
-                colors[ j ] = new THREE.Color((Math.random() ), (j / (numPoints)), (Math.random()));
+                colors[ j ] = new THREE.Color( 0.0 , (j / (numPoints)), (Math.random()));
         }
         var len = spline.getLength(nDivisions);
         // console.log(len, splineGeomentry.vertices.length);
         splineGeomentry.colors = colors;
         splineGeomentry.computeBoundingSphere();
-        var material = new THREE.LineBasicMaterial( { color: 0xffffff, opacity: 1, linewidth: 1, vertexColors: THREE.VertexColors } );
+        var material = new THREE.LineBasicMaterial({
+            color: 0xffffff, opacity: 1.0, linewidth: 1, vertexColors: THREE.VertexColors
+        });
         var mesh = new THREE.Line(splineGeomentry, material);
         mesh.updateMatrix();
         haloObjs.push(mesh);
@@ -272,14 +277,14 @@ function createSphereGeometry(spline) {
     for (var i = 0; i < controlPoints.length; i++) {
         var hl = controlPoints[i];
         var halo = haloStats[head + i];
-        // console.log(typeof(head),i,haloStats, haloStats[head + i]);
+        console.log(typeof(head),controlPoints.length, head, haloStats, haloStats[head + i]);
         // console.log("what it got", halo);
         var sphereGeometry = new THREE.SphereGeometry(halo.radius / halo.rScale * 3);
         sphereGeometry.color = new THREE.Color((Math.random() ), (i / (numPoints)), (Math.random()));
         var sphereMesh = new THREE.Mesh(
             sphereGeometry,
             new THREE.MeshBasicMaterial({
-                color: 0xffffff,
+                color: rgbToHex(255, 255, 255) ,
                 vertexColors: THREE.VertexColors,
             })
         );
@@ -315,7 +320,7 @@ function updateAllTheGeometry(nDivisions) {
             if (i === 0)
                 colors[j] = new THREE.Color(1.0, 1.0, 1.0);
             else
-                colors[j] = new THREE.Color((Math.random()), (j / (points.length * nDivisions)), (Math.random()));
+                colors[ j ] = new THREE.Color( 0.0, (j / (numPoints)), (Math.random()));
 
         }
         haloObjs[i].geometry.vertices = verts;
