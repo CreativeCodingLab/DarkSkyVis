@@ -43,7 +43,7 @@ function onCreate() {
     mouse = new THREE.Vector2();
 
     // Have to set this so it doesn complain!
-    curTarget = {object: {position: null, material: {color: null }}}
+    curTarget = {object: {position: null, material: {color: null }}};
 
     // Setup our slider
     initSlider();
@@ -55,8 +55,9 @@ function onCreate() {
     // Make some Spline Geometry
     // createBufferGeometry(nDivisions);
     createSplineGeometry(nDivisions);
+
     // position the camera near the first halo;
-    var pos = sphereGroup.children[0].position
+    var pos = sphereGroup.children[0].position;
     camera.position.set(pos.x, pos.y+0.1, pos.z-0.3);
     camera.updateMatrix();
 
@@ -73,7 +74,8 @@ function onCreate() {
 
     // Create controls
     controls = new THREE.OrbitControls( camera, container );
-    controls.target = new THREE.Vector3(57.877390714719766, 32.202756939204875, 51.225539800452616);
+    controls.target.set(57.877390714719766, 32.202756939204875, 51.225539800452616);
+    controls.update();
 
     // Add listeners
     window.addEventListener( 'resize', onReshape, false );
@@ -111,8 +113,6 @@ function onMouseMove( event ) {
 function onMouseDown( event ) {
     // update the picking ray with the camera and mouse position
     raycaster.setFromCamera( mouse, camera );
-    console.log(mouse);
-    // if (curTarget) prevTarget.object.material.color.set( rgbToHex(0,255,255) );
     // calculate objects intersecting the picking ray
     var hit = raycaster.intersectObjects( sphereGroup.children )[0];
     if (hit) {
@@ -125,9 +125,10 @@ function onMouseDown( event ) {
         }
         prevTarget.object.material.color.set( rgbToHex(255,255,255) );
         curTarget.object.material.color.set( rgbToHex(0,255,0) );
-        controls.target = curTarget.object.position;
-    };
-
+        var pos = curTarget.object.position
+        controls.target.set(pos.x, pos.y, pos.z);
+        controls.update();
+    }
 }
 
 /* ================================== *
@@ -144,7 +145,7 @@ function onFrame() {
     raycaster.setFromCamera( mouse, camera );
 
     if (hits.length > 0) {
-        console.log("prev round", hits)
+        console.log("prev round", hits);
         for (var i = 0; i < hits.length; i++) {
             if (hits[i].object.position !== curTarget.object.position) {
                 // console.log("\tdont match! 0");
@@ -153,7 +154,7 @@ function onFrame() {
                 curTarget.object.material.color.set( rgbToHex(0,255,0) );  // line green
                 console.log("matched! 0!")
             }
-        };
+        }
     }
 
     hits = raycaster.intersectObjects( sphereGroup.children );
@@ -169,8 +170,8 @@ function onFrame() {
                 console.log("matched 1")
             }
 
-        };
-    };
+        }
+    }
 
     requestAnimationFrame( onFrame );
     renderer.render( scene, camera );
