@@ -14,7 +14,7 @@ var haloLines = [], haloSpheres = [];
 var hits = [], curTarget, prevTarget;
 var nDivisions = 10, NUMTIMEPOINTS = 89;
 var numPoints = NUMTIMEPOINTS * nDivisions;
-
+var guiControls;
 // ==========================================
 //              Start
 //    Main entry point into the application
@@ -65,7 +65,7 @@ function onCreate() {
     // **** Get our Camera working ***
     initCamera();
 
-    //initGUI();
+    initGUI();
 
     // **** Setup our Raycasting stuff ***
     raycaster = new THREE.Raycaster();
@@ -73,7 +73,7 @@ function onCreate() {
         mouse = new THREE.Vector2();
 
         // **** Have to set this so it doesnt complain! ***
-        curTarget = {object: haloSpheres[head]};
+        prevTarget = curTarget = {object: haloSpheres[head]};
         curTarget.object.material.color.set( rgbToHex(255,0,0) );  // red
         curTarget.object.material.opacity = 0.8;
         tweenToPosition(250, 250);
@@ -169,7 +169,7 @@ function onMouseClick() {
         }
 
         prevTarget.object.material.color.set( rgbToHex(255,255,255) );
-        prevTarget.object.material.opacity = 0.1;
+        prevTarget.object.material.opacity = 0.2;
         curTarget.object.material.color.set( rgbToHex(255,0,0) );
 
         tweenToPosition();
@@ -302,15 +302,17 @@ function createSplineGeometry(nDivisions) {
             if (i === 0)
                 colors[ j ] = new THREE.Color(1.0, 1.0, 1.0);
             else
-                //colors[ j ] = new THREE.Color( 0.0 , (j / (numPoints)), (Math.random()));
-                colors[ j ] = new THREE.Color( color(i) );
+                colors[ j ] = new THREE.Color( 0.0 , (j / (numPoints)), (Math.random()));
+                //colors[ j ] = new THREE.Color( color(i) );
         }
         splineGeomentry.colors = colors;
         splineGeomentry.computeBoundingSphere();
         var material = new THREE.LineBasicMaterial({
             color: 0xffffff,
             linewidth: (i === 0)? 2 : 1.5,
-            vertexColors: THREE.VertexColors
+            vertexColors: THREE.VertexColors,
+            transparent: true,
+            opacity: (i < head || i > tail) ? 1.0 : 0.8
         });
         var mesh = new THREE.Line(splineGeomentry, material);
         //mesh.updateMatrix();
@@ -376,8 +378,8 @@ function updateAllTheGeometry(nDivisions) {
             if (i === 0)
                 colors[j] = new THREE.Color(1.0, 1.0, 1.0);
             else
-                colors[ j ] = new THREE.Color( color(i) );
-                //colors[ j ] = new THREE.Color( 0.0, (j / (numPoints)), (Math.random()));
+                //colors[ j ] = new THREE.Color( color(i) );
+                colors[ j ] = new THREE.Color( 0.0, (j / (numPoints)), (Math.random()));
 
         }
         haloObjs[i].geometry.vertices = verts;
@@ -385,6 +387,7 @@ function updateAllTheGeometry(nDivisions) {
         haloObjs[i].geometry.computeBoundingSphere();  // wonder what this is for?
         haloObjs[i].geometry.verticesNeedUpdate = true;
         haloObjs[i].geometry.colorsNeedUpdate = true;
+
     }
 }
 
@@ -397,12 +400,12 @@ function updateSpheres() {
     if ((tail - head) == 0)
         curTarget.object = haloSpheres[head];
     else {
-        index = parseInt(head + (tail - head)/2);
-        curTarget.object = haloSpheres[index];
+        //index = parseInt(head + (tail - head)/2);
+        curTarget.object = haloSpheres[tail];
     }
-    curTarget.object.material.color.set( rgbToHex(255,0,0) );  // line green
-    curTarget.object.material.opacity = 0.8;
-    tweenToPosition();
+    //curTarget.object.material.color.set( rgbToHex(255,0,0) );  // line green
+    //curTarget.object.material.opacity = 0.8;
+    tweenToPosition(500, 250);
 }
 
 function initPointsH257() {
@@ -439,6 +442,35 @@ function initPointsH257() {
         id = pIDS[k];
         haloLines.push(particlePaths[id]);
     }
+}
+
+
+
+function initGUI() {
+    guiControls = {
+        message: "Halos in a Dark Sky",
+        show_lines: true,
+        numDivisions: 10,
+        reset: function() {
+            prevTarget = curTarget.object = haloSpheres[head];
+            tweenToPosition();
+        }
+    };
+
+    var gui = new dat.GUI({ autoPlace: false });
+    var guiContainer = $('.ma-gui').append($(gui.domElement));
+    console.log(guiContainer );
+
+    gui.add(guiControls, "message");
+    gui.add(guiControls, "numDivisions", 0, 100);
+    var linesController = gui.add(guiControls, "show_lines");
+    linesController.onFinishChange(function(){
+        for (var i=1; i< haloLines.length; i++) {
+            haloObjs[i].visible = guiControls.show_lines;
+        }
+    });
+    gui.add(guiControls, "reset");
+
 }
 
 
@@ -481,78 +513,4 @@ function rgbToHex(R,G,B){
         return hex.length == 1 ? "0" + hex : hex;
     }
     return "#" + toHex(R) + toHex(G) + toHex(B)
-}
-
-/* ===========================================================
- * Our onKeyPress function. Rudimentary camera controls meant
- * primarily for debugging purposes
- * ========================================================== */
-function onKeyPress( event ) {
-    var key = event.keyCode;
-    console.log(key);
-    switch (key) {
-        case 119:  // w
-            camera.position.z += 0.1;
-            break;
-        case 115: // s
-            camera.position.z -= 0.1;
-            break;
-        case 97: // a
-            camera.position.x += 0.1;
-            break;
-        case 100: // d
-            camera.position.x -= 0.1;
-            break;
-        case 113:  // q
-            camera.position.y += 0.1;
-            break;
-        case 101: // e
-            camera.position.y -= 0.1;
-            break;
-        case 105:  //
-            camera.rotateX(0.05);
-            break;
-        case 107: // k
-            camera.rotateX(-0.05);
-            break;
-        case 106: // j
-            camera.rotateY(0.05);
-            break;
-        case 108:  // l
-            camera.rotateY(-0.05);
-            break;
-        case 117: //u
-            camera.rotateZ(0.05);
-            break;
-        case 111: // o
-            camera.rotateZ(-0.05);
-            break;
-        case 32: //0
-            camera.lookAt(scene.position);
-            var pos = sphereGroup.children[30].position;
-            //var pos2 = curTarget.object.position;
-            //console.log(pos, pos2)
-            camera.position.set(pos.x, pos.y, pos.z);
-            camera.lookAt(pos);
-            //controls.reset();
-            controls.update();
-            console.log(controls);
-
-    }
-    console.log( camera, camera.position, camera.rotation);
-}
-
-
-function initGUI() {
-    var options = {
-        message: "Halos in a Dark Sky",
-        reset: function() {
-
-        }
-    };
-
-    var gui = new dat.GUI();
-    gui.add(options, "message");
-    gui.add(options, "reset");
-
 }
