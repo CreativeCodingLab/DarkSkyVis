@@ -1,96 +1,96 @@
 {
 	"build_systems":
-	[
-		{
-			"file_regex": "^[ ]*File \"(...*?)\", line ([0-9]*)",
-			"name": "Anaconda Python Builder",
-			"selector": "source.python",
-			"shell_cmd": "python -u \"$file\""
-		}
-	],
+		[
+			{
+				"file_regex": "^[ ]*File \"(...*?)\", line ([0-9]*)",
+				"name": "Anaconda Python Builder",
+				"selector": "source.python",
+				"shell_cmd": "python -u \"$file\""
+			}
+		],
 	"folders":
-	[
-		{
-			"path": "."
-		},
-		{
-			"path": "./DarkSkyJs"
-		},
-		{
-			"path": "./DarkSkyPy"
-		},
-		{
-			"path": "./DarkSkyCpp"
-		}
-	],
+		[
+			{
+				"path": "."
+			},
+			{
+				"path": "./javascript"
+			},
+			{
+				"path": "./python"
+			},
+			{
+				"path": "./data"
+			}
+		],
 	"settings":
-	[
-		{
-			"auto_complete_commit_on_tab": true,
-			"auto_complete_delay": 500,
-			"close_windows_when_empty": false,
-			"color_scheme": "Packages/Color Scheme - Default/Sunburst.tmTheme",
-			"convert_indentation_to_spaces": true,
-			"detect_indentation": true,
-			"detect_slow_plugins": true,
-			"draw_minimap_border": true,
-			"ensure_newline_at_eof_on_save": false,
-			"fallback_encoding": "UTF-8",
-			"file_exclude_patterns":
-			[
-				".*",
-				"*.cache",
-				"*.pyc",
-				"*.pyo",
-				"*.exe",
-				"*.dll",
-				"*.obj",
-				"*.o",
-				"*.a",
-				"*.lib",
-				"*.so",
-				"*.dylib",
-				"*.ncb",
-				"*.sdf",
-				"*.suo",
-				"*.pdb",
-				"*.idb",
-				"*.zip",
-				"*.gz",
-				".nii",
-				"*.nii.gz",
-				"*.ppt",
-				"*.pptx",
-				"*.docx",
-				"*.doc",
-				".DS_Store",
-				"*.class",
-				"*.psd",
-				"*.jpg",
-				"*.ucls",
-				"*.pdf",
-				"*.doc",
-				"*.db",
-				"*.eps",
-				"*.aux",
-				"*.bbl",
-				"*.blg",
-				"*.fdb_latexmk",
-				"*.log",
-				"*.out",
-				"*.sublime-workspace"
-			],
-			"font_size": 15,
-			"hide_side_bar": true,
-			"highlight_line": true,
-			"highlight_modified_tabs": true,
-			"scroll_past_end": true,
-			"soda_classic_tabs": true,
-			"tab_size": 4,
-			"translate_tabs_to_spaces": true,
-			"trim_automatic_white_space": true,
-			"trim_trailing_white_space_on_save": true,
-			"word_wrap": "false"
-		}
-	]
+		[
+			{
+				"auto_complete_commit_on_tab": true,
+				"auto_complete_delay": 500,
+				"close_windows_when_empty": false,
+				"color_scheme": "Packages/Color Scheme - Default/Sunburst.tmTheme",
+				"convert_indentation_to_spaces": true,
+				"detect_indentation": true,
+				"detect_slow_plugins": true,
+				"draw_minimap_border": true,
+				"ensure_newline_at_eof_on_save": false,
+				"fallback_encoding": "UTF-8",
+				"file_exclude_patterns":
+				[
+					".*",
+					"*.cache",
+					"*.pyc",
+					"*.pyo",
+					"*.exe",
+					"*.dll",
+					"*.obj",
+					"*.o",
+					"*.a",
+					"*.lib",
+					"*.so",
+					"*.dylib",
+					"*.ncb",
+					"*.sdf",
+					"*.suo",
+					"*.pdb",
+					"*.idb",
+					"*.zip",
+					"*.gz",
+					".nii",
+					"*.nii.gz",
+					"*.ppt",
+					"*.pptx",
+					"*.docx",
+					"*.doc",
+					".DS_Store",
+					"*.class",
+					"*.psd",
+					"*.jpg",
+					"*.ucls",
+					"*.pdf",
+					"*.doc",
+					"*.db",
+					"*.eps",
+					"*.aux",
+					"*.bbl",
+					"*.blg",
+					"*.fdb_latexmk",
+					"*.log",
+					"*.out",
+					"*.sublime-workspace"
+				],
+				"font_size": 15,
+				"hide_side_bar": true,
+				"highlight_line": true,
+				"highlight_modified_tabs": true,
+				"scroll_past_end": true,
+				"soda_classic_tabs": true,
+				"tab_size": 4,
+				"translate_tabs_to_spaces": true,
+				"trim_automatic_white_space": true,
+				"trim_trailing_white_space_on_save": true,
+				"word_wrap": "false"
+			}
+		]
 }

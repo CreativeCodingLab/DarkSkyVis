@@ -4,7 +4,7 @@ import sdfpy as sdf
 import os.path as op
 from glob import glob
 import thingking as tk
-from vtkDarkSkyUtilities import Halo
+from HaloUtils import addHalo
 
 
 def l2a(l):
@@ -184,7 +184,7 @@ def intoTheVoid(fileList, TargetID, pID, coords, n):
         return intoTheVoid(fileList[1:], tHl.desc_id, tHl.id, coords, n + 1)
 
 
-def extract_haloPath_and_particles():
+def Main_extract_haloPath_and_particles():
     RAW = "../data"
     ROCKSTAR = op.join(RAW, "rockstar", "hlists", "hlist_[0-1].[0-9][0-9]000.*")
     HALO_FILES = l2a(glob(ROCKSTAR))
@@ -215,16 +215,18 @@ def extract_haloPath_and_particles():
                 outfile.write(json.dumps(halo))
 
 
-def extract_particle_path():
+def Main_extract_particle_path():
     RAW = "../data"
     ROCKSTAR = op.join(RAW, "rockstar", "hlists", "hlist_[0-1].[0-9][0-9]000.*")
-    PARTICLES = op.join(RAW, "ds14_scivis_0128", "ds14_scivis_0128_e4_dt04_[0-1].[0-9][0-9]00")
+    HALO_FILES = l2a( glob(ROCKSTAR) )
 
-    HALO_FILES = l2a(glob(ROCKSTAR))
-    PARTICLE_FILES = l2a(glob(PARTICLES)[10:])
 
-    for i in range( )
+    for i, fn in enumerate(HALO_FILES):
+        halos = tk.loadtxt(fn)
+        jsonFN = fn.split('.list')[0] + '.json'
+        with open(jsonFN, 'w') as haloJSON:
+            haloJSON.write( json.dumps( halos ) )
 
 
 if __name__ == '__main__':
-    extract_haloPath_and_particles()
+    Main_extract_haloPath_and_particles()

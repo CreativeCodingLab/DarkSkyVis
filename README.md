@@ -1,7 +1,7 @@
 ## See it in Action
-[](https://www.evl.uic.edu/krbalmryde/projects/DarkSky/index.html)
+[https://www.evl.uic.edu/krbalmryde/projects/DarkSky/index.html](https://www.evl.uic.edu/krbalmryde/projects/DarkSky/index.html)
 
-
+---
 # SciVis Contest 2015 : Visualize the Universe
 ## Overview
 Cosmological simulations are a cornerstone of our understanding of the Universe during its 13.7 billion year progression from small fluctuations that we see in the cosmic microwave background to today, where we are surrounded by galaxies and clusters of galaxies interconnected by a vast cosmic web.
@@ -15,6 +15,8 @@ Typically, structures are identified through a semi-local process known as halo 
 ---
 # The Data
 There are three primary types of data that will be utilized in this years contest.
+
+These datasets can be found here: [http://darksky.slac.stanford.edu/scivis2015/data/ds14_scivis_0128/](http://darksky.slac.stanford.edu/scivis2015/data/ds14_scivis_0128/)
 ## Raw Particle data
 The raw particle data is described by the following features
 
@@ -53,12 +55,10 @@ These catalogs are stored in both ASCII and binary formats.
 The final dataset type links the individual halo catalogs that each represent a snapshot in time, thereby creating a Merger Tree database. These merger tree datasets form a sparse graph that can then be analyzed to use quantities such as halo mass accretion and merger history to inform how galaxies form and evolve through cosmic time. Merger tree databases are also distributed in both ASCII and BINARY formats.
 
 ---
-## Action Plan
-* Generate a list of 'paths' across time that a specific halo follows.
-    * Do this for each halo
-* Identify an area of interest which contains a relatively large number of halos
-    * Generate single simulations that track only that halo of interest
-* Trace their paths and potentially their interesections and interactions
+### Helpful resources on Halos and how they are identified and organized
+[http://astro.dur.ac.uk/~jch/password_pages/merger_trees.html](http://astro.dur.ac.uk/~jch/password_pages/merger_trees.html)
+[http://coewww.rutgers.edu/www2/vizlab/node/84](http://coewww.rutgers.edu/www2/vizlab/node/84)
+[http://inspirehep.net/record/1280894/plots?ln=en](http://inspirehep.net/record/1280894/plots?ln=en)
 
 ---
 ## Notes on Measurements
@@ -95,19 +95,23 @@ which partilces move the most in the beginning
 
 redshit approximation at time 0
 
-
+### Note: This is Handy
+```bash
+  for i in ${files[*]}; do
+    cat $i | python -mjson.tool > $i
+  done
+```
 ## Papers I am reading
 [Seeing the Difference between Cosmological Simulations](https://steveharoz.com/research/cosmology/SeeingDiff-CGA.pdf)  This is a __GREAT__ paper published in 2008 that worked with a very similar dataset to the one I am currently working with.
 
 ---
 ## Progress
-## Round 1
+### Round 1
 The first image is proof of concept image of flowlines generated from particle velocities extracted from the `ds14_scivis_0128_e4_dt04_1.0000` dataset. Data was converted to VTK XML format and visualized using Paraview
-![Particle Velocity](Pics/ds14_scivis_0128_particle_velocity.png)
-![Halos](Pics/halos.png)
-![Halos and Particles](Pics/halos_and_particles.png)
-![ds14_z Projection](Pics/ds14_scivis_0128_e4_dt04_1.0000_Projection_z_all_cic.png)
-
+![Particle Velocity](images/progress/round1/ds14_scivis_0128_particle_velocity.png)
+![Halos](images/progress/round1/halos.png)
+![Halos and Particles](images/progress/round1/halos_and_particles.png)
+![ds14_z Projection](images/progress/round1/ds14_scivis_0128_e4_dt04_1.0000_Projection_z_all_cic.png)
 ---
 ### Round 2
 Following the initial proof of concepts and playing with the functionality of YT and Paraview, I ended up settling (almost by accident) on VTK. In particular, I decided that while Volume Rendering and Volume Compositiing are neat, that is not the direction I want to go with this visualization.
@@ -131,11 +135,3 @@ This required iterating over each ds14_scivis_0128_e4_dt04_[01].[0-9][0-9]00 fil
 By distributing each file and desired bounds to a separate process, we could extract only those point coordinates that we were interested in, in parallel, speeding up the processes significantly. Since the coordinates all fell within unique ranges, the order in which we received them is unimportant.
 ![Dark Matter Particle TS Cube 20 Samples](images/DarkSkyTimeBox6.png)
 ![Dark Matter Particle TS Cube 99 Samples](images/DarkSkyTimeBox9.png)
-
----
-### Round1
-The first image is proof of concept image of flowlines generated from particle velocities extracted from the `ds14_scivis_0128_e4_dt04_1.0000` dataset. Data was converted to VTK XML format and visualized using Paraview
-![Particle Velocity](images/progress/round1/ds14_scivis_0128_particle_velocity.png)
-![Halos](images/progress/round1/halos.png)
-![Halos and Particles](images/progress/round1/halos_and_particles.png)
-![ds14_z Projection](images/progress/round1/ds14_scivis_0128_e4_dt04_1.0000_Projection_z_all_cic.png)
