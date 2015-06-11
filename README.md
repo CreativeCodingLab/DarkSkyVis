@@ -1,65 +1,93 @@
 ## See it in Action
-[Halos in a DarkSky](https://www.evl.uic.edu/krbalmryde/projects/DarkSky/index.html)
+[](https://www.evl.uic.edu/krbalmryde/projects/DarkSky/index.html)
+
+
+# SciVis Contest 2015 : Visualize the Universe
+## Overview
+Cosmological simulations are a cornerstone of our understanding of the Universe during its 13.7 billion year progression from small fluctuations that we see in the cosmic microwave background to today, where we are surrounded by galaxies and clusters of galaxies interconnected by a vast cosmic web.
+
+---
+Simulations of the formation of structure in the Universe typically simulate dark matter, a collision-less fluid, as a discretized set of particles that interact only gravitationally. Ensuring adequate mass resolution within a simulation requires a large number of particles -- typically on the scale of 1024^3, 2048^3, or even 10240^3 particles in the largest simulations. Developing visualizations for these particles, and perhaps more challengingly for the structures that they form through gravitational interaction and collapse, requires first identifying the structures, developing spatial or informatics representations of the components or the structures themselves, and then correlating these visualizations across time steps.
+
+---
+Typically, structures are identified through a semi-local process known as halo finding, wherein dark matter halos are identified either via local particle density estimation or through simple linking-length mechanisms. Within these halos, which may represent galaxies or clusters of galaxies, substructures are identified -- within a galaxy cluster, smaller halos may be identified which correspond to the location of galaxies. As these structures and substructures interact, merge, separate and grow, the structure of the Universe grows and changes with it. Visualizing the transitions that simulated halos undergo during the lifetime of the Universe can provide necessary inputs to understanding observations from next generation telescopes.
+
+---
+# The Data
+There are three primary types of data that will be utilized in this years contest.
+## Raw Particle data
+The raw particle data is described by the following features
+
+  1. a position vector
+  2. velocity vector
+  3. unique particle identifier.
+  4. Approximately 100 snapshots in time
+
+Each Temporal snapshots is stored in a single file in a format called [SDF](https://bitbucket.org/JohnSalmon/sdf). This format is composed of a human readable ASCII header followed by raw binary data.
+
+---
+### Dimension Bounds
+X  -45417.3867188, 45417.4101562
+Y  -45417.3828125, 45417.3945312
+Z  -45417.4140625, 45417.2773438
+
+
+---
+### Halo Catalog
+Defines a database that groups sets of gravitationally bound particles together into coherent structures. It describes the following information about a Halo's structure, including:
+
+  1. Position
+  2. Shape
+  3. Size
+
+Additionally the following statistics are derived from the particle distribution:
+
+  1. Angular momentum
+  2. Relative concentration of the particles
+  3. and many more.
+
+These catalogs are stored in both ASCII and binary formats.
+
+---
+### Merger Tree database
+The final dataset type links the individual halo catalogs that each represent a snapshot in time, thereby creating a Merger Tree database. These merger tree datasets form a sparse graph that can then be analyzed to use quantities such as halo mass accretion and merger history to inform how galaxies form and evolve through cosmic time. Merger tree databases are also distributed in both ASCII and BINARY formats.
+
+---
+## Action Plan
+* Generate a list of 'paths' across time that a specific halo follows.
+    * Do this for each halo
+* Identify an area of interest which contains a relatively large number of halos
+    * Generate single simulations that track only that halo of interest
+* Trace their paths and potentially their interesections and interactions
+
+---
+## Notes on Measurements
+### Parsec
+[Parsec](http://en.wikipedia.org/wiki/Parsec): (symbol: **pc**) is a unit of length used to measure the astronomically large distances to objects outside the Solar System, and is the largest unit of length in International System of Units. A parsec is equal to about 3.26 light-years (31 trillion miles) in length. **Fun Fact** Most of the visible stars to the naked eye are within 500 parsecs of the Sun. Or 15,500 trillion miles away! And you thought YOU had a long trip home...
+
+#### Redshift
+[Redshift](http://en.wikipedia.org/wiki/Redshift): Is any increase in wavelength, with a corresponding decrease and frequency of elextromagnetic waves. A redshift is, in effect, a measurement of (typically) light moving **AWAY** from an observer. However the definition changes depending on the context.
+
+  * __Cosmological Redshift__: is due to the expansion of the universe, and sufficiently distant light sources show redshift corresponding
+  * __Gravitational Redshift__:
+
+#### Blueshift
+[Blueshift](http://en.wikipedia.org/wiki/Blueshift): Is any decrease in wavelength, with a corresponding increase and frequency of elextromagnetic waves. This is the direct counter to **Redshift**
+
 
 ## Important Notes
 Particle position data is listed in `proper kpc/h` while the halo data is in `comoving Mpc/h` in order
 to change this the following function can be used:
 
-```python
-
-h_100 = particles.parameters['h_100']
-width = particles.parameters['L0']
-cosmo_a = particles.parameters['a']
-kpc_to_Mpc = 1. / 1000
-sl = slice(0, None)
-
-convert_to_cMpc = lambda proper: (proper + width/2.) * h_100 * kpc_to_Mpc / cosmo_a
-```
-Except this turns out the equation **is wrong**
-
-
-```python
-import numpy as np
-
-h_100 = particles.parameters['h_100']
-width = particles.parameters['L0']
-cosmo_a = particles.parameters['a']
-kpc_to_Mpc = 1. / 1000
-sl = slice(0, None)
-
-convert_to_cMpc = lambda proper: ((proper + width) * h_100 * kpc_to_Mpc / cosmo_a)
-
-x_min = convert_to_cMpc(particles['x'][sl]).min()
-y_min = convert_to_cMpc(particles['y'][sl]).min()
-z_min = convert_to_cMpc(particles['z'][sl]).min()
-
-x_offset = abs(halo_xyz_mins[0] - x_min);
-y_offset = abs(halo_xyz_mins[1] - y_min);
-z_offset = abs(halo_xyz_mins[2] - z_min);
-
-positions = np.dstack([
-        convert_to_cMpc(particles['x'][sl]) - x_offset,
-        convert_to_cMpc(particles['y'][sl]) - y_offset,
-        convert_to_cMpc(particles['z'][sl]) - z_offset
-])[0]
-```
-
-
-
-
 Halo radius, __rvir__, is in kpc/h and must be converted to Mpc/h in order to correctly extract the
 surrounding particles. This is as simple as doing `rvir * (1/1000.)`
 
 ## Stuff to look up later
-The extract particles surrounding the halos radius get large very quickly as we
-progress through time, this is probably a function of the halos getting larger
-over time due to expansion, etc.
-
 For early time points, its not a huge deal as the number of particles extracted
 for the halo is small (only 7 at time 0) while for the last time point it spikes
 to over 23,000! For the moment we dont care, we can just trace the particles
 we care about and ignore the rest, Eventually we will need to do something about
-it. For there [Oboe.js](http://oboejs.com/) may be an option.
+it. For that, [Oboe.js](http://oboejs.com/) may be an option.
 
 coyote universe
 
@@ -68,42 +96,20 @@ which partilces move the most in the beginning
 redshit approximation at time 0
 
 
-## Things I am working on
-
-
-
----
-So it turns out using SDF's data loader is A LOT faster to process the data arrays due to its use of numpy's memmap function. Effectively, it is indexing into the binary file object, rather than loading the whole thing into memory. This way its only ever holding a small subset of the actual data, and swapping it out as it needs. The added benefit is that it is treated and behaves like any other numpy object, so *most* operations should be similar if not identical.
-
-After doing a preliminary run, I discovered that SDF not only generates the same results, but it also renders the vtk instance in under ~30 seconds! That 75% reduction in rendering time!! The limitation is that the SDF data does have all the super cool derived fields pre-built for me, so Ill have to generate those myself.
-
----
-Presently I am looking into extracting the Velocity Magnitude from the SDF dataset. We know the velocity, so it shouldnt be an issue...
-
-__Update:__ Calculating the Magnitude of a vector is easy (abs(sqrt(x^2 + y^2 + z^2))). The tricky part it turns out, is being able to understand the conversion factor. If I use sdfpy to load in the dataset, it treats velocity data as kpc/Gry aka Kiloparsecs/Gigayear while the YT data lists it as cm/s. Thats annoying because the conversion is not all that easy to come by (for someone with my small reptilian brain at any rate).
-
----
-While I think our visualization idea is wicked super cool, and for my own learning Ill implement it, I think it would be good to at least talk with an Astronomer. If only to get some of this data put into perspective. There are so many variables and values associated with the particle and halo data thats just going to waste because I dont understand what it's significance is. I think we are missing out on a really sweet opportunity to show off the data in a cool way.
-
-
-With regards to tasks, I do know that the SciVis contest asks that we try to understand the substructure of a Halo, that is the composition of particles that make up an entity that is a Halo. The obvious solution I had was to filter the particles based on the width/mass of a particular Halo, then do something like an RK4 integration using the particles velocity to get a sense of how the Halo might be behaving. For example maybe the Halo has begun to generate its own gravity and the particles are moving in a circular/orbital like manner around some point, or maybe the structure is unstable and its decomposing over time so the streamlines are moving outward....oh the possibilities!)
-
-The practical benefit of this technique would be to reduce the number of particles we are interacting with, which would reduce the memory load etc. I also did a little digging and found out that VTK has some limited support for parallel processing! As of v6.1 there are at least a few core components with VTK that are parallelize-able which would speed things up considerably!
 ## Papers I am reading
 [Seeing the Difference between Cosmological Simulations](https://steveharoz.com/research/cosmology/SeeingDiff-CGA.pdf)  This is a __GREAT__ paper published in 2008 that worked with a very similar dataset to the one I am currently working with.
 
-
-
-## Helpful Definitions
-There are a TON of scalars
-
-Phi: Gravatational Potential
-Acceleration
-Velocity
-Magnitude
-
+---
 ## Progress
-### Round2
+## Round 1
+The first image is proof of concept image of flowlines generated from particle velocities extracted from the `ds14_scivis_0128_e4_dt04_1.0000` dataset. Data was converted to VTK XML format and visualized using Paraview
+![Particle Velocity](Pics/ds14_scivis_0128_particle_velocity.png)
+![Halos](Pics/halos.png)
+![Halos and Particles](Pics/halos_and_particles.png)
+![ds14_z Projection](Pics/ds14_scivis_0128_e4_dt04_1.0000_Projection_z_all_cic.png)
+
+---
+### Round 2
 Following the initial proof of concepts and playing with the functionality of YT and Paraview, I ended up settling (almost by accident) on VTK. In particular, I decided that while Volume Rendering and Volume Compositiing are neat, that is not the direction I want to go with this visualization.
 ![Dark Matter Particle Cloud Normed-Phi values](images/progress/round2/DarkSkyParticlePhi-Normed2.png)
 ![Dark Matter Particle Cloud Velocity Magnitude](images/progress/round2/DarkSkyParticleMagnitudeCube.png)
