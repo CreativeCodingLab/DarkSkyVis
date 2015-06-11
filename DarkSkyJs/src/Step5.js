@@ -35,7 +35,55 @@ function Start() {
 function onCreate() {
     /* Setting up THREE.js stuff */
 
+    /* -------------------------------*/
+    /*      Setting the stage         */
+    /* -------------------------------*/
+
     // **** Create our scene ***
+    initScene();
+
+    // **** Set up the Renderer ***
+    initRenderer();
+
+    // **** Setup Container stuff ***
+    initContainer();
+
+    // **** DAT GUI! ***
+    initGUI();
+
+    // **** Setup our slider ***
+    initSlider();
+
+
+    /* -------------------------------*/
+    /*    Organizing our Actors       */
+    /* -------------------------------*/
+
+    // Load Data for Halo 257
+    initPointsH257();
+
+    // **** Make some Spline Geometry ***
+    createSplineGeometry(nDivisions);
+
+    // **** Lights! ***
+    initLights();
+
+    // **** Camera! ***
+    initCamera();
+
+    // **** Setup our Raycasting stuff ***
+    initRayCaster();
+
+    // **** Action! Listeners *** //
+    initListeners();
+
+}
+
+// *****************************
+//      Order does matter
+// *****************************
+
+function initScene() {
     scene = new THREE.Scene();
 
     // **** Adding our Group object ***
@@ -46,28 +94,36 @@ function onCreate() {
         scene.add( linesGroup );
         scene.add( sphereGroup );
     }
+}
 
-    // **** Lights! ***
+
+function initRenderer() {
+    renderer = new THREE.WebGLRenderer( { antialias: true } );
+    {
+        renderer.setPixelRatio( window.devicePixelRatio );
+        renderer.setSize( window.innerWidth, window.innerHeight );
+        renderer.gammaInput = true;
+        renderer.gammaOutput = true;
+    }
+}
+
+
+function initContainer() {
+    container = document.getElementById( 'Sandbox' );
+    container.appendChild( renderer.domElement );
+}
+
+// *****************************
+//      Order doesnt matter
+// *****************************
+
+
+function initLights() {
     ambient = new THREE.AmbientLight(0x404040); //rgbToHex(197, 176, 255)
     scene.add(ambient);
+}
 
-    // **** Setup our slider ***
-    initSlider();
-
-    // **** creates some random and some predetermined ***
-    // points
-    initPointsH257();
-
-    // **** Make some Spline Geometry ***
-    // createBufferGeometry(nDivisions);
-    createSplineGeometry(nDivisions);
-
-    // **** Get our Camera working ***
-    initCamera();
-
-    initGUI();
-
-    // **** Setup our Raycasting stuff ***
+function initRayCaster() {
     raycaster = new THREE.Raycaster();
     {
         mouse = new THREE.Vector2();
@@ -78,29 +134,7 @@ function onCreate() {
         curTarget.object.material.opacity = 0.8;
         tweenToPosition(250, 250);
     }
-
-    // **** Set up the Renderer ***
-    renderer = new THREE.WebGLRenderer( { antialias: true } );
-    {
-        renderer.setPixelRatio( window.devicePixelRatio );
-        renderer.setSize( window.innerWidth, window.innerHeight );
-        renderer.gammaInput = true;
-        renderer.gammaOutput = true;
-    }
-
-    // **** Setup Container stuff ***
-    container = document.getElementById( 'Sandbox' );
-    container.appendChild( renderer.domElement );
-
-
-    // **** Add listeners *** //
-    window.addEventListener( 'resize', onReshape, false );
-    window.addEventListener( 'mousemove', onMouseMove, false );
-    window.addEventListener( 'mousedown', onMouseClick, true );
-    //window.addEventListener( 'keypress', onKeyPress, false );
-
 }
-
 
 function initCamera() {
     camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 1000 );
@@ -130,6 +164,75 @@ function initCamera() {
         controls.update();
     }
 }
+
+function initListeners() {
+    window.addEventListener( 'resize', onReshape, false );
+    window.addEventListener( 'mousemove', onMouseMove, false );
+    window.addEventListener( 'mousedown', onMouseClick, true );
+    //window.addEventListener( 'keypress', onKeyPress, false );
+}
+
+
+function initGUI() {
+    guiControls = {
+        message: "Halos in a Dark Sky",
+        show_lines: true,
+        numDivisions: 10,
+        reset: function() {
+            prevTarget = curTarget.object = haloSpheres[head];
+            tweenToPosition();
+        }
+    };
+
+    var gui = new dat.GUI({ autoPlace: false });
+    var guiContainer = $('.ma-gui').append($(gui.domElement));
+    console.log(guiContainer );
+
+    gui.add(guiControls, "message");
+    gui.add(guiControls, "numDivisions", 0, 100);
+    var linesController = gui.add(guiControls, "show_lines");
+    linesController.onFinishChange(function(){
+        for (var i=1; i< haloLines.length; i++) {
+            haloObjs[i].visible = guiControls.show_lines;
+        }
+    });
+    gui.add(guiControls, "reset");
+
+}
+
+
+function initSlider() {
+    // console.log("\t initSlider()");
+    slider = $('.tslider');
+    slider.noUiSlider({
+        start: [25, 50],
+        connect: true,  // shows areas of coverage
+        orientation: "vertical",
+        direction: "ltr",  //
+        behaviour: 'drag-tap',  // allows user to drag center around
+        step: 1,  // steps between values
+        format: wNumb({   // determines number format
+            decimals: 0
+        }),
+        range: {   // min and max of range
+            'min': [0],
+            '25%': [25],
+            '50%': [50],
+            '75%': [75],
+            'max': [88]
+        }
+    });
+
+    slider.noUiSlider_pips({
+        mode: 'count',
+        values: 5,
+        density: 3
+    });
+
+    slider.Link('lower').to($('#value-lower'));
+    slider.Link('upper').to($('#value-upper'));
+}
+
 
 
 // ==========================================
@@ -270,7 +373,6 @@ function render() {
                 curTarget.object.material.color.set( rgbToHex(255,0,0) );
                 hits[i].object.material.opacity = 0.8;
             }
-
         }
     }
     controls.update();
@@ -290,7 +392,7 @@ function createSplineGeometry(nDivisions) {
         spline.initFromArray(points.slice(head,tail));
         var splineGeomentry = new THREE.Geometry();
 
-        if ( i === 0 ){
+        if ( i === 0 ) {
             createSphereGeometry();
         }
 
@@ -444,67 +546,6 @@ function initPointsH257() {
     }
 }
 
-
-
-function initGUI() {
-    guiControls = {
-        message: "Halos in a Dark Sky",
-        show_lines: true,
-        numDivisions: 10,
-        reset: function() {
-            prevTarget = curTarget.object = haloSpheres[head];
-            tweenToPosition();
-        }
-    };
-
-    var gui = new dat.GUI({ autoPlace: false });
-    var guiContainer = $('.ma-gui').append($(gui.domElement));
-    console.log(guiContainer );
-
-    gui.add(guiControls, "message");
-    gui.add(guiControls, "numDivisions", 0, 100);
-    var linesController = gui.add(guiControls, "show_lines");
-    linesController.onFinishChange(function(){
-        for (var i=1; i< haloLines.length; i++) {
-            haloObjs[i].visible = guiControls.show_lines;
-        }
-    });
-    gui.add(guiControls, "reset");
-
-}
-
-
-function initSlider() {
-    // console.log("\t initSlider()");
-    slider = $('.tslider');
-    slider.noUiSlider({
-        start: [25, 50],
-        connect: true,  // shows areas of coverage
-        orientation: "vertical",
-        direction: "ltr",  //
-        behaviour: 'drag-tap',  // allows user to drag center around
-        step: 1,  // steps between values
-        format: wNumb({   // determines number format
-            decimals: 0
-        }),
-        range: {   // min and max of range
-            'min': [0],
-            '25%': [25],
-            '50%': [50],
-            '75%': [75],
-            'max': [88]
-        }
-    });
-
-    slider.noUiSlider_pips({
-        mode: 'count',
-        values: 5,
-        density: 3
-    });
-
-    slider.Link('lower').to($('#value-lower'));
-    slider.Link('upper').to($('#value-upper'));
-}
 
 
 function rgbToHex(R,G,B){
