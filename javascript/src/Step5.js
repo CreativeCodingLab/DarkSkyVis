@@ -147,8 +147,8 @@ function initCamera() {
         controls = new THREE.TrackballControls( camera );
         {
             controls.rotateSpeed = 4.0;
-            controls.zoomSpeed = 5.2;
-            controls.panSpeed = 3.8;
+            controls.zoomSpeed = 4.0;
+            controls.panSpeed = 1.0;
 
             controls.noZoom = false;
             controls.noPan = false;

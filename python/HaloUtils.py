@@ -166,16 +166,13 @@ class Halo(object):
 def main():
     # # Load N-body particles from a = 1.0 dataset. Particles have positions with
     # # units of proper kpc, and velocities with units of km/s.
-    # particles = load_sdf(prefix+"ds14_scivis_0128/ds14_scivis_0128_e4_dt04_" + time + "00")
-    foo = "http://darksky.slac.stanford.edu/scivis2015/data/ds14_scivis_0128/rockstar/hlists/hlist_[0-1].[0-9][0-9]000.*"
-    RAW = "http://darksky.slac.stanford.edu/scivis2015/data/ds14_scivis_0128/"
-    ROCKSTAR = op.join(RAW, "rockstar", "hlists", "hlist_[0-1].[0-9][0-9]000.*")
-    HALO_FILES = list( glob(foo))
-    print "hello", ROCKSTAR, HALO_FILES
+    RAW = "http://darksky.slac.stanford.edu/scivis2015/data/ds14_scivis_0128"
 
-    for i, fn in enumerate(HALO_FILES):
-        print fn
-        halos = [addHalo(halo) for halo in tk.loadtxt(fn)]
+    for time in np.arange(0.12, 1.01, 0.01):
+        HALO = op.join(RAW, "rockstar", "hlists", "hlist_" + time + "000.list")
+        # PARTICLE = op.join(RAW, "ds14_scivis_0128_e4_dt04_" + time + "00")
+
+        halos = [addHalo(halo) for halo in tk.loadtxt(HALO)]
         jsonFN = fn.split('.list')[0] + ".json"
         with open(jsonFN, 'w') as haloJSON:
             print jsonFN, halos

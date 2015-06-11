@@ -30,7 +30,9 @@ Each Temporal snapshots is stored in a single file in a format called [SDF](http
 ---
 ### Dimension Bounds
 X  -45417.3867188, 45417.4101562
+
 Y  -45417.3828125, 45417.3945312
+
 Z  -45417.4140625, 45417.2773438
 
 
@@ -55,9 +57,11 @@ These catalogs are stored in both ASCII and binary formats.
 The final dataset type links the individual halo catalogs that each represent a snapshot in time, thereby creating a Merger Tree database. These merger tree datasets form a sparse graph that can then be analyzed to use quantities such as halo mass accretion and merger history to inform how galaxies form and evolve through cosmic time. Merger tree databases are also distributed in both ASCII and BINARY formats.
 
 ---
-### Helpful resources on Halos and how they are identified and organized
+#### Helpful resources on Halos and how they are identified and organized
 [http://astro.dur.ac.uk/~jch/password_pages/merger_trees.html](http://astro.dur.ac.uk/~jch/password_pages/merger_trees.html)
+
 [http://coewww.rutgers.edu/www2/vizlab/node/84](http://coewww.rutgers.edu/www2/vizlab/node/84)
+
 [http://inspirehep.net/record/1280894/plots?ln=en](http://inspirehep.net/record/1280894/plots?ln=en)
 
 ---
