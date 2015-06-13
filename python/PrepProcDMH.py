@@ -7,6 +7,9 @@ import thingking as tk
 from HaloUtils import addHalo
 
 
+RAW = "http://darksky.slac.stanford.edu/scivis2015/data/ds14_scivis_0128"
+
+
 def l2a(l):
     return np.array(l)
 
@@ -89,7 +92,7 @@ def filter_sphere(time, center, radius, xyz_mins):
     print "filter_sphere", time, center, radius, xyz_mins
 
     # Load relevant particle data file
-    pfn = "../data/ds14_scivis_0128/ds14_scivis_0128_e4_dt04_" + time + "00"
+    pfn = op.join(RAW, "ds14_scivis_0128_e4_dt04_" + time + "00")
     particles = sdf.load_sdf(pfn)
 
     # Get left/right for periodicity considerations
@@ -132,9 +135,9 @@ def getHaloMinMaxXYZ(Halos):
     '''
     # Load the a=1 Rockstar hlist file. The header of the file lists the useful
     # units/information.
-    x_min = l2a([hl.position[0] for hl in Halos]).min()
-    y_min = l2a([hl.position[1] for hl in Halos]).min()
-    z_min = l2a([hl.position[2] for hl in Halos]).min()
+    x_min = l2a([hl['x'] for hl in Halos]).min()
+    y_min = l2a([hl['y'] for hl in Halos]).min()
+    z_min = l2a([hl['z'] for hl in Halos]).min()
     return (x_min, y_min, z_min)
 
 
@@ -154,9 +157,10 @@ def intoTheVoid(fileList, TargetID, pID, coords, n):
 
     hfn = fileList[0]
     time = hfn[-12:-8]
-    halosObjs = l2a([Halo(hl) for hl in tk.loadtxt(hfn)])
+    print hfn
+    halosObjs = l2a([addHalo(hl) for hl in tk.loadtxt(hfn)])
     halo_xyz_mins = getHaloMinMaxXYZ(halosObjs)
-    haloIDList = l2a([halo.id for halo in halosObjs])
+    haloIDList = l2a([halo['id'] for halo in halosObjs])
     if TargetID is None:
         print TargetID, "is None"
         TargetID = haloIDList[0]
@@ -168,29 +172,60 @@ def intoTheVoid(fileList, TargetID, pID, coords, n):
         tHl = halosObjs[index]
         halo = {
             "time": n,
-            "xyz": list(tHl.position),
-            "rvir": tHl.rvir * (1. / 1000),  # radius, in mpc rather than kpc
-            "rs": tHl.rs,  # scale radius
-            "id": tHl.id,
-            "child": tHl.desc_id,
+            "xyz": list(tHl['position']),
+            "rvir": tHl['rvir'] * (1. / 1000),  # radius, in mpc rather than kpc
+            "rs": tHl['rs'],  # scale radius
+            "id": tHl['id'],
+            "child": tHl['desc_id'],
             "particles": filter_sphere(
                             time,
-                            tHl.position,
-                            tHl.rvir * (1. / 1000),
+                            tHl['position'],
+                            tHl['rvir'] * (1. / 1000),
                             halo_xyz_mins
                         )
         }
         coords.append(halo)
-        return intoTheVoid(fileList[1:], tHl.desc_id, tHl.id, coords, n + 1)
+        return intoTheVoid(fileList[1:], tHl['desc_id'], tHl['id'], coords, n + 1)
+
+
+def intoTheAbyss(haloList, objs):
+    if haloList is []:
+        return objs
+
+    targetHalo = haloList[0]
+    print targetHalo
+    ROCKSTAR = op.join(RAW, "rockstar", "hlists")
+    time = targetHalo['scale'] + "000" if len(targetHalo['scale']) < 4  else targetHalo['scale'] + "00"
+    fn = op.join(ROCKSTAR, "hlist_"+time+"0.list")
+
+    print targetHalo['id'], targetHalo['scale'], time, fn
+
+    halosObjs = l2a([addHalo(hl) for hl in tk.loadtxt(fn)])
+    halo_xyz_mins = getHaloMinMaxXYZ(halosObjs)
+
+    halo = {
+        "time": n,
+        "xyz": list(targetHalo['position']),
+        "rvir": targetHalo['rvir'] * (1. / 1000),  # radius, in mpc rather than kpc
+        "rs": targetHalo['rs'],  # scale radius
+        "id": targetHalo['id'],
+        "child": targetHalo['desc_id'],
+        "particles": filter_sphere(
+                        time,
+                        targetHalo['position'],
+                        targetHalo['rvir'] * (1. / 1000),
+                        halo_xyz_mins
+                    )
+    }
+    objs.append(halo)
+    return intoTheAbyss(haloList[1:], objs)
+
 
 
 def Main_extract_haloPath_and_particles():
-    RAW = "../data"
-    ROCKSTAR = op.join(RAW, "rockstar", "hlists", "hlist_[0-1].[0-9][0-9]000.*")
-    HALO_FILES = l2a(glob(ROCKSTAR))
-    # PARTICLES = op.join(RAW, "ds14_scivis_0128", "ds14_scivis_0128_e4_dt04_[0-1].[0-9][0-9]00")
-    # PARTICLE_FILES = l2a(glob(PARTICLES))
-
+    ROCKSTAR = op.join(RAW, "rockstar", "hlists")
+    PARTICLES = op.join(RAW, "ds14_scivis_0128")
+    HALO_FILES, PARTICLE_FILES = [], []
     HALO_ID_LIST = [257., 259., 260., 263., 265., 129., 131., 132., 133.,
                     228., 224., 248., 335., 135., 125., 184., 121., 113.,
                     318., 300., 75., 76., 5., 340., 80., 82., 245.,
@@ -199,6 +234,13 @@ def Main_extract_haloPath_and_particles():
                     72., 151., 321., 137., 31., 78., 79., 4., 180.,
                     74., 179., 272., 283., 247., 36., 71., 199., 290.]
 
+
+    for t in np.arange(0.12, 1.01, 0.01):
+        time = str(t) + "000" if len(str(t)) < 4  else str(t) + "00"
+        PARTICLE_FILES.append( op.join(PARTICLES, "ds14_scivis_0128_e4_dt04_"+str(time)) )
+        HALO_FILES.append( op.join(ROCKSTAR, "hlist_"+str(time)+"0.list") )
+
+    print HALO_FILES, PARTICLE_FILES
 
     # Get a list of coordinates starting with a halo at time "zero".
 
@@ -215,10 +257,20 @@ def Main_extract_haloPath_and_particles():
                 outfile.write(json.dumps(halo))
 
 
+def main():
+    DATA = "../data/dev/miniTreeTest.dat"
+    HaloObjs = [ addHalo(h) for h in tk.loadtxt(DATA)]
+    objs = intoTheAbyss(HaloObjs, [])
+    with open("../data/dev/haloTreeComplete.json", 'w') as haloJSON:
+            haloJSON.write( json.dumps( objs ) )
+
+
 def Main_extract_particle_path():
-    RAW = "../data"
-    ROCKSTAR = op.join(RAW, "rockstar", "hlists", "hlist_[0-1].[0-9][0-9]000.*")
-    HALO_FILES = l2a( glob(ROCKSTAR) )
+    HALO_FILES = []
+    ROCKSTAR = op.join(RAW, "rockstar", "hlists")
+    for t in np.arange(0.12, 1.01, 0.01):
+        time = str(t) + "000" if len(str(t)) < 4  else str(t) + "00"
+        HALO_FILES.append( op.join(ROCKSTAR, "hlists_"+str(time)+"0.list") )
 
 
     for i, fn in enumerate(HALO_FILES):
@@ -229,4 +281,4 @@ def Main_extract_particle_path():
 
 
 if __name__ == '__main__':
-    Main_extract_haloPath_and_particles()
+    main()

@@ -56,8 +56,18 @@ These catalogs are stored in both ASCII and binary formats.
 ### Merger Tree database
 The final dataset type links the individual halo catalogs that each represent a snapshot in time, thereby creating a Merger Tree database. These merger tree datasets form a sparse graph that can then be analyzed to use quantities such as halo mass accretion and merger history to inform how galaxies form and evolve through cosmic time. Merger tree databases are also distributed in both ASCII and BINARY formats.
 
+
+##### Mad ravings about Merger Trees...
+I get it now! The tree_0_0_0.dat is the actual merger tree. Starting from the LAST time point, 1.00000, it tracks EACH halo’s descendants and progenitors across the entire time series until we get to the first time step, in this case 0.12000.
+
+It treats each entry in hlist_1.00000.list as a tree, thus creating a forest of 7497 trees. Again, each halo in hlist_1.0000, the last timepoint, has a tree. In the data file, it shows the scale factor next to the halo id, that scale factor is what Ive been using to represent the time point.
+
+Not ALL timepoints are represented by every tree, rather, not ever root has an origin all the way back to timepoint 0.12, so only go as far as timepoint 0.90 in some cases. Regardless, Ive identified at least one tree that goes all the way back to time 0.12, Im still figuring out how they connect to each other etc, but Im making progress!
+
 ---
 #### Helpful resources on Halos and how they are identified and organized
+[http://web.cse.ohio-state.edu/~raghu/teaching/CSE5544/Visweek2012/vast/posters/takle.pdf](http://web.cse.ohio-state.edu/~raghu/teaching/CSE5544/Visweek2012/vast/posters/takle.pdf)
+
 [http://astro.dur.ac.uk/~jch/password_pages/merger_trees.html](http://astro.dur.ac.uk/~jch/password_pages/merger_trees.html)
 
 [http://coewww.rutgers.edu/www2/vizlab/node/84](http://coewww.rutgers.edu/www2/vizlab/node/84)
@@ -106,6 +116,8 @@ redshit approximation at time 0
   done
 ```
 ## Papers I am reading
+
+
 [Seeing the Difference between Cosmological Simulations](https://steveharoz.com/research/cosmology/SeeingDiff-CGA.pdf)  This is a __GREAT__ paper published in 2008 that worked with a very similar dataset to the one I am currently working with.
 
 ---
