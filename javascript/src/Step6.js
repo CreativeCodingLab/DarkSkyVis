@@ -564,6 +564,41 @@ function updateSpheres() {
     tweenToPosition(500, 250);
 }
 
+
+for (i = 0; i < Foo; i++){
+    halo = Foo[i];
+    if (i > 0){
+
+    } else {
+
+    }
+
+
+}
+
+
+function intoTheAbyss(pCurr, coords, TimeNodes) {
+    coords.push(pCurr.position);
+
+    if ( !TimeNodes || TimeNodes.length <= 0) {
+        console.log("\t\tEmpty!", coords);
+        return coords;
+    }
+    //points.push(pNode.xyz);
+
+    var pHead = TimeNodes[0];
+    var len = TimeNodes.length;
+    var tSlice = TimeNodes.slice(1, len);
+    for (var i = 0; i < pHead.length; i++) {
+        var pNext = pHead[i];
+        if (pCurr.desc_id === pNext.id)
+            coords = intoTheAbyss(pNext, coords, tSlice);
+    }
+    console.log("\tThats all folks!", level, coords);
+    return coords;
+}
+
+
 function initHaloTree() {
     console.log("\n\ninitHaloTree!!");
     console.log(HALOTREE);
@@ -572,39 +607,30 @@ function initHaloTree() {
     var size = 0;  // related to the number of unique halos, other those halos that are not direct descendants to the original path
 
     var haloPath = [];
-    for (var i = 0; i < HALOTREE.length; i++) {
+    for (var i = HALOTREE.length-1; i >=0; i--) {
         var halo = HALOTREE[i];
-        halo.children = [];
-        halo.parents = [];
-        //halo = {
-        //    id: _h.id,
-        //    x: _h.x,
-        //    y: _h.y,
-        //    z: _h.z,
-        //    xyz: _h.position,
-        //    child: _h.desc_id,
-        //    pid: _h.pid,
-        //    sub_halos: [],
-        //    radius: _h.rvir,
-        //    rScale: _h.rs,
-        //    rs1: _h.rvir / _h.rs,
-        //    rs2: _h.rvir * _h.rs,
-        //    time: _h.time,
-        //    scale: _h.scale
-        //};
-
-        //console.log(halo.time, typeof(halo.time), halo);
+        halo.children = [];  // add list for children/descendants
+        halo.parents = [];  // add list for halo parents
+        halo.rs1 = (halo.rvir / halo.rs);  // convenience keys, one divided by
+        halo.rs2 = (halo.rvir * halo.rs);  // the other multiplied
+        halo.vec3 = THREE.Vector3(halo.x, halo.y, halo.z);  // Convenience, make a THREE.Vector3
+        halo.parentID = []; // This will keep track of its parent, use it as an array in order to store multiple parents as the case may be
 
         // add Halos to list by ID
         HaloLUT[halo.id] = halo;
         HaloLUT.length++;
+
+        if (halo.desc_id in HaloLUT){
+            HaloLUT[halo.desc_id].parents.push(halo.id)
+        }
+
 
         // Will need to wait until the array has been filled
         //// Add any sub-halos to their host, if they exist
         //if (halo.pid in HaloLUT)
         //    HaloLUT[halo.pid].sub_halos.push(halo.id);
 
-        // Organize Halo's by time, ignore host/sub status
+        //// Organize Halo's by time, ignore host/sub status
         if (halo.time in TimePoints) {
             //console.log("\tTimePoints", TimePoints, head);
             TimePoints[halo.time].push(halo);
@@ -612,8 +638,10 @@ function initHaloTree() {
         } else {
             TimePoints[halo.time] = [halo];
         }
-
     }
+
+
+
     console.log("\n\tTimePoints", TimePoints,"\n");
     console.log("\tHaloObjs", HaloLUT,"\n");
     console.log("\tSize", size,"\n");
