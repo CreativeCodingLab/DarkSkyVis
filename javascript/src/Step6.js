@@ -9,7 +9,7 @@ var head, tail;
 var scene, renderer;
 var camera, slider;
 var mouse, raycaster, ambient;
-var HaloObjs, TimePoints;
+var HaloLUT, TimePoints;
 var haloObjs = [], haloStats = [];
 var haloLines = [], haloSpheres = {};
 var hits = [], curTarget, prevTarget;
@@ -400,35 +400,8 @@ function render() {
 
 
 function createSplineLines() {
-// Helper function
 
-    function intoTheVoid(pNode, points, TimeNodes) {
-        console.log("\n\tIntoTheVOid!", TimeNodes.length, points, pNode);
-        console.log("\t\tinsert..", [pNode.x,pNode.y,pNode.z,pNode.id, pNode.child, pNode.time]);
-        points.push([pNode.x,pNode.y,pNode.z,pNode.id, pNode.child, pNode.time]);
-        if ( !TimeNodes || TimeNodes.length <= 0) {
-            console.log("\t\tEmpty!", points);
-            return points
-        }
-        //points.push(pNode.xyz);
-
-        var pHead = TimeNodes[0];
-        var len = TimeNodes.length;
-        var tSlice = TimeNodes.slice(1, len);
-        for (var i = 0; i < pHead.length; i++) {
-            if (pNode.child === pHead[i].id){
-                console.log("\t\tGot a match!", i, "child", pNode.child, "pHead", pHead[i].id);
-                return intoTheVoid(pHead[i], points, tSlice);
-            } else {
-                console.log("\t\tNot a match :(  ", i, "child", pNode.child, "pHead", pHead[i].id);
-                points.push(intoTheVoid(pHead[i], [], tSlice));
-            }
-        }
-        console.log("\tThats all folks!", points);
-        return points;
-    }
-
-
+    // Helper function2
     function createPathLine(points, color) {
         if (points.length >= 2) {
             var index, xyz;
@@ -460,28 +433,70 @@ function createSplineLines() {
             linesGroup.add(lineMesh);
         }
     }
+
+
+    // Helper function1
+    function intoTheVoid(level, pNode, coords, TimeNodes) {
+        console.log("\n\tIntoTheVOid!", level, coords, pNode.id);
+        coords.push(pNode.xyz);
+
+        if ( !TimeNodes || TimeNodes.length <= 0) {
+            console.log("\t\tEmpty!", coords);
+            return coords;
+        }
+        //points.push(pNode.xyz);
+
+        var pHead = TimeNodes[0];
+        var len = TimeNodes.length;
+        var tSlice = TimeNodes.slice(1, len);
+        for (var i = 0; i < pHead.length; i++) {
+            if (pNode.desc_id === pHead[i].id){
+                level++;
+                coords = intoTheVoid(level, pHead[i], coords, tSlice);
+                console.log("\t\tGot a match!", i, "child", pNode.child, "pHead", pHead[i].id, "points", coords);
+            } else {
+                var subCoords = [];
+                subCoords = intoTheVoid(0, pHead[i], [], tSlice);
+                console.log("\t\tNot a match :(  ",level,  i, "child", subCoords );
+                //haloLines.push(subCoords )
+            }
+        }
+        console.log("\tThats all folks!", level, coords);
+        return coords;
+    }
+
     //----------------------
     // Main body of Function
     //----------------------
     console.log("createSplineLines()", TimePoints.length);
+    haloLines = [];
+    var color = d3.scale.category20();
     var control_points = TimePoints.slice(head, tail+1);
     var stop = control_points.length;
-    var color = d3.scale.category20();
-    haloLines = [];
     console.log("control_points", control_points.length, control_points);
     var nodes = control_points[0];
+
+    var result = [];
     console.log("nodes", nodes.length, nodes);
     for (var j = 0; j < nodes.length; j++) {
         var coords = [];
         var pHead = nodes[j];
         console.log(j, "head", pHead, "nodes", nodes);
-        haloLines.push(intoTheVoid(pHead, coords, control_points.slice(1, stop)));
-        console.log("\thaloLines", haloLines);
+        haloLines.push(intoTheVoid(0, pHead, coords, control_points.slice(1, stop)));
     }
+    //console.log("\nhaloLines", haloLines);
+    //var temp = [];
+    //for (var k = 0; k < haloLines.length; k++) {
+    //    var pointset = haloLines[k];
+    //    if (pointset.length > 1)
+    //        temp.push(pointset)
+    //}
+    //console.log("temp is", temp);
 
     for (i =0; i < haloLines.length; i++) {
         var points = haloLines[i];
-        createPathLine(points, color(i));
+        if (points.length >= 2)
+            createPathLine(points, color(i));
     }
 
     console.log("end createSplineLines", haloLines);
@@ -552,40 +567,42 @@ function updateSpheres() {
 function initHaloTree() {
     console.log("\n\ninitHaloTree!!");
     console.log(HALOTREE);
-    HaloObjs = {length: 0};  // just to keep track of how many objects we have
+    HaloLUT = {length: 0};  // just to keep track of how many objects we have
     TimePoints = [];
     var size = 0;  // related to the number of unique halos, other those halos that are not direct descendants to the original path
 
     var haloPath = [];
     for (var i = 0; i < HALOTREE.length; i++) {
-        var _h = HALOTREE[i];
-        halo = {
-            id: _h.id,
-            x: _h.x,
-            y: _h.y,
-            z: _h.z,
-            xyz: _h.position,
-            child: _h.desc_id,
-            pid: _h.pid,
-            sub_halos: [],
-            radius: _h.rvir,
-            rScale: _h.rs,
-            rs1: _h.rvir / _h.rs,
-            rs2: _h.rvir * _h.rs,
-            time: _h.time,
-            scale: _h.scale
-        };
+        var halo = HALOTREE[i];
+        halo.children = [];
+        halo.parents = [];
+        //halo = {
+        //    id: _h.id,
+        //    x: _h.x,
+        //    y: _h.y,
+        //    z: _h.z,
+        //    xyz: _h.position,
+        //    child: _h.desc_id,
+        //    pid: _h.pid,
+        //    sub_halos: [],
+        //    radius: _h.rvir,
+        //    rScale: _h.rs,
+        //    rs1: _h.rvir / _h.rs,
+        //    rs2: _h.rvir * _h.rs,
+        //    time: _h.time,
+        //    scale: _h.scale
+        //};
 
         //console.log(halo.time, typeof(halo.time), halo);
 
         // add Halos to list by ID
-        HaloObjs[halo.id] = halo;
-        HaloObjs.length++;
+        HaloLUT[halo.id] = halo;
+        HaloLUT.length++;
 
         // Will need to wait until the array has been filled
         //// Add any sub-halos to their host, if they exist
-        //if (halo.pid in HaloObjs)
-        //    HaloObjs[halo.pid].sub_halos.push(halo.id);
+        //if (halo.pid in HaloLUT)
+        //    HaloLUT[halo.pid].sub_halos.push(halo.id);
 
         // Organize Halo's by time, ignore host/sub status
         if (halo.time in TimePoints) {
@@ -598,7 +615,7 @@ function initHaloTree() {
 
     }
     console.log("\n\tTimePoints", TimePoints,"\n");
-    console.log("\tHaloObjs", HaloObjs,"\n");
+    console.log("\tHaloObjs", HaloLUT,"\n");
     console.log("\tSize", size,"\n");
 }
 
