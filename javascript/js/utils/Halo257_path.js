@@ -4,7 +4,7 @@
  * Contains the path for
  */
 
-HALO257 = [
+var HALO257 = [
     {
     "rs": 31.047,
     "xyz": [57.75873, 30.51175, 50.67266],

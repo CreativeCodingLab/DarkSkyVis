@@ -10,8 +10,8 @@ var scene, renderer;
 var camera, slider;
 var mouse, raycaster, ambient;
 var HaloLUT, TimePeriods, Traversed={};
-var haloObjs = [], haloStats = [];
-var HaloLines = [], haloSpheres = {};
+var haloObjs = [];
+var HaloLines = [], HaloSpheres = [];
 var hits = [], curTarget, prevTarget;
 var nDivisions = 10, NUMTIMEPERIODS = 12;
 var numPoints = NUMTIMEPERIODS * nDivisions;
@@ -136,7 +136,7 @@ function initRayCaster() {
         mouse = new THREE.Vector2();
 
         // **** Have to set this so it doesnt complain! ***
-        prevTarget = curTarget = {object: haloSpheres[head][0]};
+        prevTarget = curTarget = {object: HaloSpheres[head][0]};
         curTarget.object.material.color.set( rgbToHex(255,0,0) );  // red
         curTarget.object.material.opacity = 0.8;
         console.log("prevTarget, curTarget", prevTarget, curTarget);
@@ -186,7 +186,7 @@ function initGUI() {
         show_lines: true,
         numDivisions: 10,
         reset: function() {
-            prevTarget = curTarget.object = haloSpheres[head][0];
+            prevTarget = curTarget.object = HaloSpheres[head][0];
             tweenToPosition();
         }
     };
@@ -498,13 +498,19 @@ function createSplineLines() {
  *  represented as spheres.
  * ================================== */
 function createHaloGeometry() {
+    HaloSpheres = [];
     console.log("\n\ncreateHaloGeometry()!!");
+    console.log("\n\tTimePeriods", Array.isArray(TimePeriods), TimePeriods,"\n");
+
     for (var i=0; i < TimePeriods.length; i++) {
-        haloSpheres[i] = [];
-        //console.log("\tTimePeriods", i, TimePeriods.length, TimePeriods[i], '\n\t',TimePeriods);
-        for ( var j=0; j < TimePeriods[i].length; j++){
-            var halo = TimePeriods[i][j];
-            console.log("\t\thalo", i, j, halo, "tps", TimePeriods[i].length);
+        console.log("In Loop TimePeriods", i, TimePeriods.length, TimePeriods[i].length, TimePeriods[i]);
+        var HaloPositions = TimePeriods[i];
+        console.log("HaloPositions ", HaloPositions );
+
+        for ( var j=0; j < HaloPositions.length; j++){
+            var halo = HaloPositions[j];
+            console.log("\t\thalo", i, j, halo.id);
+
             var mesh = new THREE.Mesh(
                 new THREE.SphereGeometry(halo.rs1/100),
                 new THREE.MeshBasicMaterial({
@@ -517,9 +523,9 @@ function createHaloGeometry() {
 
             mesh.position.set( halo.x, halo.y, halo.z);
             mesh.updateMatrix();
-            haloSpheres[i].push(mesh);
+            HaloSpheres.push(mesh);
             sphereGroup.add(mesh);
-            //console.log("Halospheres", i, mesh, haloSpheres[i], haloSpheres);
+            //console.log("Halospheres", i, mesh, HaloSpheres[i], HaloSpheres);
         }
     }
 }
@@ -541,14 +547,14 @@ function updateAllTheGeometry(nDivisions) {
 function updateSpheres() {
     //Adjust the sphere's opacity!
     var index;
-    for (var i = 0; i < haloSpheres.length; i++) {
-        haloSpheres[i].material.opacity = 0.2;
+    for (var i = 0; i < HaloSpheres.length; i++) {
+        HaloSpheres[i].material.opacity = 0.2;
     }
     if ((tail - head) == 0)
-        curTarget.object = haloSpheres[head];
+        curTarget.object = HaloSpheres[head];
     else {
         //index = parseInt(head + (tail - head)/2);
-        curTarget.object = haloSpheres[tail];
+        curTarget.object = HaloSpheres[tail];
     }
     //curTarget.object.material.color.set( rgbToHex(255,0,0) );  // line green
     //curTarget.object.material.opacity = 0.8;
@@ -558,21 +564,21 @@ function updateSpheres() {
 
 function initHaloTree() {
     console.log("\n\ninitHaloTree!!");
-    console.log(HALOTREE);
+    console.log(TREE675571);  // HALOTREE
     HaloLUT = {length: 0};  // just to keep track of how many objects we have
     TimePeriods = [];
     var size = 0;  // related to the number of unique halos, other those halos that are not direct descendants to the original path
 
     var haloPath = [];
-    for (var i = 0; i < HALOTREE.length; i++) {
-        var halo = HALOTREE[i];
+    for (var i = 0; i < TREE675571.length; i++) {
+        var halo = TREE675571[i];
         halo.children = [];  // add list for children/descendants
         halo.parents = [];  // add list for halo parents
         halo.rs1 = (halo.rvir / halo.rs);  // convenience keys, one divided by
         halo.rs2 = (halo.rvir * halo.rs);  // the other multiplied
         halo.vec3 = THREE.Vector3(halo.x, halo.y, halo.z);  // Convenience, make a THREE.Vector3
         halo.parentID = []; // This will keep track of its parent, use it as an array in order to store multiple parents as the case may be
-        halo.time = parseInt(halo.scale * 100) - 12;
+        halo.time = parseInt(halo.scale * 100) - tree_offset
         console.log("\tHalo.id ", halo.id, "Halo.scale",halo.scale, "Halo.time",halo.time);
         // add Halos to list by ID
         HaloLUT[halo.id] = halo;
