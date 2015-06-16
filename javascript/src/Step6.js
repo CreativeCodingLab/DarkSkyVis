@@ -9,13 +9,16 @@ var head, tail;
 var scene, renderer;
 var camera, slider;
 var mouse, raycaster, ambient;
-var HaloLUT, TimePoints;
+var HaloLUT, TimePeriods, Traversed={};
 var haloObjs = [], haloStats = [];
-var haloLines = [], haloSpheres = {};
+var HaloLines = [], haloSpheres = {};
 var hits = [], curTarget, prevTarget;
-var nDivisions = 10, NUMTIMEPOINTS = 12;
-var numPoints = NUMTIMEPOINTS * nDivisions;
+var nDivisions = 10, NUMTIMEPERIODS = 12;
+var numPoints = NUMTIMEPERIODS * nDivisions;
 var guiControls;
+
+
+
 // ==========================================
 //              Start
 //    Main entry point into the application
@@ -67,7 +70,7 @@ function onCreate() {
     // **** Make some Spline Geometry ***
     createHaloGeometry();
     createSplineLines();
-    console.log("\nfinal haloLines", haloLines);
+    console.log("\nfinal haloLines", HaloLines);
 
     // **** Lights! ***
     initLights();
@@ -241,7 +244,6 @@ function initSlider() {
 }
 
 
-
 // ==========================================
 //              onReshape, onMouseMove
 // And associated Event Listeners
@@ -249,7 +251,6 @@ function initSlider() {
 function onReshape() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
-
     renderer.setSize( window.innerWidth, window.innerHeight );
 }
 
@@ -260,7 +261,6 @@ function onMouseMove( event ) {
     event.preventDefault();
     mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
     mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-
 }
 
 
@@ -399,107 +399,96 @@ function render() {
  * ================================== */
 
 
+// Helper function2
+function createPathLine(points, color) {
+    if (points.length >= 2) {
+        var index, xyz;
+        var colors = [];
+        var spline = new THREE.Spline();
+        var numPoints = points.length*nDivisions;
+        var splineGeometry = new THREE.Geometry();
+
+        spline.initFromArray(points);
+        for (var i=0; i < numPoints; i++) {
+            index = i/numPoints;
+            xyz = spline.getPoint(index);
+            splineGeometry.vertices[i] = new THREE.Vector3( xyz.x, xyz.y, xyz.z );
+            colors[ i ] = new THREE.Color(color);
+
+        }
+        splineGeometry.colors = colors;
+        splineGeometry.computeBoundingSphere();
+        var material = new THREE.LineBasicMaterial({
+            color: 0xffffff,
+            linewidth: 2,
+            vertexColors: THREE.VertexColors,
+            transparent: true,
+            opacity: 1.0
+        });
+
+        var lineMesh = new THREE.Line(splineGeometry, material);
+        haloObjs.push(lineMesh);
+        linesGroup.add(lineMesh);
+    }
+}
+
+
+function intoTheVoid(halo, points) {
+    console.log("\tintoTheVoid(halo, points)", halo.id, points);
+    points.push(halo.position);
+    if (halo.desc_id in HaloLUT) {
+        var next = HaloLUT[halo.desc_id];
+        if (halo.desc_id in Traversed) {
+            points.push([next.x, next.y, next.z, next.id, next.desc_id]);
+            return points;
+        } else {
+            Traversed[halo.id] = true;
+            console.log("\t\tAdding", halo.id, "to Traversed", Traversed);
+            return intoTheVoid(next, points);
+        }
+    } else {
+        console.log("\t\thalo->id:",halo.id, "!= halo.desc_id:", halo.desc_id);
+        return points;
+    }
+}
+
 function createSplineLines() {
-
-    // Helper function2
-    function createPathLine(points, color) {
-        if (points.length >= 2) {
-            var index, xyz;
-            var colors = [];
-            var spline = new THREE.Spline();
-            var numPoints = points.length*nDivisions;
-            var splineGeometry = new THREE.Geometry();
-
-            spline.initFromArray(points);
-            for (var i=0; i < numPoints; i++) {
-                index = i/numPoints;
-                xyz = spline.getPoint(index);
-                splineGeometry.vertices[i] = new THREE.Vector3( xyz.x, xyz.y, xyz.z );
-                colors[ i ] = new THREE.Color(color);
-
-            }
-            splineGeometry.colors = colors;
-            splineGeometry.computeBoundingSphere();
-            var material = new THREE.LineBasicMaterial({
-                color: 0xffffff,
-                linewidth: 2,
-                vertexColors: THREE.VertexColors,
-                transparent: true,
-                opacity: 1.0
-            });
-
-            var lineMesh = new THREE.Line(splineGeometry, material);
-            haloObjs.push(lineMesh);
-            linesGroup.add(lineMesh);
-        }
-    }
-
-
-    // Helper function1
-    function intoTheVoid(level, pNode, coords, TimeNodes) {
-        console.log("\n\tIntoTheVOid!", level, coords, pNode.id);
-        coords.push(pNode.xyz);
-
-        if ( !TimeNodes || TimeNodes.length <= 0) {
-            console.log("\t\tEmpty!", coords);
-            return coords;
-        }
-        //points.push(pNode.xyz);
-
-        var pHead = TimeNodes[0];
-        var len = TimeNodes.length;
-        var tSlice = TimeNodes.slice(1, len);
-        for (var i = 0; i < pHead.length; i++) {
-            if (pNode.desc_id === pHead[i].id){
-                level++;
-                coords = intoTheVoid(level, pHead[i], coords, tSlice);
-                console.log("\t\tGot a match!", i, "child", pNode.child, "pHead", pHead[i].id, "points", coords);
-            } else {
-                var subCoords = [];
-                subCoords = intoTheVoid(0, pHead[i], [], tSlice);
-                console.log("\t\tNot a match :(  ",level,  i, "child", subCoords );
-                //haloLines.push(subCoords )
-            }
-        }
-        console.log("\tThats all folks!", level, coords);
-        return coords;
-    }
-
-    //----------------------
-    // Main body of Function
-    //----------------------
-    console.log("createSplineLines()", TimePoints.length);
-    haloLines = [];
+    console.log("createSplineLines()", TimePeriods.length, TimePeriods);
+    HaloLines = [];
     var color = d3.scale.category20();
-    var control_points = TimePoints.slice(head, tail+1);
-    var stop = control_points.length;
-    console.log("control_points", control_points.length, control_points);
-    var nodes = control_points[0];
+    var TimePeriodSlice = TimePeriods.slice(head, tail+1);
+    console.log("\n\nTimeSlice.length", TimePeriodSlice.length, TimePeriodSlice);
 
-    var result = [];
-    console.log("nodes", nodes.length, nodes);
-    for (var j = 0; j < nodes.length; j++) {
-        var coords = [];
-        var pHead = nodes[j];
-        console.log(j, "head", pHead, "nodes", nodes);
-        haloLines.push(intoTheVoid(0, pHead, coords, control_points.slice(1, stop)));
+    for (var i = 0; i < TimePeriodSlice.length; i++) {
+        HaloLines[i] = [];
+        var Halos = TimePeriodSlice[i];
+        console.log("\nTimePeriodSlice[",i,"]");
+
+        for (var j = 0; j < Halos.length; j++) {
+            console.log(j, "Halos.length", Halos.length, "Halos",Halos);
+            var halo = Halos[j];
+            console.log("\thalo is", halo.id);
+
+            if (!(halo.id in Traversed)) {
+                var points = intoTheVoid(halo, [ ]);
+                HaloLines[i].push(points);
+
+            } else
+                console.log("\tWe have traversed it!");
+
+        }
     }
-    //console.log("\nhaloLines", haloLines);
-    //var temp = [];
-    //for (var k = 0; k < haloLines.length; k++) {
-    //    var pointset = haloLines[k];
-    //    if (pointset.length > 1)
-    //        temp.push(pointset)
-    //}
-    //console.log("temp is", temp);
+    console.log("\nlines", HaloLines);
 
-    for (i =0; i < haloLines.length; i++) {
-        var points = haloLines[i];
-        if (points.length >= 2)
-            createPathLine(points, color(i));
-    }
+     for (i =0; i < HaloLines.length; i++) {
+         for (j = 0; j < HaloLines[i].length; j++){
+             var segment = HaloLines[i][j];
+             if (segment.length > 1)
+                 createPathLine(segment, color(i));
+         }
+     }
 
-    console.log("end createSplineLines", haloLines);
+    console.log("end createSplineLines");
 }
 
 
@@ -510,14 +499,14 @@ function createSplineLines() {
  * ================================== */
 function createHaloGeometry() {
     console.log("\n\ncreateHaloGeometry()!!");
-    for (var i=0; i < TimePoints.length; i++) {
+    for (var i=0; i < TimePeriods.length; i++) {
         haloSpheres[i] = [];
-        //console.log("\tTimePoints", i, TimePoints.length, TimePoints[i], '\n\t',TimePoints);
-        for ( var j=0; j < TimePoints[i].length; j++){
-            var halo = TimePoints[i][j];
-            //console.log("\t\thalo", i, j, halo, "tps", TimePoints[i].length);
+        //console.log("\tTimePeriods", i, TimePeriods.length, TimePeriods[i], '\n\t',TimePeriods);
+        for ( var j=0; j < TimePeriods[i].length; j++){
+            var halo = TimePeriods[i][j];
+            console.log("\t\thalo", i, j, halo, "tps", TimePeriods[i].length);
             var mesh = new THREE.Mesh(
-                new THREE.SphereGeometry(halo.rs * 6),
+                new THREE.SphereGeometry(halo.rs1/100),
                 new THREE.MeshBasicMaterial({
                     color: rgbToHex(255, 255, 255) ,
                     vertexColors: THREE.VertexColors,
@@ -540,7 +529,9 @@ function createHaloGeometry() {
  *  Redraws the Splines for the paths
  *  and turns sphere opacity on or off
  * ================================== */
-function updateAllTheGeometry(nDivisions) {}
+function updateAllTheGeometry(nDivisions) {
+    createSplineLines();
+}
 
 /* ================================== *
  *          updateAllTheGeometry
@@ -565,49 +556,15 @@ function updateSpheres() {
 }
 
 
-for (i = 0; i < Foo; i++){
-    halo = Foo[i];
-    if (i > 0){
-
-    } else {
-
-    }
-
-
-}
-
-
-function intoTheAbyss(pCurr, coords, TimeNodes) {
-    coords.push(pCurr.position);
-
-    if ( !TimeNodes || TimeNodes.length <= 0) {
-        console.log("\t\tEmpty!", coords);
-        return coords;
-    }
-    //points.push(pNode.xyz);
-
-    var pHead = TimeNodes[0];
-    var len = TimeNodes.length;
-    var tSlice = TimeNodes.slice(1, len);
-    for (var i = 0; i < pHead.length; i++) {
-        var pNext = pHead[i];
-        if (pCurr.desc_id === pNext.id)
-            coords = intoTheAbyss(pNext, coords, tSlice);
-    }
-    console.log("\tThats all folks!", level, coords);
-    return coords;
-}
-
-
 function initHaloTree() {
     console.log("\n\ninitHaloTree!!");
     console.log(HALOTREE);
     HaloLUT = {length: 0};  // just to keep track of how many objects we have
-    TimePoints = [];
+    TimePeriods = [];
     var size = 0;  // related to the number of unique halos, other those halos that are not direct descendants to the original path
 
     var haloPath = [];
-    for (var i = HALOTREE.length-1; i >=0; i--) {
+    for (var i = 0; i < HALOTREE.length; i++) {
         var halo = HALOTREE[i];
         halo.children = [];  // add list for children/descendants
         halo.parents = [];  // add list for halo parents
@@ -615,14 +572,15 @@ function initHaloTree() {
         halo.rs2 = (halo.rvir * halo.rs);  // the other multiplied
         halo.vec3 = THREE.Vector3(halo.x, halo.y, halo.z);  // Convenience, make a THREE.Vector3
         halo.parentID = []; // This will keep track of its parent, use it as an array in order to store multiple parents as the case may be
-
+        halo.time = parseInt(halo.scale * 100) - 12;
+        console.log("\tHalo.id ", halo.id, "Halo.scale",halo.scale, "Halo.time",halo.time);
         // add Halos to list by ID
         HaloLUT[halo.id] = halo;
         HaloLUT.length++;
 
-        if (halo.desc_id in HaloLUT){
-            HaloLUT[halo.desc_id].parents.push(halo.id)
-        }
+        // if (halo.desc_id in HaloLUT){
+        //     HaloLUT[halo.desc_id].parents.push(halo.id)
+        // }
 
 
         // Will need to wait until the array has been filled
@@ -631,19 +589,18 @@ function initHaloTree() {
         //    HaloLUT[halo.pid].sub_halos.push(halo.id);
 
         //// Organize Halo's by time, ignore host/sub status
-        if (halo.time in TimePoints) {
-            //console.log("\tTimePoints", TimePoints, head);
-            TimePoints[halo.time].push(halo);
+        if (halo.time in TimePeriods) {
+            TimePeriods[halo.time].push(halo);
             size += 1;
         } else {
-            TimePoints[halo.time] = [halo];
+            TimePeriods[halo.time] = [halo];
         }
     }
 
 
 
-    console.log("\n\tTimePoints", TimePoints,"\n");
-    console.log("\tHaloObjs", HaloLUT,"\n");
+    console.log("\n\tTimePeriods", TimePeriods,"\n");
+    console.log("\tHaloLUT", HaloLUT,"\n");
     console.log("\tSize", size,"\n");
 }
 

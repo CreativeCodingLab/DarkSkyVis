@@ -441,7 +441,7 @@ function createSplineGeometry(nDivisions) {
  *  represented as spheres.
  * ================================== */
 function createSphereGeometry() {
-    // Halo Lines [0] is the main halopath
+    // Halo HaloLines [0] is the main halopath
     //var points = haloLines[0];
     //var spline = new THREE.Spline();
     //spline.initFromArray(points);

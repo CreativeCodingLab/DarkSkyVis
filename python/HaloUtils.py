@@ -286,11 +286,10 @@ def main_toJson():
             haloJSON.write( json.dumps( halos ) )
 
 def main():
-    DATA = "../data/dev/miniTreeTest.dat"
+    DATA = "../data/dev/biggerTreeTest.dat"
     HaloObjs = [ addHalo(h) for h in tk.loadtxt(DATA)]
-    objs = intoTheAbyss(HaloObjs, [])
-    with open("../data/dev/haloTreeComplete.json", 'w') as haloJSON:
-        haloJSON.write( json.dumps( objs ) )
+    with open("../data/dev/biggerTreeTest.json", 'w') as haloJSON:
+        haloJSON.write( json.dumps( HaloObjs ) )
 
 if __name__ == '__main__':
     main()
