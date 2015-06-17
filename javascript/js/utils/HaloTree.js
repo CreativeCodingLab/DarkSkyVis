@@ -1,3 +1,4 @@
+var tree_offset = 12;
 var HALOTREE = [
     {
         "Breadth_first_ID": 3495.0,

@@ -4,6 +4,7 @@
  * Contains the path for
  */
 
+var tree_offset = 12;
 var HALO257 = [
     {
     "rs": 31.047,
