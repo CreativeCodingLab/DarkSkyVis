@@ -36,6 +36,7 @@ Y  -45417.3828125, 45417.3945312
 Z  -45417.4140625, 45417.2773438
 
 
+
 ---
 ### Halo Catalog
 Defines a database that groups sets of gravitationally bound particles together into coherent structures. It describes the following information about a Halo's structure, including:
@@ -116,8 +117,9 @@ redshit approximation at time 0
   done
 ```
 ## Papers I am reading
-
-
+[Behroozi, P. S., Wechsler, R. H., Wu, H. Y., Busha, M. T., Klypin, A. A., & Primack, J. R. (2013). Gravitationally consistent halo catalogs and merger trees for precision cosmology. The Astrophysical Journal, 763(1), 18.](http://arxiv.org/abs/1110.4370)
+[Behroozi, P. S., Wechsler, R. H., & Wu, H. Y. (2013). The ROCKSTAR phase-space temporal halo finder and the velocity offsets of cluster cores. The Astrophysical Journal, 762(2), 109.](http://arxiv.org/abs/1110.4372)
+[Klypin, A. A., Trujillo-Gomez, S., & Primack, J. (2011). Dark matter halos in the standard cosmological model: Results from the bolshoi simulation. The Astrophysical Journal, 740(2), 102.](http://arxiv.org/abs/1002.3660)
 [Seeing the Difference between Cosmological Simulations](https://steveharoz.com/research/cosmology/SeeingDiff-CGA.pdf)  This is a __GREAT__ paper published in 2008 that worked with a very similar dataset to the one I am currently working with.
 
 ---

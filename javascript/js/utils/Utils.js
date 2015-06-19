@@ -79,9 +79,9 @@ function initStats() {
 
 function initOrbit() {
     // console.log("\t initOrbit()");
-    var len = haloObjs[0].geometry.vertices.length;
+    var len = HaloLinesObjs[0].geometry.vertices.length;
     var index = parseInt(len/2);
-    var focus = haloObjs[0].geometry.vertices[index];
+    var focus = HaloLinesObjs[0].geometry.vertices[index];
     controls = new THREE.OrbitControls( camera, container );
     controls.damping = 0.2;
     controls.target = focus;

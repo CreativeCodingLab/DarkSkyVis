@@ -169,23 +169,23 @@ def intoTheVoid(fileList, TargetID, pID, coords, n):
         print "its -1!"
         return coords, n
     elif index > -1:
-        tHl = halosObjs[index]
-        halo = {
-            "time": n,
-            "xyz": list(tHl['position']),
-            "rvir": tHl['rvir'] * (1. / 1000),  # radius, in mpc rather than kpc
-            "rs": tHl['rs'],  # scale radius
-            "id": tHl['id'],
-            "child": tHl['desc_id'],
-            "particles": filter_sphere(
-                            time,
-                            tHl['position'],
-                            tHl['rvir'] * (1. / 1000),
-                            halo_xyz_mins
-                        )
-        }
+        halo = halosObjs[index]
+        # halo = {
+        #     "time": n,
+        #     "xyz": list(tHl['position']),
+        #     "rvir": tHl['rvir'] * (1. / 1000),  # radius, in mpc rather than kpc
+        #     "rs": tHl['rs'],  # scale radius
+        #     "id": tHl['id'],
+        #     "child": tHl['desc_id'],
+        #     "particles": filter_sphere(
+        #                     time,
+        #                     tHl['position'],
+        #                     tHl['rvir'] * (1. / 1000),
+        #                     halo_xyz_mins
+        #                 )
+        # }
         coords.append(halo)
-        return intoTheVoid(fileList[1:], tHl['desc_id'], tHl['id'], coords, n + 1)
+        return intoTheVoid(fileList[1:], halo['desc_id'], halo['id'], coords, n + 1)
 
 
 def intoTheAbyss(haloList, objs):
@@ -257,13 +257,6 @@ def Main_extract_haloPath_and_particles():
                 outfile.write(json.dumps(halo))
 
 
-def main():
-    DATA = "../data/dev/miniTreeTest.dat"
-    HaloObjs = [ addHalo(h) for h in tk.loadtxt(DATA)]
-    objs = intoTheAbyss(HaloObjs, [])
-    with open("../data/dev/haloTreeComplete.json", 'w') as haloJSON:
-            haloJSON.write( json.dumps( objs ) )
-
 
 def Main_extract_particle_path():
     HALO_FILES = []
@@ -278,6 +271,24 @@ def Main_extract_particle_path():
         jsonFN = fn.split('.list')[0] + '.json'
         with open(jsonFN, 'w') as haloJSON:
             haloJSON.write( json.dumps( halos ) )
+
+def main():
+    ROCKSTAR = op.join(RAW, "rockstar", "hlists")
+    HALO_FILES = []
+
+    for t in np.arange(0.12, 1.01, 0.01):
+        time = str(t) + "000" if len(str(t)) < 4  else str(t) + "00"
+        HALO_FILES.append( op.join(ROCKSTAR, "hlist_"+str(time)+"0.list") )
+
+    print HALO_FILES
+
+    # Get a list of coordinates starting with a halo at time "zero".
+
+    # for i, haloID in enumerate(HALO_ID_LIST[0:1]):  # Limiting our list to just one HALO
+        # haloFileIndex = i + 0
+    HaloObjs, time = intoTheVoid(HALO_FILES, 257., -1, [], 0)
+    with open("../data/dev/Path257.json", 'w') as jsonHalo:
+        jsonHalo.write( json.dumps( HaloObjs ) )
 
 
 if __name__ == '__main__':
