@@ -64,7 +64,7 @@ function onCreate() {
 
     // Load Data for Halo 257
     //initPointsH257();
-    initHaloTree(TREE676638, true);
+    initHaloTree(PATH257, true);
 
     // **** Make some Spline Geometry ***
     createHaloGeometry();
@@ -186,6 +186,33 @@ function initListeners() {
 }
 
 
+
+function __resetView() {
+    console.log("You hit the reset button!!");
+    var halo;
+    for (var i = head; i < tail; i++) {
+        if (halo) break;
+        for (var j = 0; j < HaloSpheres[i].length; j++){
+            halo = HaloSpheres[i][j];
+            if ( halo ) break;
+        }
+    }
+    prevTarget = curTarget = {object: halo};
+    curTarget.object.material.color.set( rgbToHex(255,0,0) );  // red
+    curTarget.object.material.opacity = 0.8;
+    console.log("prevTarget, curTarget", prevTarget, curTarget);
+    tweenToPosition();
+}
+
+function __updateData(dataset) {
+    console.log("Gui Event Fired! .onChange", dataset);
+    resetGlobalStructures();
+    initHaloTree(dataset, false);
+    createHaloGeometry();
+    __resetView();
+}
+
+
 function initGUI() {
 
     var gui = new dat.GUI({ autoPlace: false });
@@ -193,33 +220,13 @@ function initGUI() {
     var guiBox = gui.addFolder("Halos in a Dark Sky");
     guiBox.open();
 
-    function updateData(dataset) {
-        console.log("Gui Event Fired! .onChange", dataset);
-        resetGlobalStructures();
-        initHaloTree(dataset, false);
-        createHaloGeometry();
-        //var halo;
-        //for (var i = head; i < tail; i++) {
-        //    if (halo) break;
-        //    for (var j = 0; j < HaloSpheres[i].length; j++){
-        //        halo = HaloSpheres[i][j];
-        //        if ( halo ) break;
-        //    }
-        //}
-        //prevTarget = curTarget = {object: halo};
-        //onFrame();
-    }
-
     var GUIcontrols = function() {
         this.showPaths = true;
         this.showHalos = true;
-        this.Path257 = function () { updateData(PATH257) };
-        this.SampleTree = function () { updateData(HALOTREE) };
-        this.Tree676638 = function () { updateData(TREE676638) };
-        this.reset = function() {
-            prevTarget = curTarget.object = HaloSpheres[head][0];
-            tweenToPosition();
-        }
+        this.Path257 = function () { __updateData(PATH257) };
+        this.SampleTree = function () { __updateData(HALOTREE) };
+        this.Tree676638 = function () { __updateData(TREE676638) };
+        this.reset = function () { __resetView() };
     };
 
     var config = new GUIcontrols();
@@ -245,11 +252,11 @@ function initGUI() {
         }
     });
 
-    //var dataSetBox = guiBox.addFolder("Choose a dataset!");
-    //dataSetBox.open();
-    //dataSetBox.add(config, "Path257");
-    //dataSetBox.add(config, "SampleTree");
-    //dataSetBox.add(config, "Tree676638");
+    var dataSetBox = guiBox.addFolder("Choose a dataset!");
+    dataSetBox.open();
+    dataSetBox.add(config, "Path257");
+    dataSetBox.add(config, "SampleTree");
+    dataSetBox.add(config, "Tree676638");
 
     guiBox.add(config, "reset");
 
@@ -260,7 +267,7 @@ function initSlider() {
     // console.log("\t initSlider()");
     slider = $('.tslider');
     slider.noUiSlider({
-        start: [0, 88],
+        start: [0, 12],
         connect: true,  // shows areas of coverage
         orientation: "vertical",
         direction: "ltr",  //
@@ -336,6 +343,7 @@ function onMouseClick() {
 
 
 function tweenToPosition(durationA, durationB) {
+    console.log("we are tweenToPosition!");
     TWEEN.removeAll();
 
     durationA = (durationA) ? durationA: 1500;
@@ -390,7 +398,7 @@ function onFrame() {
     if ((head !== sliderVal0) || (tail !== sliderVal1)) {
         head = sliderVal0;
         tail = sliderVal1;
-        updateAllTheGeometry(nDivisions);
+        updateAllTheGeometry();
     }
     requestAnimationFrame( onFrame );
     TWEEN.update();
@@ -409,11 +417,13 @@ function render() {
     // original color once we have moved the mouse away
     if (hits.length > 0) {
         for (var i = 0; i < hits.length; i++) {
-            if (hits[i].object.position !== curTarget.object.position && hits[i].object.material.opacity !== 0.0) {
+            if (hits[i].object.position !== curTarget.object.position &&
+                hits[i].object.material.opacity !== 0.0 && hits[i].object.visible){
                 hits[i].object.material.color.set( rgbToHex(255, 255, 255) );
                 hits[i].object.material.opacity = 0.2;
-            } else if (hits[i].object.position === curTarget.object.position && hits[i].object.material.opacity !== 0.0) {
-                curTarget.object.material.color.set( rgbToHex(255,0,0) );  // line green
+            } else if (hits[i].object.position === curTarget.object.position &&
+                hits[i].object.material.opacity !== 0.0 && hits[i].object.visible){
+                curTarget.object.material.color.set( rgbToHex(255,0,0) );
                 curTarget.object.material.opacity = 0.8;
             }
         }
@@ -425,10 +435,12 @@ function render() {
     // that weve moved over them
     if (hits.length > 0) {
         for (var i = 0; i < hits.length; i++) {
-            if (hits[i].object.position !== curTarget.object.position && hits[i].object.material.opacity !== 0.0){
+            if (hits[i].object.position !== curTarget.object.position &&
+                hits[i].object.material.opacity !== 0.0 && hits[i].object.visible){
                 hits[i].object.material.color.set( rgbToHex(255, 255, 0) ); // yellow
                 hits[i].object.material.opacity = 0.8;
-            } else if (hits[i].object.position === curTarget.object.position && hits[i].object.material.opacity !== 0.0) {
+            } else if (hits[i].object.position === curTarget.object.position &&
+                hits[i].object.material.opacity !== 0.0 && hits[i].object.visible){
                 curTarget.object.material.color.set( rgbToHex(255,0,0) );
                 hits[i].object.material.opacity = 0.8;
             }
@@ -445,7 +457,6 @@ function render() {
  * ================================== */
 function initHaloTree(DATASET, firstTime) {
     console.log("\n\ninitHaloTree!!", firstTime);
-    HaloLUT = {length: 0};  // just to keep track of how many objects we have
 
     if (firstTime)
         prepGlobalStructures();
@@ -481,6 +492,9 @@ function prepGlobalStructures() {
     HaloLines = [];
     HaloSpheres = [];
     HaloLinesObjs = [];
+    Traversed = { };
+    HaloLUT = {length: 0};  // just to keep track of how many objects we have
+
 
     TimePeriods = [];
     for (var i = 0; i < 89; i++) {
@@ -494,37 +508,33 @@ function prepGlobalStructures() {
 function resetGlobalStructures() {
     console.log("calling resetGlobalStructures()!");
     for (var i = 0; i < TimePeriods.length; i++) {
-        console.log(i);
+
         for (var j = 0; j < HaloLinesObjs[i].length; j++) {
-            console.log(i,j,  HaloSpheres[i], HaloLinesObjs[i]);
-            var line = HaloLinesObjs[i][j];
-            var sphere = HaloSpheres[i][j];
+            if (HaloLinesObjs[i][j]) {
+                console.log(HaloLinesObjs[i][j], linesGroup.children);
+                linesGroup.remove(HaloLinesObjs[i][j]);
+                scene.remove(HaloLinesObjs[i][j]);
+                HaloLinesObjs[i][j].material.dispose();
+                HaloLinesObjs[i][j].geometry.dispose();
+                console.log(HaloLinesObjs[i][j], linesGroup.children.length);
+            }
+        }
 
-
-            if (sphere) {
+        for (var k = 0; k < HaloSpheres[i].length; k++) {
+            //var sphere = HaloSpheres[i][k];
+            if (HaloSpheres[i][k]) {
                 console.log("its a bingo!");
-                console.log(sphere, sphereGroup.children.length);
-                sphereGroup.remove(sphere);
-                scene.remove(sphere);
-                //sphere.dispose();
-                sphere.material.dispose();
-                sphere.geometry.dispose();
-                console.log(sphere, sphereGroup.children.length);
-                //HaloSpheres[i][j] = "fuck yo sphere";
-            }
-            if (line) {
-                console.log(line, linesGroup.children);
-                linesGroup.remove(line);
-                scene.remove(line);
-                //line.dispose();
-                line.material.dispose();
-                line.geometry.dispose();
-                console.log(line, linesGroup.children.length);
-                //HaloLinesObjs[i][j] = "fuck yo line";
-            }
+                console.log(HaloSpheres[i][k], sphereGroup.children.length);
+                sphereGroup.remove(HaloSpheres[i][k]);
+                scene.remove(HaloSpheres[i][k]);
+                HaloSpheres[i][k].material.dispose();
+                HaloSpheres[i][k].geometry.dispose();
 
+                console.log(HaloSpheres[i][k], sphereGroup.children.length);
+            }
         }
     }
+    prepGlobalStructures();
 }
 
 
@@ -553,14 +563,13 @@ function createHaloGeometry() {
             var id = Halos[j];
             //console.log("\thalo is", id);
 
-            //if (i >= head && i <= tail) {
-                if (!(id in Traversed)) {
-                    var points = intoTheVoid(id, []);
-                    HaloLines[i].push(points);
-                } else
-                    console.log("\tWe have traversed it!");
+            if (!(id in Traversed)) {
+                var points = intoTheVoid(id, []);
+                HaloLines[i].push(points);
+                console.log("\t\tAdded halo", id);
+            } else
+                console.log("\t\tWe have traversed it!", id);
 
-            //}
             createSphere(id, i);
         }
     }
@@ -572,8 +581,8 @@ function createHaloGeometry() {
         }
     }
 
-    //console.log("\nfinal HaloLines", HaloLines);
-    //console.log("final HaloSpheres", HaloSpheres);
+    console.log("\nfinal HaloLines", HaloLines);
+    console.log("final HaloSpheres", HaloSpheres);
 
     // set the visibility of the halo data
     displayHaloData();
@@ -582,7 +591,6 @@ function createHaloGeometry() {
 
 function displayHaloData() {
     for (var i = 0; i < TimePeriods.length; i++) {
-        console.log(i);
         for (var j = 0; j < HaloLinesObjs[i].length; j++) {
             HaloLinesObjs[i][j].visible = !!(i >= head && i <= tail);
         }
@@ -649,12 +657,14 @@ function createPathLine(points, color, period) {
         var lineMesh = new THREE.Line(splineGeometry, material);
         HaloLinesObjs[period].push(lineMesh);
         linesGroup.add(lineMesh);
+        //console.log("created HaloLine", index, HaloLines.length, HaloLines[period].length);
     }
 }
 
 
 function createSphere(id, index) {
     var halo = HaloLUT[id];
+    console.log("createSphere", halo.id, index);
     var mesh = new THREE.Mesh(
         new THREE.SphereGeometry(halo.rs1/50),
         new THREE.MeshBasicMaterial({
@@ -669,88 +679,8 @@ function createSphere(id, index) {
     mesh.updateMatrix();
     HaloSpheres[index].push(mesh);
     sphereGroup.add(mesh);
-    console.log("Halospheres", index, mesh, HaloSpheres[index], HaloSpheres);
+    //console.log("created Halosphere", halo.id, index, HaloSpheres.length, HaloSpheres[index].length);
 }
-
-/* ================================== *
- *          Deprecated Functions
- *  Draws the actual Halo objects
- *  represented as spheres.
-
-function createHaloSplineGeometry() {
-    console.log("\n\n=======================================================");
-    console.log("createHaloSplineGeometry()", TimePeriods.length, TimePeriods);
-    console.log("=======================================================");
-    var color = d3.scale.category20();
-    var TimePeriodSlice = TimePeriods.slice(head, tail+1);
-    console.log("\nTimeSlice.length", TimePeriodSlice.length, TimePeriodSlice);
-
-    for (var i = 0; i < TimePeriodSlice.length; i++) {
-        var Halos = TimePeriodSlice[i];
-        console.log("\nTimePeriodSlice[",i,"]");
-
-        for (var j = 0; j < Halos.length; j++) {
-            console.log(j, "Halos.length", Halos.length, "Halos",Halos);
-            var halo = Halos[j];
-            console.log("\thalo is", halo.id);
-
-            if (!(halo.id in Traversed)) {
-                var points = intoTheVoid(halo, [ ]);
-                HaloLines[i].push(points);
-
-            } else
-                console.log("\tWe have traversed it!");
-
-        }
-    }
-    console.log("\nlines", HaloLines);
-
-    for (i =0; i < HaloLines.length; i++) {
-        for (j = 0; j < HaloLines[i].length; j++){
-            var segment = HaloLines[i][j];
-            if (segment.length > 1)
-                createPathLine(segment, color(i));
-        }
-    }
-
-    console.log("end createHaloSplineGeometry");
-}
-
-
-function createHaloSphereGeometry() {
-    console.log("\n\ncreateHaloGeometry()!!");
-    console.log("\n\tTimePeriods", Array.isArray(TimePeriods), TimePeriods,"\n");
-
-    for (var i=0; i < TimePeriods.length; i++) {
-        console.log("In Loop TimePeriods", i, TimePeriods.length, TimePeriods[i].length, TimePeriods[i]);
-        var Halos = TimePeriods[i];
-
-        if (Halos.length > 1) {
-            console.log("HaloPositions ", Halos );
-            for ( var j=0; j < Halos.length; j++){
-                var halo = Halos[j];
-                console.log("\t\thalo", i, j, halo.id);
-
-                var mesh = new THREE.Mesh(
-                    new THREE.SphereGeometry(halo.rs1/100),
-                    new THREE.MeshBasicMaterial({
-                        color: rgbToHex(255, 255, 255) ,
-                        vertexColors: THREE.VertexColors,
-                        transparent: true,
-                        opacity: (i < head || i > tail) ? 0.0 : 0.2
-                    })
-                );
-
-                mesh.position.set( halo.x, halo.y, halo.z);
-                mesh.updateMatrix();
-                HaloSpheres[i].push(mesh);
-                sphereGroup.add(mesh);
-                console.log("Halospheres", i, mesh, HaloSpheres[i], HaloSpheres);
-            }
-        }
-    }
-}
- * ================================== */
 
 
 /* ================================== *
@@ -758,57 +688,11 @@ function createHaloSphereGeometry() {
  *  Redraws the Splines for the paths
  *  and turns sphere opacity on or off
  * ================================== */
-function updateAllTheGeometry(nDivisions) {
+function updateAllTheGeometry() {
 
-    //resetGlobalStructures();
     displayHaloData();
-    //for (var i = 0; i < TimePeriods.length; i++) {
-    //    //for (var i = head; i < tail + 1; i++) {
-    //    var Halos = TimePeriods[i];
-    //
-    //    for (var j = 0; j < Halos.length; j++) {
-    //        console.log(j, "Halos.length", Halos.length, "Halos", Halos);
-    //        var id = Halos[j];
-    //        console.log("\thalo is", id);
-    //
-    //        if (i >= head && i <= tail)
-    //            if (!(id in Traversed)) {
-    //                var points = intoTheVoid(id, []);
-    //                HaloLines[i].push(points);
-    //            } else
-    //                console.log("\tWe have traversed it!");
-    //        else
-    //            HaloLinesObjs[i][j].geometry.dispose();  // Kill it!
-    //        createSphere(id, i);
-    //    }
-    //}
-    //for (i =0; i < HaloLines.length; i++) {
-    //    for (j = 0; j < HaloLines[i].length; j++){
-    //        var segment = HaloLines[i][j];
-    //        if (segment.length > 1)
-    //            createPathLine(segment, color(i), i);
-    //    }
-    //}
 
 }
-
-function updateSpheres() {
-    //Adjust the sphere's opacity!
-    var index;
-    for (var i = 0; i < HaloSpheres.length; i++) {
-        HaloSpheres[i].material.opacity = 0.2;
-    }
-    if ((tail - head) == 0)
-        curTarget.object = HaloSpheres[head];
-    else {
-        //index = parseInt(head + (tail - head)/2);
-        curTarget.object = HaloSpheres[tail];
-    }
-    //curTarget.object.material.color.set( rgbToHex(255,0,0) );  // line green
-    //curTarget.object.material.opacity = 0.8;
-    tweenToPosition(500, 250);
-}
-
 
 
 function rgbToHex(R,G,B){
