@@ -64,7 +64,7 @@ function onCreate() {
 
     // Load Data for Halo 257
     //initPointsH257();
-    initHaloTree(HALOTREE, true);
+    initHaloTree(TREE676638, true);
 
     // **** Make some Spline Geometry ***
     createHaloGeometry();
@@ -207,7 +207,7 @@ function initGUI() {
         //    }
         //}
         //prevTarget = curTarget = {object: halo};
-        onFrame();
+        //onFrame();
     }
 
     var GUIcontrols = function() {
@@ -260,7 +260,7 @@ function initSlider() {
     // console.log("\t initSlider()");
     slider = $('.tslider');
     slider.noUiSlider({
-        start: [3, 16],
+        start: [0, 88],
         connect: true,  // shows areas of coverage
         orientation: "vertical",
         direction: "ltr",  //
@@ -317,7 +317,7 @@ function onMouseClick() {
     raycaster.setFromCamera( mouse, camera );
     // calculate objects intersecting the picking ray
     var hit = raycaster.intersectObjects( sphereGroup.children )[0];
-    if (hit && hit.object.material.opacity !== 0.0) {
+    if (hit && (hit.object.material.opacity !== 0.0 && hit.object.visible)) {
         console.log("we got something!", hit);
         if (!prevTarget)
             prevTarget = curTarget = hit;
@@ -544,8 +544,8 @@ function createHaloGeometry() {
     var color = d3.scale.category20();
 
     // We only need to iterate around the head and tail
-    //for (var i = 0; i < TimePeriods.length; i++) {
-    for (var i = head; i < tail + 1; i++) {
+    for (var i = 0; i < TimePeriods.length; i++) {
+    //for (var i = head; i < tail + 1; i++) {
         var Halos = TimePeriods[i];
 
         for (var j = 0; j < Halos.length; j++) {
@@ -574,7 +574,24 @@ function createHaloGeometry() {
 
     //console.log("\nfinal HaloLines", HaloLines);
     //console.log("final HaloSpheres", HaloSpheres);
+
+    // set the visibility of the halo data
+    displayHaloData();
 }
+
+
+function displayHaloData() {
+    for (var i = 0; i < TimePeriods.length; i++) {
+        console.log(i);
+        for (var j = 0; j < HaloLinesObjs[i].length; j++) {
+            HaloLinesObjs[i][j].visible = !!(i >= head && i <= tail);
+        }
+        for (var k = 0; k < HaloSpheres[i].length; k++) {
+            HaloSpheres[i][k].visible = !!(i >= head && i <= tail);
+        }
+    }
+}
+
 
 // Helper function
 function intoTheVoid(id, points) {
@@ -583,7 +600,8 @@ function intoTheVoid(id, points) {
     //points.push(halo.position);
     points.push([halo.x,halo.y,halo.z,halo.id,halo.desc_id]);
 
-    if (halo.desc_id in HaloLUT && halo.time < tail) {
+    //if (halo.desc_id in HaloLUT && halo.time < tail) {
+    if (halo.desc_id in HaloLUT) {
         var next = HaloLUT[halo.desc_id];
         if (halo.desc_id in Traversed) {
             //points.push(next.position);
@@ -742,8 +760,8 @@ function createHaloSphereGeometry() {
  * ================================== */
 function updateAllTheGeometry(nDivisions) {
 
-    resetGlobalStructures();
-    createHaloGeometry();
+    //resetGlobalStructures();
+    displayHaloData();
     //for (var i = 0; i < TimePeriods.length; i++) {
     //    //for (var i = head; i < tail + 1; i++) {
     //    var Halos = TimePeriods[i];
