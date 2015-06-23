@@ -193,26 +193,41 @@ function initListeners() {
 function __resetView(toHead) {
     console.log("You hit the reset button!!");
     var halo;
-    if (toHead)
-        (function goToHead() {
-            for (var i = head; i <= tail; i++) {
-                if (halo) break;
-                for (var j = 0; j < HaloSpheres[i].length; j++){
-                    halo = HaloSpheres[i][j];
-                    if ( halo ) break;
+    switch (toHead) {
+        case 0:
+            (function () {
+                for (var i = head; i <= tail; i++) {
+                    if (halo) break;
+                    for (var j = 0; j < HaloSpheres[i].length; j++) {
+                        halo = HaloSpheres[i][j];
+                        if (halo) break;
+                    }
                 }
-            }
-        }());
-    else
-        (function goToTail() {
-            for (var i = tail; i >= head; i--) {
-                if (halo) break;
-                for (var j = 0; j < HaloSpheres[i].length; j++){
-                    halo = HaloSpheres[i][j];
-                    if ( halo ) break;
+            }());
+            break;
+
+        case 1:
+            (function () {
+                var start = (head < tail)? (head + parseInt((tail - head)/2)) : 0;
+                for (var j = 0; j < HaloSpheres[start].length; j++) {
+                    halo = HaloSpheres[start][j];
+                    if (halo) break;
                 }
-            }
-        })();
+            })();
+            break;
+
+        case 2:
+            (function () {
+                for (var i = tail; i >= head; i--) {
+                    if (halo) break;
+                    for (var j = 0; j < HaloSpheres[i].length; j++) {
+                        halo = HaloSpheres[i][j];
+                        if (halo) break;
+                    }
+                }
+            })();
+            break;
+    }
 
     if (curTarget.object)
         curTarget.object = halo;
@@ -245,8 +260,9 @@ function initGUI() {
         this.Path257 = function () { __updateData(PATH257) };
         this.SampleTree = function () { __updateData(HALOTREE) };
         this.Tree676638 = function () { __updateData(TREE676638) };
-        this.goToHead = function () { __resetView(true) };
-        this.goToTail = function () { __resetView(false) };
+        this.goToHead = function () { __resetView(0) };
+        this.goToMiddle = function () { __resetView(1) };
+        this.goToTail = function () { __resetView(2) };
     };
 
     var config = new GUIcontrols();
@@ -280,7 +296,9 @@ function initGUI() {
     dataSetBox.add(config, "SampleTree");
     dataSetBox.add(config, "Tree676638");
 
+    var haloFocusBox = guiBox.addFolder("Choose a focus point!");
     guiBox.add(config, "goToHead");
+    guiBox.add(config, "goToMiddle");
     guiBox.add(config, "goToTail");
 
 }
