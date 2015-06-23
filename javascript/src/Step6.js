@@ -14,9 +14,10 @@ var HaloLinesObjs = [];
 var HaloLines = [], HaloSpheres = [];
 var hits = [], curTarget, prevTarget;
 var nDivisions = 10, NUMTIMEPERIODS = 89;
-var ObjectsVisible = true;
-var colorKey = d3.scale.linear().domain([0,NUMTIMEPERIODS])
-    .range([rgbToHex(0,255,0), rgbToHex(0,0,255)]);
+var SpheresVisible = true, LinesVisible = true;
+
+var colorKey = d3.scale.linear().domain([0, 44, NUMTIMEPERIODS])
+    .range([rgbToHex(255, 0, 0), rgbToHex(0, 0, 255), rgbToHex(0, 255, 0)]);
 
 // ==========================================
 //              Start
@@ -143,7 +144,7 @@ function initRayCaster() {
         }
 
         prevTarget = curTarget = {object: halo};
-        curTarget.object.material.color.set( rgbToHex(255,0,0) );  // red
+        //curTarget.object.material.color.set( rgbToHex(255,0,0) );  // red
         curTarget.object.material.opacity = 0.8;
         console.log("prevTarget, curTarget", prevTarget, curTarget);
         tweenToPosition(250, 250);
@@ -188,30 +189,46 @@ function initListeners() {
 
 
 
-function __resetView() {
+
+function __resetView(toHead) {
     console.log("You hit the reset button!!");
     var halo;
-    for (var i = head; i <= tail; i++) {
-        if (halo) break;
-        for (var j = 0; j < HaloSpheres[i].length; j++){
-            halo = HaloSpheres[i][j];
-            if ( halo ) break;
-        }
-    }
+    if (toHead)
+        (function goToHead() {
+            for (var i = head; i <= tail; i++) {
+                if (halo) break;
+                for (var j = 0; j < HaloSpheres[i].length; j++){
+                    halo = HaloSpheres[i][j];
+                    if ( halo ) break;
+                }
+            }
+        }());
+    else
+        (function goToTail() {
+            for (var i = tail; i >= head; i--) {
+                if (halo) break;
+                for (var j = 0; j < HaloSpheres[i].length; j++){
+                    halo = HaloSpheres[i][j];
+                    if ( halo ) break;
+                }
+            }
+        })();
+
     if (curTarget.object)
         curTarget.object = halo;
     else
         prevTarget = curTarget = {object: halo};
-    curTarget.object.material.color.set( rgbToHex(255,0,0) );  // red
+    //curTarget.object.material.color.set( rgbToHex(255,0,0) );  // red
     curTarget.object.material.opacity = 0.8;
     console.log("prevTarget, curTarget", prevTarget, curTarget);
+    displayHaloData();
     tweenToPosition();
 }
 
 function __updateData(dataset) {
     initHaloTree(dataset, false);
     createHaloGeometry();
-    __resetView();
+    __resetView(true);
 }
 
 
@@ -228,7 +245,8 @@ function initGUI() {
         this.Path257 = function () { __updateData(PATH257) };
         this.SampleTree = function () { __updateData(HALOTREE) };
         this.Tree676638 = function () { __updateData(TREE676638) };
-        this.reset = function () { __resetView() };
+        this.goToHead = function () { __resetView(true) };
+        this.goToTail = function () { __resetView(false) };
     };
 
     var config = new GUIcontrols();
@@ -236,6 +254,7 @@ function initGUI() {
     var spheresController = guiBox.add(config, "showHalos");
     spheresController.onFinishChange(function(){
         console.log("spheresController.onFinishChange");
+        SpheresVisible = config.showHalos;
         for (var i=head; i< tail+1; i++) {
             for (var j=0; j < HaloSpheres[i].length; j++) {
                 HaloSpheres[i][j].visible = config.showHalos;
@@ -247,6 +266,7 @@ function initGUI() {
     var linesController = guiBox.add(config, "showPaths");
     linesController.onFinishChange(function(){
         console.log("linesController.onFinishChange");
+        LinesVisible = config.showPaths;
         for (var i=head; i< tail+1; i++) {
             for (var j=0; j < HaloLinesObjs[i].length; j++) {
                 HaloLinesObjs[i][j].visible = config.showPaths;
@@ -260,7 +280,8 @@ function initGUI() {
     dataSetBox.add(config, "SampleTree");
     dataSetBox.add(config, "Tree676638");
 
-    guiBox.add(config, "reset");
+    guiBox.add(config, "goToHead");
+    guiBox.add(config, "goToTail");
 
 }
 
@@ -335,9 +356,10 @@ function onMouseClick() {
             curTarget = hit;
         }
 
-        prevTarget.object.material.color.set( rgbToHex(255,255,255) );
+        //prevTarget.object.material.color.set( rgbToHex(255,255,255) );
         prevTarget.object.material.opacity = 0.2;
-        curTarget.object.material.color.set( rgbToHex(255,0,0) );
+        //curTarget.object.material.color.set( rgbToHex(255,0,0) );
+        curTarget.object.material.opacity = 0.8;
 
         tweenToPosition();
     }
@@ -438,11 +460,11 @@ function render() {
         for (var i = 0; i < hits.length; i++) {
             if (hits[i].object.position !== curTarget.object.position &&
                 hits[i].object.material.opacity !== 0.0 && hits[i].object.visible){
-                hits[i].object.material.color.set( rgbToHex(255,255,255) );
+                //hits[i].object.material.color.set( rgbToHex(255,255,255) );
                 hits[i].object.material.opacity = 0.2;
             } else if (hits[i].object.position === curTarget.object.position &&
                 hits[i].object.material.opacity !== 0.0 && hits[i].object.visible){
-                curTarget.object.material.color.set( rgbToHex(255,0,0) );
+                //curTarget.object.material.color.set( rgbToHex(255,0,0) );
                 curTarget.object.material.opacity = 0.8;
             }
         }
@@ -456,11 +478,11 @@ function render() {
         for (var i = 0; i < hits.length; i++) {
             if (hits[i].object.position !== curTarget.object.position &&
                 hits[i].object.material.opacity !== 0.0 && hits[i].object.visible){
-                hits[i].object.material.color.set( rgbToHex(255, 255, 0) ); // yellow
+                //hits[i].object.material.color.set( rgbToHex(255, 255, 0) ); // yellow
                 hits[i].object.material.opacity = 0.8;
             } else if (hits[i].object.position === curTarget.object.position &&
                 hits[i].object.material.opacity !== 0.0 && hits[i].object.visible){
-                curTarget.object.material.color.set( rgbToHex(255,0,0) );
+                //curTarget.object.material.color.set( rgbToHex(255,0,0) );
                 hits[i].object.material.opacity = 0.8;
             }
         }
@@ -610,11 +632,11 @@ function displayHaloData() {
     for (var i = 0; i < TimePeriods.length; i++) {
         for (var j = 0; j < HaloLinesObjs[i].length; j++) {
             //HaloLinesObjs[i][j].visible = !!(i >= head && i < tail);
-            HaloLinesObjs[i][j].visible = (i >= head && i < tail)? ObjectsVisible : false;
+            HaloLinesObjs[i][j].visible = (i >= head && i < tail)? LinesVisible : false;
         }
         for (var k = 0; k < HaloSpheres[i].length; k++) {
             //HaloSpheres[i][k].visible = !!(i >= head && i <= tail);
-            HaloSpheres[i][k].visible = (i >= head && i <= tail)? ObjectsVisible : false;
+            HaloSpheres[i][k].visible = (i >= head && i <= tail)? SpheresVisible : false;
             if (curTarget && HaloSpheres[i][k].position !== curTarget.object.position){
                 HaloSpheres[i][k].material.color.set(colorKey(i));
                 HaloSpheres[i][k].material.opacity = 0.2;
@@ -690,7 +712,7 @@ function createSphere(id, color, index) {
     var halo = HaloLUT[id];
     console.log("createSphere", index, halo.id);
     var mesh = new THREE.Mesh(
-        new THREE.SphereGeometry(halo.rs2),
+        new THREE.SphereGeometry(halo.rs1/100),
         new THREE.MeshBasicMaterial({
             color: color,
             vertexColors: THREE.VertexColors,
@@ -714,23 +736,24 @@ function createSphere(id, color, index) {
  * ================================== */
 function updateAllTheGeometry() {
 
-    var halo;
-    for (var i = head; i <= tail; i++) {
-        if (halo) break;
-        for (var j = 0; j < HaloSpheres[i].length; j++){
-            halo = HaloSpheres[i][j];
-            if ( halo ) break;
-        }
-    }
-    if (curTarget.object)
-        curTarget.object = halo;
-    else
-        prevTarget = curTarget = {object: halo};
-    curTarget.object.material.color.set( rgbToHex(255,0,0) );  // red
-    curTarget.object.material.opacity = 0.8;
+
+    //var halo;
+    //for (var i = head; i <= tail; i++) {
+    //    if (halo) break;
+    //    for (var j = 0; j < HaloSpheres[i].length; j++){
+    //        halo = HaloSpheres[i][j];
+    //        if ( halo ) break;
+    //    }
+    //}
+    //if (curTarget.object)
+    //    curTarget.object = halo;
+    //else
+    //    prevTarget = curTarget = {object: halo};
+    //curTarget.object.material.color.set( rgbToHex(255,0,0) );  // red
+    //curTarget.object.material.opacity = 0.8;
     displayHaloData();
     console.log("prevTarget, curTarget", prevTarget, curTarget);
-    tweenToPosition();
+    //tweenToPosition();
 
 
 }
