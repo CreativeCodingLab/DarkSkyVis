@@ -2,11 +2,11 @@ body {
     margin: 0px;
     overflow: hidden;
     font-family: Monospace;
-    background-color: #000000;
+    /*background-color: #000000;*/
+    background-color: white;
 }
 
 canvas { width: 100%; height: 100%; }
-
 
 /**********************************
  * Settings for the GUI values
@@ -16,6 +16,10 @@ canvas { width: 100%; height: 100%; }
     top: 2px;
     left: 2px
 }
+
+
+
+
 
 /**********************************
  * Settings for the Slider values
@@ -94,6 +98,6 @@ canvas { width: 100%; height: 100%; }
 }
 
 .noUi-connect {
-    background: blue;
+    background: linear-gradient(red, blue, green);
 }
 

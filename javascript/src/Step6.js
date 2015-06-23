@@ -14,10 +14,12 @@ var HaloLinesObjs = [];
 var HaloLines = [], HaloSpheres = [];
 var hits = [], curTarget, prevTarget;
 var nDivisions = 10, NUMTIMEPERIODS = 89;
-var SpheresVisible = true, LinesVisible = true;
+var config;
 
-var colorKey = d3.scale.linear().domain([0, 44, NUMTIMEPERIODS])
-    .range([rgbToHex(255, 0, 0), rgbToHex(0, 0, 255), rgbToHex(0, 255, 0)]);
+// Be sure to match this with the slider's connect!!
+var colorKey = d3.scale.linear()
+    .domain([0, 44, NUMTIMEPERIODS])
+    .range([rgbToHex(255,0,0), rgbToHex(0,0,255), rgbToHex(0,255,0)]);
 
 // ==========================================
 //              Start
@@ -65,7 +67,7 @@ function onCreate() {
 
     // Load Data for Halo 257
     //initPointsH257();
-    initHaloTree(PATH257, true);
+    initHaloTree(TREE676638, true);
 
     // **** Make some Spline Geometry ***
     createHaloGeometry();
@@ -107,6 +109,7 @@ function initRenderer() {
     {
         renderer.setPixelRatio( window.devicePixelRatio );
         renderer.setSize( window.innerWidth, window.innerHeight );
+        renderer.setClearColor(rgbToHex(50,50,50), 1);
         renderer.gammaInput = true;
         renderer.gammaOutput = true;
     }
@@ -243,7 +246,7 @@ function __resetView(toHead) {
 function __updateData(dataset) {
     initHaloTree(dataset, false);
     createHaloGeometry();
-    __resetView(true);
+    __resetView(0);
 }
 
 
@@ -252,54 +255,79 @@ function initGUI() {
     var gui = new dat.GUI({ autoPlace: false });
     var guiContainer = $('.ma-gui').append($(gui.domElement));
     var guiBox = gui.addFolder("Halos in a Dark Sky");
-    guiBox.open();
+        guiBox.open();
 
     var GUIcontrols = function() {
-        this.showPaths = true;
+        this.showPaths = false;
         this.showHalos = true;
+
+        //this.color0 = rgbToHex(255,0,0);
+        //this.color1 = rgbToHex(0,0,255);
+        //this.color2 = rgbToHex(0,255,0);
+
         this.Path257 = function () { __updateData(PATH257) };
         this.SampleTree = function () { __updateData(HALOTREE) };
         this.Tree676638 = function () { __updateData(TREE676638) };
         this.goToHead = function () { __resetView(0) };
-        this.goToMiddle = function () { __resetView(1) };
+        this.goToCenter = function () { __resetView(1) };
         this.goToTail = function () { __resetView(2) };
     };
 
-    var config = new GUIcontrols();
+    config = new GUIcontrols();
 
     var spheresController = guiBox.add(config, "showHalos");
-    spheresController.onFinishChange(function(){
-        console.log("spheresController.onFinishChange");
-        SpheresVisible = config.showHalos;
-        for (var i=head; i< tail+1; i++) {
-            for (var j=0; j < HaloSpheres[i].length; j++) {
-                HaloSpheres[i][j].visible = config.showHalos;
+    {
+        spheresController.onFinishChange(function(){
+            console.log("spheresController.onFinishChange");
+            //SpheresVisible = config.showHalos;
+            for (var i=head; i< tail+1; i++) {
+                for (var j=0; j < HaloSpheres[i].length; j++) {
+                    HaloSpheres[i][j].visible = config.showHalos;
+                }
             }
-        }
-    });
+        });
+    }
 
 
     var linesController = guiBox.add(config, "showPaths");
-    linesController.onFinishChange(function(){
-        console.log("linesController.onFinishChange");
-        LinesVisible = config.showPaths;
-        for (var i=head; i< tail+1; i++) {
-            for (var j=0; j < HaloLinesObjs[i].length; j++) {
-                HaloLinesObjs[i][j].visible = config.showPaths;
+    {
+        linesController.onFinishChange(function(){
+            console.log("linesController.onFinishChange");
+            //LinesVisible = config.showPaths;
+            for (var i=head; i< tail+1; i++) {
+                for (var j=0; j < HaloLinesObjs[i].length; j++) {
+                    HaloLinesObjs[i][j].visible = config.showPaths;
+                }
             }
-        }
-    });
+        });
+    }
 
     var dataSetBox = guiBox.addFolder("Choose a dataset!");
-    dataSetBox.open();
-    dataSetBox.add(config, "Path257");
-    dataSetBox.add(config, "SampleTree");
-    dataSetBox.add(config, "Tree676638");
+    {
+        dataSetBox.add(config, "Tree676638");
+        dataSetBox.add(config, "Path257");
+        dataSetBox.add(config, "SampleTree");
+    }
 
     var haloFocusBox = guiBox.addFolder("Choose a focus point!");
-    guiBox.add(config, "goToHead");
-    guiBox.add(config, "goToMiddle");
-    guiBox.add(config, "goToTail");
+    {
+        haloFocusBox.add(config, "goToHead");
+        haloFocusBox.add(config, "goToCenter");
+        haloFocusBox.add(config, "goToTail");
+        haloFocusBox.open();
+    }
+
+    //var colorBox = guiBox.addFolder("Cosmetic");
+    //{
+    //    colorBox.addColor(config, "color0");
+    //    colorBox.addColor(config, "color1");
+    //    colorBox.addColor(config, "color2");
+    //
+    //    colorKey = d3.scale.linear()
+    //        .domain([0, 44, NUMTIMEPERIODS])
+    //        .range([config.color0, config.color1, config.color2]);
+    //
+    //}
 
 }
 
@@ -650,11 +678,11 @@ function displayHaloData() {
     for (var i = 0; i < TimePeriods.length; i++) {
         for (var j = 0; j < HaloLinesObjs[i].length; j++) {
             //HaloLinesObjs[i][j].visible = !!(i >= head && i < tail);
-            HaloLinesObjs[i][j].visible = (i >= head && i < tail)? LinesVisible : false;
+            HaloLinesObjs[i][j].visible = (i >= head && i < tail)? config.showPaths : false;
         }
         for (var k = 0; k < HaloSpheres[i].length; k++) {
             //HaloSpheres[i][k].visible = !!(i >= head && i <= tail);
-            HaloSpheres[i][k].visible = (i >= head && i <= tail)? SpheresVisible : false;
+            HaloSpheres[i][k].visible = (i >= head && i <= tail)? config.showHalos : false;
             if (curTarget && HaloSpheres[i][k].position !== curTarget.object.position){
                 HaloSpheres[i][k].material.color.set(colorKey(i));
                 HaloSpheres[i][k].material.opacity = 0.2;
@@ -690,6 +718,7 @@ function intoTheVoid(id, points, steps) {
     }
 }
 
+
 function createPathLine(points, color, period) {
     // if points is defined at all...
     if (points && points.length > 1) {
@@ -698,10 +727,11 @@ function createPathLine(points, color, period) {
         var colors = [];
         var spline = new THREE.Spline();
         var numPoints = points.length*nDivisions;
+
         var splineGeometry = new THREE.Geometry();
 
         spline.initFromArray(points);
-        for (var i=0; i < numPoints; i++) {
+        for (var i=0; i <= numPoints; i++) {
             index = i/numPoints;
             xyz = spline.getPoint(index);
             splineGeometry.vertices[i] = new THREE.Vector3( xyz.x, xyz.y, xyz.z );
@@ -710,6 +740,7 @@ function createPathLine(points, color, period) {
         }
         splineGeometry.colors = colors;
         splineGeometry.computeBoundingSphere();
+
         var material = new THREE.LineBasicMaterial({
             color: rgbToHex(255, 255, 255),
             linewidth: 2,
@@ -722,6 +753,39 @@ function createPathLine(points, color, period) {
         HaloLinesObjs[period].push(lineMesh);
         linesGroup.add(lineMesh);
         //console.log("created HaloLine", index, HaloLines.length, HaloLines[period].length);
+    }
+}
+
+
+
+function createPathLine2(points, color, period) {
+    // if points is defined at all...
+    if (points && points.length > 1) {
+        var index, xyz;
+        var colors = [];
+
+        var splineGeometry = new THREE.Geometry();
+
+        for (var i=0; i < points.length; i++) {
+            xyz = points[i];
+            splineGeometry.vertices[i] = new THREE.Vector3( xyz[0], xyz[1], xyz[2] );
+            colors[ i ] = new THREE.Color(color);
+
+        }
+        splineGeometry.colors = colors;
+        splineGeometry.computeBoundingSphere();
+
+        var material = new THREE.LineBasicMaterial({
+            color: rgbToHex(255, 255, 255),
+            linewidth: 1,
+            vertexColors: THREE.VertexColors,
+            transparent: true,
+            opacity: 0.5
+        });
+
+        var lineMesh = new THREE.Line(splineGeometry, material);
+        HaloLinesObjs[period].push(lineMesh);
+        linesGroup.add(lineMesh);
     }
 }
 
