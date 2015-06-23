@@ -18,8 +18,8 @@ var config;
 
 // Be sure to match this with the slider's connect!!
 var colorKey = d3.scale.linear()
-    .domain([0, 44, NUMTIMEPERIODS])
-    .range([rgbToHex(255,0,0), rgbToHex(0,0,255), rgbToHex(0,255,0)]);
+    .domain([0, 18, 36, 72, NUMTIMEPERIODS])
+    .range([rgbToHex(255,0,0), rgbToHex(255,255,0), rgbToHex(0,0,255), rgbToHex(0,255,0)]);
 
 // ==========================================
 //              Start
@@ -347,9 +347,9 @@ function initSlider() {
         }),
         range: {   // min and max of range
             'min': [0],
-            '25%': [25],
-            '50%': [50],
-            '75%': [75],
+            '25%': [18],
+            '50%': [36],
+            '75%': [72],
             'max': [88]
         }
     });
@@ -794,7 +794,7 @@ function createSphere(id, color, index) {
     var halo = HaloLUT[id];
     console.log("createSphere", index, halo.id);
     var mesh = new THREE.Mesh(
-        new THREE.SphereGeometry(halo.rs1/100),
+        new THREE.SphereGeometry(halo.rs1/100, 32, 32),
         new THREE.MeshBasicMaterial({
             color: color,
             vertexColors: THREE.VertexColors,

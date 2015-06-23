@@ -98,6 +98,6 @@ canvas { width: 100%; height: 100%; }
 }
 
 .noUi-connect {
-    background: linear-gradient(red, blue, green);
+    background: linear-gradient(red, yellow, blue, green);
 }
 
