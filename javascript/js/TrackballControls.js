@@ -355,7 +355,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 	function keydown( event ) {
 		if ( _this.enabled === false ) return;
 
-		window.removeEventListener( 'keydown', keydown );
+		//window.removeEventListener( 'keydown', keydown );
 
 		_prevState = _state;
 
@@ -384,7 +384,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 		_state = _prevState;
 
-		window.addEventListener( 'keydown', keydown, false );
+		//window.addEventListener( 'keydown', keydown, false );
 
 	}
 
