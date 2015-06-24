@@ -792,9 +792,9 @@ function createPathLine2(points, color, period) {
 
 function createSphere(id, color, index) {
     var halo = HaloLUT[id];
-    console.log("createSphere", index, halo.id);
+    //console.log("createSphere", index, halo.id);
     var mesh = new THREE.Mesh(
-        new THREE.SphereGeometry(halo.rs1/100, 32, 32),
+        new THREE.SphereGeometry(halo.rs1/100, 15, 15),
         new THREE.MeshBasicMaterial({
             color: color,
             vertexColors: THREE.VertexColors,
