@@ -128,6 +128,7 @@ redshit approximation at time 0
 [Seeing the Difference between Cosmological Simulations](https://steveharoz.com/research/cosmology/SeeingDiff-CGA.pdf)  This is a __GREAT__ paper published in 2008 that worked with a very similar dataset to the one I am currently working with.
 
 [This one basically did what I was planning to do...]( http://arxiv.org/pdf/1412.7780.pdf)
+
 ---
 ## Progress
 ### Round 1
