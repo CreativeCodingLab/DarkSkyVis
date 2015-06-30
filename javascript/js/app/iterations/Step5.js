@@ -441,7 +441,7 @@ function createSplineGeometry(nDivisions) {
  *  represented as spheres.
  * ================================== */
 function createSphereGeometry() {
-    // Halo HaloLines [0] is the main halopath
+    // Halo Lines [0] is the main halopath
     //var points = haloLines[0];
     //var spline = new THREE.Spline();
     //spline.initFromArray(points);
@@ -529,7 +529,7 @@ function updateSpheres() {
     if ((tail - head) == 0)
         curTarget.object = haloSpheres[head];
     else {
-        //index = parseInt(head + (tail - head)/2);
+        //index = parseInt(EPOCH_HEAD + (EPOCH_TAIL - EPOCH_HEAD)/2);
         curTarget.object = haloSpheres[tail];
     }
     //curTarget.object.material.color.set( rgbToHex(255,0,0) );  // line green

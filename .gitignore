@@ -30,6 +30,7 @@ docs/presentations
 docs/examples/*
 python/images/*
 javascript/js/assets/*.js
+javascript/js/assets/*.json
 
 
 ds14_scivis_0128_e4_dt04_0.*

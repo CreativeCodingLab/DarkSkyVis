@@ -8,6 +8,25 @@ body {
 
 canvas { width: 100%; height: 100%; }
 
+div.haloStats {
+    position: absolute;
+    bottom: 2px;
+    left: 2px;
+    width:350px;
+    height:200px;
+    border:4px solid red;
+    background: #1c1c1c;
+    padding:6px;
+    overflow:auto;
+    display:none;
+    color: #efff9e;
+}
+strong, b {
+    color: #0bc9ff;
+    font-weight: bold;
+}
+
+
 /**********************************
  * Settings for the GUI values
  ***********************************/
@@ -16,9 +35,6 @@ canvas { width: 100%; height: 100%; }
     top: 2px;
     left: 2px
 }
-
-
-
 
 
 /**********************************
@@ -98,6 +114,12 @@ canvas { width: 100%; height: 100%; }
 }
 
 .noUi-connect {
-    background: linear-gradient(red, yellow, blue, green);
+    background: linear-gradient(
+            #FF0000 0%,
+            #FF00FF 20%,
+            #0000FF 40%,
+            #00FFFF 60%,
+            #00FF00  80%
+    );
 }
 
