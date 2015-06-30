@@ -1,22 +1,38 @@
+# Compiled code
 *.class
-*.nii*
-*.pdf
-*.png  # dont want images taking up space
 *.pyc
 *.o
 *.gz
 *.zip
 *.log
-ds14_scivis_0128_e4_dt04_0.*
+
+*.nii*
+*.pdf
+*.pptx
+*.key
 .DS_Store
-data/*
-*.mp4
-docs/papers/*
-docs/examples/*
+
+
+# Media
+*.png  # dont want images taking up space
+*.jpg
 *.gif
-DarkSkyPy/images/*
-.idea
+*.mp4
+*.svg
+
+# directories
+data/*
+docs/*
 images/*
+docs/papers/*
+docs/presentations
+docs/examples/*
+python/images/*
+javascript/js/assets/*.js
+
+
+ds14_scivis_0128_e4_dt04_0.*
+.idea
 data/json/*.json
 conversion_images
 gotit_images
