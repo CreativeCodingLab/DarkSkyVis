@@ -286,12 +286,68 @@ def main_toJson():
             haloJSON.write( json.dumps( halos ) )
 
 def main():
-    DATA = "../data/dev/biggerTreeTest.dat"
+    DATA = "../data/dev/tree679582.dat"
     HaloObjs = [ addHalo(h) for h in tk.loadtxt(DATA)]
-    with open("../data/dev/biggerTreeTest.json", 'w') as haloJSON:
+    with open("../data/dev/tree679582.json", 'w') as haloJSON:
         haloJSON.write( json.dumps( HaloObjs ) )
 
 if __name__ == '__main__':
     main()
 
 
+# "scale" data[i++]
+# "id" data[i++]
+# "desc_scale" data[i++]
+# "desc_id" data[i++]
+# "num_prog" data[i++]
+# "pid" data[i++]
+# "upid" data[i++]
+# "desc_pid" data[i++]
+# "phantom" data[i++]
+# "sam_mvir" data[i++]
+# "mvir" data[i++]
+# "rvir" data[i++]
+# "rs" data[i++]
+# "vrms" data[i++]
+# "mmp?" data[i++]
+# "scale_of_last_MM" data[i++]
+# "vmax" data[i++]
+# "x" data[i++]
+# "y" data[i++]
+# "z" data[i++]
+# "vx" data[i++]
+# "vy" data[i++]
+# "vz" data[i++]
+# "Jx" data[i++]
+# "Jy" data[i++]
+# "Jz" data[i++]
+# "Spin" data[i++]
+# "Breadth_first_ID" data[i++]
+# "Depth_first_ID" data[i++]
+# "Tree_root_ID" data[i++]
+# "Orig_halo_ID" data[i++]
+# "Snap_num" data[i++]
+# "Next_coprogenitor_depthfirst_ID" data[i++]
+# "Last_progenitor_depthfirst_ID" data[i++]
+# "Rs_Klypin" data[i++]
+# "M_all" data[i++]
+# "M200b" data[i++]
+# "M200c" data[i++]
+# "M500c" data[i++]
+# "M2500c" data[i++]
+# "Xoff" data[i++]
+# "Voff" data[i++]
+# "Spin_Bullock" data[i++]
+# "b_to_a" data[i++]
+# "c_to_a" data[i++]
+# "A[x]" data[i++]
+# "A[y]" data[i++]
+# "A[z]" data[i++]
+# "b_to_a(500c)" data[i++]
+# "c_to_a(500c)" data[i++]
+# "A[x](500c)" data[i++]
+# "A[y](500c)" data[i++]
+# "A[z](500c)" data[i++]
+# "T/|U|" data[i++]
+# "M_pe_Behroozi" data[i++]
+# "M_pe_Diemer" data[i++]

@@ -83,7 +83,7 @@ if __name__ == '__main__':
     f) compute their uvw magnitude
 
 
-'''
+
 
     def __toCoMoving(self, proper):
         h_100 = self.sdfHeader['h_100']
@@ -136,3 +136,4 @@ if __name__ == '__main__':
 
             yield filtered
 
+'''
