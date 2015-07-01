@@ -10,8 +10,9 @@ var scene, renderer;
 var camera, slider;
 var mouse, raycaster, ambient;
 var HaloLUT, TimePeriods, Traversed={};
-var HaloLines = [];
-var Lines = [], HaloSpheres = [];
+
+var Lines = [];
+var HaloLines = [], HaloSpheres = [];
 var hits = [], curTarget, prevTarget;
 var nDivisions = 10, NUMTIMEPERIODS = 89;
 var config, haloStats;
@@ -439,6 +440,10 @@ function onMouseDblClick() {
 
 }
 
+
+// given a clicked Halo id, traverse the tree with the given halo.
+
+//
 function intoTheAbyss(id, points, steps) {
     var maxSteps = 89;
     var halo = HaloLUT[id];  // use the ID to pull the halo
