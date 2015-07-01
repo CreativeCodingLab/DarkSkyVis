@@ -201,9 +201,29 @@ function displayHaloStats() {
     console.log(haloStats);
     var haloData = HaloLUT[curTarget.object.halo_id];
 
-    var result = $.map(haloData, function(value, index) {
-        return  "<b>"+ index  +":</b> " + value;
-    }).join("</br>");
+    var result = "<b> time:</b> " + haloData['time'] + "</br>" +
+    "<b>        id:</b> " + haloData['id'] + "</br>" +
+    "<b>   desc_id:</b> " + haloData['desc_id'] + "</br>" +
+    "<b>  num_prog:</b> " + haloData['num_prog'] + "</br>" +
+    "<b>       pid:</b> " + haloData['pid'] + "</br>" +
+    "<b>      upid:</b> " +  haloData['upid'] + "</br>" +
+    "<b>  desc_pid:</b> " +  haloData['desc_pid'] + "</br>" +
+    "<b>     scale:</b> " +  haloData['scale'] + "</br>" +
+    "<b>desc_scale:</b> " +  haloData['desc_scale'] + "</br>" +
+    "<b>   phantom:</b> " +  haloData['phantom'] + "</br>" +
+    "<b>  position:</b> " +  haloData['position'] + "</br>" +
+    "<b>  velocity:</b> " +  haloData['velocity'] + "</br>" +
+    "<b>        rs:</b> " +  haloData['rs'] + "</br>" +
+    "<b>      mvir:</b> " +  haloData['mvir'] + "</br>" +
+    "<b>      rvir:</b> " +  haloData['rvir'] + "</br>" +
+    "<b>      vrms:</b> " +  haloData['vrms'] + "</br>" +
+    "<b>      vmax:</b> " +  haloData['vmax'] + "</br>" +
+    "<b>  sam_mvir:</b> " +  haloData['sam_mvir'] + "</br>" +
+    "<b>      Spin:</b> " +  haloData['Spin'] + "</br>"
+
+    // var result = $.map(haloData, function(value, index) {
+    //     return  "<b>"+ index  +":</b> " + value;
+    // }).join("</br>");
 
     haloStats.html(result);
 }
