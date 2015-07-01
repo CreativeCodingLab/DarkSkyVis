@@ -11,8 +11,9 @@ var camera, slider;
 var mouse, raycaster, ambient;
 var HaloLUT, TimePeriods, __traversed={};
 
-var Lines = [], HaloBranch = {};
+var Lines = [];
 var HaloLines = {}, HaloSpheres = {};
+var HaloBranch = {}, HaloSelect = {};
 var hits = [], curTarget, prevTarget;
 var nDivisions = 10, NUMTIMEPERIODS = 89;
 var config, haloStats;
@@ -107,7 +108,7 @@ function initRenderer() {
     {
         renderer.setPixelRatio( window.devicePixelRatio );
         renderer.setSize( window.innerWidth, window.innerHeight );
-        renderer.setClearColor(rgbToHex(50,50,50), 1);
+        renderer.setClearColor(rgbToHex(0,0,0), 1);
         renderer.gammaInput = true;
         renderer.gammaOutput = true;
     }
@@ -266,7 +267,7 @@ function initGUI() {
 
     function __updateData(dataset) {
         initHaloTree(dataset, false);
-        createHaloGeometry();
+        createHaloGeometry(TimePeriods);
         __resetView(0);
     }
 
@@ -281,6 +282,7 @@ function initGUI() {
         this.showPaths = false;
         this.showHalos = true;
         this.showStats = false;
+        this.enableSelection = false;
 
         this.color0 = rgbToHex(255,0,0);
         this.color1 = rgbToHex(255,255,0);
@@ -302,7 +304,10 @@ function initGUI() {
     {
         spheresController.onFinishChange(function(){
             console.log("spheresController.onFinishChange");
-            toggleVisibility(HaloSpheres,config.showHalos);
+            if (config.enableSelection)
+                toggleVisibility(HaloSelect,config.showHalos);
+            else
+                toggleVisibility(HaloSpheres,config.showHalos);
         });
     }
 
@@ -311,7 +316,10 @@ function initGUI() {
     {
         linesController.onFinishChange(function(){
             console.log("linesController.onFinishChange");
-            toggleVisibility(HaloLines,config.showPaths);
+            if (config.enableSelection)
+                toggleVisibility(HaloBranch,config.showPaths);
+            else
+                toggleVisibility(HaloLines,config.showPaths);
         });
     }
 
@@ -327,6 +335,22 @@ function initGUI() {
                     else
                         return "none";
                 })
+        })
+    }
+
+    var selectionController = guiBox.add(config, "enableSelection");
+    {
+        selectionController.onFinishChange(function() {
+            if (config.enableSelection) {
+                console.log("Selection Mode is active!");
+                renderer.setClearColor(rgbToHex(50,50,50), 1);
+            } else {
+                __resetHaloBranch()
+                toggleVisibility(HaloLines, config.showPaths);
+                toggleVisibility(HaloSpheres, config.showHalos);
+                renderer.setClearColor(rgbToHex(0,0,0), 1);
+            }
+
         })
     }
 
@@ -364,7 +388,6 @@ function initGUI() {
             });
         })
     }
-
 }
 
 
@@ -438,33 +461,56 @@ function onMouseMove( event ) {
 function onMouseDblClick() {
     console.log("Double Click!!", curTarget.object.halo_id);
     // update the picking ray with the camera and mouse position
-    toggleVisibility(HaloLines, false);
-    toggleVisibility(HaloSpheres, false);
-    HaloBranch = {};
-    __traversed = {};
 
-    var id = curTarget.object.halo_id;
-    var period = curTarget.object.halo_period;
-    // just need to use the halo-id's to turn the spheres on, no sense in rebuilding existing data.
-    var points = intoTheAbyss(id, period, [], 0);
-    createSpline(points, id, period);
+    if(config.enableSelection) {
+        toggleVisibility(HaloLines, false);
+        toggleVisibility(HaloSpheres, false);
+
+        __resetHaloBranch()
+
+
+        var id = curTarget.object.halo_id;
+        var period = curTarget.object.halo_period;
+        // just need to use the halo-id's to turn the spheres on, no sense in rebuilding existing data.
+        var points = intoTheAbyss(id, period, []);
+        createSpline(points, id, period);
+    } else {
+        __resetHaloBranch()
+        toggleVisibility(HaloLines, config.showPaths);
+        toggleVisibility(HaloSpheres, config.showHalos);
+    }
 
 }
 
+function __resetHaloBranch() {
+    for (var id in HaloSelect) {
+        if (id in HaloBranch){
+            console.log("HaloBranch", id)
+            linesGroup.remove(HaloBranch[id]);
+            scene.remove(HaloBranch[id]);
+            HaloBranch[id].material.dispose();
+            HaloBranch[id].geometry.dispose();
+            delete HaloBranch[id]
+        }
+        delete HaloSelect[id]
+    }
+    HaloSelect = {};
+    HaloBranch = {};
+    __traversed = {};
+}
 
 // given a clicked Halo id, traverse the tree with the given halo.
 
 //
-function intoTheAbyss(id, period, points, steps) {
-    var maxSteps = 89;
+function intoTheAbyss(id, period, points) {
     var halo = HaloLUT[id];  // use the ID to pull the halo
     points.push(halo.position);
-
+    HaloSelect[id] = true;
     HaloSpheres[id].visible = (period >= EPOCH_HEAD && period < EPOCH_TAIL)? config.showHalos : false;
     //points.push([halo.x,halo.y,halo.z,halo.id,halo.desc_id]); // for debugging purposes
 
     //if (halo.desc_id in HaloLUT && halo.time < EPOCH_TAIL) {
-    if (halo.desc_id in HaloLUT && steps < maxSteps) {
+    if (halo.desc_id in HaloLUT && period < EPOCH_TAIL) {
         var next = HaloLUT[halo.desc_id];
 
         if (halo.desc_id in __traversed) {
@@ -472,7 +518,7 @@ function intoTheAbyss(id, period, points, steps) {
             return points;
         } else {
             __traversed[halo.id] = true;
-            return intoTheAbyss(next.id, next.time, points, steps+1);
+            return intoTheAbyss(next.id, next.time, points);
         }
     } else {
         //console.log("\t\thalo->id:",halo.id, "!= halo.desc_id:", halo.desc_id);
@@ -514,7 +560,7 @@ function createSpline(points, id, period) {
         var mesh = new THREE.Line(splineGeometry, material);
         mesh.halo_id = id;
         mesh.halo_period = period;
-        HaloBranch[id].push(mesh);
+        HaloBranch[id] = mesh;
         linesGroup.add(mesh);
     }
 }
@@ -926,7 +972,12 @@ function displayHaloData() {
  *  and turns sphere opacity on or off
  * ================================== */
 function updateAllTheGeometry() {
-    displayHaloData();
+    if (config.enableSelection) {
+        toggleVisibility(HaloBranch,config.showPaths);
+        toggleVisibility(HaloSelect,config.showHalos);
+    } else{
+        displayHaloData();
+    };
 
 }
 
