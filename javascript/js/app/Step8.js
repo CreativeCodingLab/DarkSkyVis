@@ -1,16 +1,17 @@
 /**
  * Created by krbalmryde on 6/24/15.
  */
+"use strict"
 
 if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 var container;
 var EPOCH_HEAD, EPOCH_TAIL;
 var scene, renderer;
-var camera, slider;
+var camera, slider, controls;
 var mouse, raycaster, ambient;
 var HaloLUT, TimePeriods, __traversed={};
-
+var linesGroup, sphereGroup;
 var Lines = [];
 var HaloLines = {}, HaloSpheres = {};
 var HaloBranch = {}, HaloSelect = {};
@@ -29,8 +30,10 @@ var colorKey = d3.scale.linear()
 //    Gets called by index.html
 // ==========================================
 function Start() {
+
     onCreate();
     onFrame();
+
 }
 
 /* ==========================================
@@ -41,6 +44,7 @@ function Start() {
  * ==========================================
  */
 function onCreate() {
+
     /* -------------------------------*/
     /*      Setting the stage         */
     /* -------------------------------*/
@@ -83,6 +87,7 @@ function onCreate() {
     // **** Action! Listeners *** //
     initListeners();
 
+
 }
 
 // *****************************
@@ -90,6 +95,7 @@ function onCreate() {
 // *****************************
 
 function initScene() {
+
     scene = new THREE.Scene();
 
     // **** Adding our Group object ***
@@ -100,24 +106,29 @@ function initScene() {
         scene.add( linesGroup );
         scene.add( sphereGroup );
     }
+
 }
 
 
 function initRenderer() {
+
     renderer = new THREE.WebGLRenderer( { antialias: true } );
     {
         renderer.setPixelRatio( window.devicePixelRatio );
         renderer.setSize( window.innerWidth, window.innerHeight );
-        renderer.setClearColor(rgbToHex(0,0,0), 1);
+        renderer.setClearColor(rgbToHex(255,255,255), 1);
         renderer.gammaInput = true;
         renderer.gammaOutput = true;
     }
+
 }
 
 
 function initContainer() {
+
     container = document.getElementById( 'Sandbox' );
     container.appendChild( renderer.domElement );
+
 }
 
 // *****************************
@@ -126,11 +137,14 @@ function initContainer() {
 
 
 function initLights() {
+
     ambient = new THREE.AmbientLight(0xFFFFFF); //rgbToHex(197, 176, 255)
     scene.add(ambient);
+
 }
 
 function initRayCaster() {
+
     raycaster = new THREE.Raycaster();
     {
         mouse = new THREE.Vector2();
@@ -138,8 +152,10 @@ function initRayCaster() {
         var halo;
 
         for (var i = EPOCH_HEAD; i < EPOCH_TAIL; i++) {
+
             if (halo) break;
             for (var j = 0; j < TimePeriods[i].length; j++) {
+
                 var id = TimePeriods[i][j];
                 halo = HaloSpheres[id];
                 if ( halo ) break;
@@ -147,12 +163,14 @@ function initRayCaster() {
         }
 
         prevTarget = curTarget = {object: halo};
-        curTarget.object.material.opacity = 0.8;
+        curTarget.object.material.opacity = 0.7;
         tweenToPosition(250, 250);
     }
+
 }
 
 function initCamera() {
+
     camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 1000 );
     {
         // **** position the camera near the first halo; ***
@@ -177,17 +195,21 @@ function initCamera() {
         controls.target.set(pos.x, pos.y, pos.z);
         controls.update();
     }
+
 }
 
 function initListeners() {
+
     window.addEventListener( 'resize', onReshape, false );
     window.addEventListener( 'mousemove', onMouseMove, false );
     window.addEventListener( 'click', onMouseClick, true );
     window.addEventListener( 'dblclick', onMouseDblClick, true );
     window.addEventListener( 'keypress', onKeyPress, false );
+
 }
 
 function initStatsInfo() {
+
     console.log("initStatsInfo\n");
     haloStats = d3.select("#Sandbox")
         .append("div")
@@ -195,9 +217,11 @@ function initStatsInfo() {
 
     $('.haloStats').append($(haloStats.domElement));
     console.log(haloStats);
+
 }
 
 function displayHaloStats() {
+
     console.log(haloStats);
     var haloData = HaloLUT[curTarget.object.halo_id];
 
@@ -222,24 +246,32 @@ function displayHaloStats() {
     "<b>      Spin:</b> " +  haloData['Spin'] + "</br>"
 
     // var result = $.map(haloData, function(value, index) {
+
     //     return  "<b>"+ index  +":</b> " + value;
     // }).join("</br>");
 
     haloStats.html(result);
+
 }
 
 
 function initGUI() {
 
+
     function __resetView(toHead) {
+
         console.log("You hit the reset button!!");
         var halo;
         switch (toHead) {
+
             case 0:
                 (function () {
+
                     for (var i = EPOCH_HEAD; i <= EPOCH_TAIL; i++) {
+
                         if (halo) break;
                         for (var j = 0; j < TimePeriods[i].length; j++) {
+
                             var id = TimePeriods[i][j]
                             halo = HaloSpheres[id];
                             if (halo) break;
@@ -250,8 +282,10 @@ function initGUI() {
 
             case 1:
                 (function () {
+
                     var i = (EPOCH_HEAD < EPOCH_TAIL)? (EPOCH_HEAD + parseInt((EPOCH_TAIL - EPOCH_HEAD)/2)) : 0;
                     for (var j = 0; j < TimePeriods[i].length; j++) {
+
                         var id = TimePeriods[i][j]
                         halo = HaloSpheres[id];
                         if (halo) break;
@@ -261,9 +295,12 @@ function initGUI() {
 
             case 2:
                 (function () {
+
                     for (var i = EPOCH_TAIL; i >= EPOCH_HEAD; i--) {
+
                         if (halo) break;
                         for (var j = 0; j < TimePeriods[i].length; j++) {
+
                             var id = TimePeriods[i][j]
                             halo = HaloSpheres[id];
                             if (halo) break;
@@ -277,7 +314,7 @@ function initGUI() {
             curTarget.object = halo;
         else
             prevTarget = curTarget = {object: halo};
-        curTarget.object.material.opacity = 0.8;
+        curTarget.object.material.opacity = 0.7;
         console.log("prevTarget, curTarget", prevTarget, curTarget);
 
         displayHaloStats();
@@ -286,6 +323,7 @@ function initGUI() {
     }
 
     function __updateData(dataset) {
+
         initHaloTree(dataset, false);
         createHaloGeometry(TimePeriods);
         __resetView(0);
@@ -299,6 +337,7 @@ function initGUI() {
     guiBox.open();
 
     var GUIcontrols = function() {
+
         this.showPaths = false;
         this.showHalos = true;
         this.showStats = false;
@@ -347,6 +386,7 @@ function initGUI() {
     var statsController = guiBox.add(config, "showStats");
     {
         statsController.onFinishChange(function() {
+
             console.log("statsController.onFinishChange");
             haloStats
                 .style("display", function(){
@@ -361,7 +401,10 @@ function initGUI() {
     var selectionController = guiBox.add(config, "enableSelection");
     {
         selectionController.onFinishChange(function() {
+
+            console.log("selectionController.onFinishChange");
             if (config.enableSelection) {
+
                 console.log("Selection Mode is active!");
                 renderer.setClearColor(rgbToHex(50,50,50), 1);
             } else {
@@ -400,6 +443,7 @@ function initGUI() {
             var foo = $(".noUi-connect");
             console.log("\twooo we got it!!", foo, config.color3);
             foo.css( "background-image", function() {
+
                 return "-webkit-linear-gradient( "
                     + config.color0  + " 0%, "
                     + config.color1  +  " 25%, "
@@ -408,21 +452,34 @@ function initGUI() {
             });
         })
     }
+
 }
 
 
-function toggleVisibility(HaloObject, showIt) {
+function toggleVisibility(HaloObject, showIt, opacity) {
+
+
     for (var i=EPOCH_HEAD; i<EPOCH_TAIL+1; i++) {
+
         for (var j = 0; j < TimePeriods[i].length; j++) {
+
             var id = TimePeriods[i][j];
-            if(HaloObject[id])
+            if(HaloObject[id]){
                 HaloObject[id].visible = showIt;
+                if (opacity){
+                    console.log("toggleVisibility", i, opacity);
+                    HaloObject[id].material.opacity = opacity;
+                }
+            }
+
         }
     }
+
 }
 
 
 function initSlider() {
+
     // console.log("\t initSlider()");
     slider = $('.tslider');
     slider.noUiSlider({
@@ -456,6 +513,7 @@ function initSlider() {
     EPOCH_HEAD = parseInt(slider.val()[0]);
     EPOCH_TAIL = parseInt(slider.val()[1]);
 
+
 }
 
 
@@ -464,27 +522,33 @@ function initSlider() {
 // And associated Event Listeners
 // ==========================================
 function onReshape() {
+
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize( window.innerWidth, window.innerHeight );
+
 }
 
 
 function onMouseMove( event ) {
+
     // calculate mouse position in normalized device coordinates
     // (-1 to +1) for both components
     event.preventDefault();
     mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
     mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
 }
 
 function onMouseDblClick() {
+
     console.log("Double Click!!", curTarget.object.halo_id);
     // update the picking ray with the camera and mouse position
 
     if(config.enableSelection) {
-        toggleVisibility(HaloLines, false);
-        toggleVisibility(HaloSpheres, false);
+
+        toggleVisibility(HaloLines, false, 0.5);
+        toggleVisibility(HaloSpheres, false, 0.05);
 
         __resetHaloBranch()
 
@@ -496,14 +560,17 @@ function onMouseDblClick() {
         createSpline(points, id, period);
     } else {
         __resetHaloBranch()
-        toggleVisibility(HaloLines, config.showPaths);
-        toggleVisibility(HaloSpheres, config.showHalos);
+        toggleVisibility(HaloLines, config.showPaths, 0.05);
+        toggleVisibility(HaloSpheres, config.showHalos, 0.05);
     }
+
 
 }
 
 function __resetHaloBranch() {
+
     for (var id in HaloSelect) {
+
         if (id in HaloBranch){
             console.log("HaloBranch", id)
             linesGroup.remove(HaloBranch[id]);
@@ -517,12 +584,14 @@ function __resetHaloBranch() {
     HaloSelect = {};
     HaloBranch = {};
     __traversed = {};
+
 }
 
 // given a clicked Halo id, traverse the tree with the given halo.
 
 //
 function intoTheAbyss(id, period, points) {
+
     var halo = HaloLUT[id];  // use the ID to pull the halo
     points.push(halo.position);
     HaloSelect[id] = true;
@@ -530,10 +599,13 @@ function intoTheAbyss(id, period, points) {
     //points.push([halo.x,halo.y,halo.z,halo.id,halo.desc_id]); // for debugging purposes
 
     //if (halo.desc_id in HaloLUT && halo.time < EPOCH_TAIL) {
+
     if (halo.desc_id in HaloLUT && period < EPOCH_TAIL) {
+
         var next = HaloLUT[halo.desc_id];
 
         if (halo.desc_id in __traversed) {
+
             points.push(next.position);
             return points;
         } else {
@@ -544,12 +616,21 @@ function intoTheAbyss(id, period, points) {
         //console.log("\t\thalo->id:",halo.id, "!= halo.desc_id:", halo.desc_id);
         return points;
     }
+
+}
+
+function traceBackPath(id, period, points) {
+
+
+
 }
 
 
 function createSpline(points, id, period) {
+
     // if points is defined at all...
     if (points && points.length > 1) {
+
         //console.log("creating PathLine!", period);
         var index, xyz;
         var colors = [];
@@ -560,6 +641,7 @@ function createSpline(points, id, period) {
 
         spline.initFromArray(points);
         for (var i=0; i <= numPoints; i++) {
+
             index = i/numPoints;
             xyz = spline.getPoint(index);
             splineGeometry.vertices[i] = new THREE.Vector3( xyz.x, xyz.y, xyz.z );
@@ -583,21 +665,25 @@ function createSpline(points, id, period) {
         HaloBranch[id] = mesh;
         linesGroup.add(mesh);
     }
+
 }
 
 
 function onMouseClick() {
+
     console.log("Single Click!!");
     // update the picking ray with the camera and mouse position
     raycaster.setFromCamera( mouse, camera );
     // calculate objects intersecting the picking ray
     var hit, hits = raycaster.intersectObjects( sphereGroup.children );
     for (var i = 0; i < hits.length; i++) {
+
         hit = raycaster.intersectObjects( sphereGroup.children )[i];
         console.log(i, "hit?", hit);
         if (hit.object.visible) break;
     }
     if (hit && (hit.object.material.opacity !== 0.0 && hit.object.visible)) {
+
         console.log("we got something!", hit);
         if (!prevTarget)
             prevTarget = curTarget = hit;
@@ -607,18 +693,21 @@ function onMouseClick() {
         }
 
         prevTarget.object.material.opacity = 0.2;
-        curTarget.object.material.opacity = 0.8;
+        curTarget.object.material.opacity = 0.7;
 
         tweenToPosition();
         displayHaloStats();
     }
 
+
 }
 
 
 function onKeyPress( event ) {
+
     console.log("Key is",event.keyCode);
     switch (event.keyCode) {
+
         case 49:
             camera.position.set(camera.position.x, camera.position.y, camera.position.z-0.3);
             controls.update();
@@ -628,11 +717,13 @@ function onKeyPress( event ) {
             controls.update();
             break;
     }
+
 }
 
 
 
 function tweenToPosition(durationA, durationB) {
+
     console.log("we are tweenToPosition!");
     TWEEN.removeAll();
 
@@ -658,6 +749,7 @@ function tweenToPosition(durationA, durationB) {
     var tweenLookAt = new TWEEN.Tween(currentLookAt)
         .to(haloDestination, durationA)
         .onUpdate(function() {
+
             controls.target.set(currentLookAt.x, currentLookAt.y, currentLookAt.z);
         });
 
@@ -665,12 +757,14 @@ function tweenToPosition(durationA, durationB) {
     var tweenPosition = new TWEEN.Tween(cameraPosition)
         .to(zoomDestination, durationB)
         .onUpdate(function() {
+
             camera.position.set(cameraPosition.x, cameraPosition.y, cameraPosition.z);
             controls.update();
         });
 
     //tweenLookAt.chain(tweenPosition);
     tweenLookAt.start();
+
 }
 
 /* ================================== *
@@ -679,10 +773,12 @@ function tweenToPosition(durationA, durationB) {
  *  associated draw function
  * ================================== */
 function onFrame() {
+
     var sliderVal0 = parseInt(slider.val()[0]);
     var sliderVal1 = parseInt(slider.val()[1]);
 
     if ((EPOCH_HEAD !== sliderVal0) || (EPOCH_TAIL !== sliderVal1)) {
+
         EPOCH_HEAD = sliderVal0;
         EPOCH_TAIL = sliderVal1;
         updateAllTheGeometry();
@@ -690,6 +786,7 @@ function onFrame() {
     requestAnimationFrame( onFrame );
     TWEEN.update();
     render();
+
 }
 
 /* ================================== *
@@ -698,12 +795,15 @@ function onFrame() {
  *  the scene and its associated objects
  * ================================== */
 function render() {
+
     raycaster.setFromCamera( mouse, camera );
 
     // This loop is to set the captured moused over halos back to their
     // original color once we have moved the mouse away
     if (hits.length > 0) {
+
         for (var i = 0; i < hits.length; i++) {
+
             // Hit object is NOT the currently selected object
             if (hits[i].object.position !== curTarget.object.position &&
                 hits[i].object.material.opacity !== 0.0 && hits[i].object.visible){
@@ -711,7 +811,7 @@ function render() {
             // Hit object is the currently selected object
             } else if (hits[i].object.position === curTarget.object.position &&
                 hits[i].object.material.opacity !== 0.0 && hits[i].object.visible){
-                curTarget.object.material.opacity = 0.8;
+                curTarget.object.material.opacity = 0.7;
             }
         }
     }
@@ -721,7 +821,9 @@ function render() {
     // This loop is to set the captured moused over halos to yellow to highlight
     // that weve moved over them
     if (hits.length > 0) {
+
         for (var i = 0; i < hits.length; i++) {
+
             // Hit object is not our currently selected object
             if (hits[i].object.position !== curTarget.object.position &&
                 hits[i].object.material.opacity !== 0.0 && hits[i].object.visible){
@@ -729,12 +831,13 @@ function render() {
             // Hit object is our currently selected object
             } else if (hits[i].object.position === curTarget.object.position &&
                 hits[i].object.material.opacity !== 0.0 && hits[i].object.visible){
-                hits[i].object.material.opacity = 0.8;
+                hits[i].object.material.opacity = 0.7;
             }
         }
     }
     controls.update();
     renderer.render( scene, camera );
+
 }
 
 
@@ -744,11 +847,13 @@ function render() {
  *  the scene and its associated objects
  * ================================== */
 function initHaloTree(DATASET, firstTime) {
+
     console.log("\n\ninitHaloTree!!", firstTime, DATASET.length);
 
 
     // Helper Function, closure
     function __prepGlobalStructures() {
+
         console.log("calling __prepGlobalStructures()!");
         Lines = [];
         HaloBranch = {};
@@ -760,17 +865,22 @@ function initHaloTree(DATASET, firstTime) {
 
         TimePeriods = [];
         for (var i = 0; i < NUMTIMEPERIODS; i++) {
+
             Lines[i] = [];
             TimePeriods[i] = [];
         }
     }
 
     function __resetGlobalStructures() {
+
         console.log("calling __resetGlobalStructures()!");
         for (var i = 0; i < TimePeriods.length; i++) {
+
             for (var j = 0; j < TimePeriods[i].length; j++) {
+
                 var id = TimePeriods[i][j]
                 if (HaloLines[id]) {
+
                     linesGroup.remove(HaloLines[id]);
                     scene.remove(HaloLines[id]);
                     HaloLines[id].material.dispose();
@@ -779,6 +889,7 @@ function initHaloTree(DATASET, firstTime) {
                 }
 
                 if (HaloSpheres[id]) {
+
                     sphereGroup.remove(HaloSpheres[id]);
                     scene.remove(HaloSpheres[id]);
                     HaloSpheres[id].material.dispose();
@@ -787,6 +898,7 @@ function initHaloTree(DATASET, firstTime) {
                 }
 
                 if (HaloLUT[id]) {
+
                     delete HaloLUT[id]
                     HaloLUT.length--;
                 }
@@ -802,6 +914,7 @@ function initHaloTree(DATASET, firstTime) {
 
     // PATH257, HALOTREE, TREE676638
     for (var i = 0; i < DATASET.length; i++) {
+
         var halo = DATASET[i];
         halo.rs1 = (halo.rvir / halo.rs);  // convenience keys, one divided by
         halo.rs2 = (halo.rvir * halo.rs);  // the other multiplied
@@ -809,6 +922,7 @@ function initHaloTree(DATASET, firstTime) {
         //halo.position[0] = halo.x
         halo.vec3 = THREE.Vector3(halo.x, halo.y, halo.z);  // Convenience, make a THREE.Vector3
         halo.time = parseInt(halo.scale * 100) - tree_offset;
+        console.log(halo.time, halo.id, halo.desc_id, halo.pid)
         //console.log("\tHalo.id ", halo.id, "Halo.scale",halo.scale, "Halo.time",halo.time);
 
         // if (halo.x > 50.0 && halo.time)
@@ -826,6 +940,7 @@ function initHaloTree(DATASET, firstTime) {
 
     // **** Make some Spline Geometry ***
     createHaloGeometry(TimePeriods);
+
 }
 
 /* ================================== *
@@ -838,12 +953,16 @@ function initHaloTree(DATASET, firstTime) {
  *  included below
  * ================================== */
 function createHaloGeometry(TimePeriods) {
+
     for (var i = 0; i < TimePeriods.length; i++) {
+
         for (var j = 0; j < TimePeriods[i].length; j++) {
+
 
             var id = TimePeriods[i][j];
 
             if (!(id in __traversed)) {
+
                 var points = intoTheVoid(id, [], 0);
                 Lines[i].push( { 'points': points, 'id': id } );
             }
@@ -853,6 +972,7 @@ function createHaloGeometry(TimePeriods) {
     }
 
     for (i = 0; i < Lines.length; i++) {
+
         for (j = 0; j < Lines[i].length; j++){
             var id = Lines[i][j].id
             var segment = Lines[i][j].points;
@@ -863,20 +983,25 @@ function createHaloGeometry(TimePeriods) {
 
     // set the visibility of the halo data
     displayHaloData();
+
 }
 
 // Helper function
 function intoTheVoid(id, points, steps) {
+
     var maxSteps = 1;
     var halo = HaloLUT[id];  // use the ID to pull the halo
     points.push(halo.position);
     //points.push([halo.x,halo.y,halo.z,halo.id,halo.desc_id]); // for debugging purposes
 
     //if (halo.desc_id in HaloLUT && halo.time < EPOCH_TAIL) {
+
     if (halo.desc_id in HaloLUT && steps < maxSteps) {
+
         var next = HaloLUT[halo.desc_id];
 
         if (halo.desc_id in __traversed) {
+
             //if (halo.time === next.time){
             //    console.log('\t',halo.time, next.time, halo.id, next.id, halo.position, next.position);
             //    return [];
@@ -894,9 +1019,11 @@ function intoTheVoid(id, points, steps) {
         //console.log("\t\thalo->id:",halo.id, "!= halo.desc_id:", halo.desc_id);
         return points;
     }
+
 }
 
 function createSphere(id, color, index) {
+
     var halo = HaloLUT[id];
     //console.log("createSphere", index, halo.id);
 
@@ -914,7 +1041,7 @@ function createSphere(id, color, index) {
     );
 
     // Add the halo's id to the mess so we can check it against the Halo ID map/LUT/Hash.
-    mesh.renderOrder = 1;
+    mesh.renderOrder = halo.time;
     mesh.halo_id = id;
     mesh.halo_period = halo.time;
     mesh.position.set( halo.x, halo.y, halo.z);
@@ -922,13 +1049,16 @@ function createSphere(id, color, index) {
     HaloSpheres[id] = mesh;
     sphereGroup.add(mesh);
     //console.log("created Halosphere", halo.id, index, HaloSpheres.length, HaloSpheres[index].length);
+
 }
 
 
 function createPathLine(points, color, id, period) {
+
     // if points is defined at all...
     if (points && points.length > 1) {
-        console.log("creating PathLine!", period);
+
+        // console.log("creating PathLine!", period);
         var index, xyz;
         var colors = [];
         var spline = new THREE.Spline();
@@ -938,6 +1068,7 @@ function createPathLine(points, color, id, period) {
 
         spline.initFromArray(points);
         for (var i=0; i <= numPoints; i++) {
+
             index = i/numPoints;
             xyz = spline.getPoint(index);
             splineGeometry.vertices[i] = new THREE.Vector3( xyz.x, xyz.y, xyz.z );
@@ -961,18 +1092,22 @@ function createPathLine(points, color, id, period) {
         HaloLines[id] = mesh;
         linesGroup.add(mesh);
     }
+
 }
 
 // kind of a misleading function name
 function displayHaloData() {
+
     for (var i = 0; i < TimePeriods.length; i++) {
+
         for (var j = 0; j < TimePeriods[i].length; j++) {
+
 
             var id = TimePeriods[i][j];
             console.log(i, id)
             // Set Halo Line Visibility
             if (HaloLines[id]){
-                console.log("\tdisplaying Halo line?", i, id, config.showPaths, EPOCH_HEAD, EPOCH_TAIL)
+                // console.log("\tdisplaying Halo line?", i, id, config.showPaths, EPOCH_HEAD, EPOCH_TAIL)
                 HaloLines[id].visible = (i >= EPOCH_HEAD && i < EPOCH_TAIL)? config.showPaths : false;
             }
             // Set Halo Spheres Visibility
@@ -983,6 +1118,7 @@ function displayHaloData() {
             }
         }
     }
+
 }
 
 
@@ -992,20 +1128,25 @@ function displayHaloData() {
  *  and turns sphere opacity on or off
  * ================================== */
 function updateAllTheGeometry() {
+
     if (config.enableSelection) {
-        toggleVisibility(HaloBranch,config.showPaths);
-        toggleVisibility(HaloSelect,config.showHalos);
+
+        toggleVisibility(HaloBranch,config.showPaths, 0.5);
+        toggleVisibility(HaloSelect,config.showHalos, 0.05);
     } else{
         displayHaloData();
     };
+
 
 }
 
 
 function rgbToHex(R,G,B){
     function toHex(c) {
+
         var hex = c.toString(16);
         return hex.length == 1 ? "0" + hex : hex;
     }
     return "#" + toHex(R) + toHex(G) + toHex(B)
+
 }

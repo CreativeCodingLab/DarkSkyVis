@@ -102,10 +102,6 @@ def addHalo(data):
     }
 
 
-def l2a(l):
-    return np.array(l)
-
-
 def getDomainWidth(sdfPosition):
     print "\tgetDomainWidth"
     rmin = l2a([sdfPosition[:, 0].min(),
@@ -285,11 +281,26 @@ def main_toJson():
             print jsonFN, halos
             haloJSON.write( json.dumps( halos ) )
 
-def main():
+def main_tree679582():
     DATA = "../data/dev/tree679582.dat"
     HaloObjs = [ addHalo(h) for h in tk.loadtxt(DATA)]
     with open("../data/dev/tree679582.json", 'w') as haloJSON:
         haloJSON.write( json.dumps( HaloObjs ) )
+
+
+def main():
+    RAW = "http://darksky.slac.stanford.edu/scivis2015/data/ds14_scivis_0128"
+    HALO = op.join(RAW, "rockstar", "hlists", "hlist_1.00000.list")
+        # PARTICLE = op.join(RAW, "ds14_scivis_0128_e4_dt04_" + time + "00")
+    halos = list()
+    for halo in tk.loadtxt(HALO):
+        halos.appen(addHalo(halo))
+
+    # halos = [addHalo(halo) for halo in tk.loadtxt(HALO)]
+    jsonFN = "hlist_1.0.json"
+    with open(jsonFN, 'w') as haloJSON:
+        print jsonFN, len(halos)
+        haloJSON.write( json.dumps( halos ) )
 
 if __name__ == '__main__':
     main()

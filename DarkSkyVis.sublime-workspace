@@ -4,6 +4,14 @@
 		"selected_items":
 		[
 			[
+				"show",
+				"showPaths"
+			],
+			[
+				"halo_",
+				"halo_period"
+			],
+			[
 				"for",
 				"for	for (…) {…}"
 			],
@@ -376,19 +384,42 @@
 	"buffers":
 	[
 		{
-			"contents": "Beth -- Chicago Teacher: Jewish school in North Side of the city\n        Science coordinator, 8th grade Science teacher\n        Former Science educator at Field Museum\n\nDianna -- Worked with her in the past\n\nJoe/ann -- Female teacher\n\n\nWallcology -- Running in Chicago and Toronto\n            3 months! \n\n            Ecology or Evolution? \n              +            -  \n\n              previously ++ Manipulate the environmnetal variables\n                                look at effect of those maniulations on the vegitation, \n                                        and food webs\n\nKnowledge Community -- Build the knowledge of the group, rather than the individual\n                        Toronto beleives this is a modality of learning\n\n\n                        Create an honest need for information from other people\n                        Want to make the kids interested, while still enabling them\n\n                        Community learning\n\n                        Food Web\n                            - two or three species of vegitation\n                            - 4 - 6 critters\n                            + each habitat has a unique starting \n\n                            habitat with green and yellow bugs, with green bug is top\n\n\n                            changes in populations overt? Or covert?\n\n\nThe danger of going TOO abstract is it looses the feel of nature and becomes a game\n\n\nTeachers are pro evolution: \n    Tom is not so much\n\nHappy to keep it ecology based: 6th graders dont know enough about ecology!\n    \n\nLittle Labs:\n    Each group has some non-uniform distribution of critters. \n\n\n    Prey characteristics match enviornment. Incidental features versus central\n\n\nFeatures:\n    - Lifecycles\n\n    + Run experiments\n        + Temperature Change\n        + Be able to \n    + Monetary value to the experiemnts that they run\n        + Will encourage them to pay attention\n\n        Biodiversity begets biodiversity\n        More Biodiversity means more productivity\n        Less Biodiversity means less productivity\n\n        Ecosystem services going on behind the scenes\n            If X is healthy, Y is going to be healthy\n\n        Eggs, critters have babies? \n\n        Local resource projections? AKA Plants\n\n        Predators have an approach distance, when a predator comes into range of \n            the predator, if it can detect it, it will move away or run away\n\n        \n\nFood Webs? \n    Things need to die, turn into dirt, so other things can eat it\n\n\nDiferent walls have different climates/food webs\nPair this activity with outdoor experinces in the real-world\n\n\nMapping of the Scientific conceptual domain\n    + Food Web\n    + Enviornmental conditions\n    + Patterns/Shapes of Food webs\n    + Science that they can safely reach\n    + Learning Goals\n\nLearning Games\n\n\nCurrent Idea\n    4 Identical Wall Zones\n    Different collections of species in these different zones\n\n    Name these critters\n\n\n\nTry not to be a game....\n\n\nNutella\n    agent based systems\n\n\n\nDeadline:\n    July 5th:- Deadline for Narrative\n    Describe what people are doing in the classroom...\n    Map out the space of the critters, which wall has which critters\n\n    Run Dates? \n        Mid September +/- two weeks",
+			"file": "/Users/krbalmryde/Dropbox/Class-projects/cs424/projects/SweetHomeChicago/chicago.js",
 			"settings":
 			{
-				"buffer_size": 3223,
-				"line_ending": "Unix",
-				"name": "Beth -- Chicago Teacher: Jewish school in North Si"
+				"buffer_size": 33640,
+				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "javascript/index.html",
+			"file": "javascript/js/app/Step7.js",
 			"settings":
 			{
-				"buffer_size": 2415,
+				"buffer_size": 32900,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "python/HaloUtils.py",
+			"settings":
+			{
+				"buffer_size": 13231,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "<!DOCTYPE html>\n<html>\n  <head>\n    <title>Force-Directed Layout</title>\n    <script type=\"text/javascript\" src=\"http://mbostock.github.com/d3/d3.js?1.29.1\"></script>\n    <script type=\"text/javascript\" src=\"http://mbostock.github.com/d3/d3.geom.js?1.29.1\"></script>\n    <script type=\"text/javascript\" src=\"http://mbostock.github.com/d3/d3.layout.js?1.29.1\"></script>\n    <style type=\"text/css\">\n\ncircle {\n  stroke-width: 1.5px;\n}\n\nline {\n  stroke: #999;\n}\n\n    </style>\n  </head>\n  <body>\n    <script type=\"text/javascript\">\n\n        var w = 960,\n            h = 500,\n            r = 6,\n            fill = d3.scale.category20();\n\n        var force = d3.layout.force()\n            .charge(-120)\n            .linkDistance(30)\n            .size([w, h]);\n\n        var svg = d3.select(\"body\").append(\"svg:svg\")\n            .attr(\"width\", w)\n            .attr(\"height\", h);\n\n        d3.json(\"graph.json\", function(json) {\n          var link = svg.selectAll(\"line\")\n              .data(json.links)\n            .enter().append(\"svg:line\");\n\n          var node = svg.selectAll(\"circle\")\n              .data(json.nodes)\n            .enter().append(\"svg:circle\")\n              .attr(\"r\", r - .75)\n              .style(\"fill\", function(d) { return fill(d.group); })\n              .style(\"stroke\", function(d) { return d3.rgb(fill(d.group)).darker(); })\n              .call(force.drag);\n\n          force\n              .nodes(json.nodes)\n              .links(json.links)\n              .on(\"tick\", tick)\n              .start();\n\n          function tick(e) {\n\n            // Push sources up and targets down to form a weak tree.\n            var k = 6 * e.alpha;\n            json.links.forEach(function(d, i) {\n              d.source.y -= k;\n              d.target.y += k;\n            });\n\n            node.attr(\"cx\", function(d) { return d.x; })\n                .attr(\"cy\", function(d) { return d.y; });\n\n            link.attr(\"x1\", function(d) { return d.source.x; })\n                .attr(\"y1\", function(d) { return d.source.y; })\n                .attr(\"x2\", function(d) { return d.target.x; })\n                .attr(\"y2\", function(d) { return d.target.y; });\n          }\n        });\n\n    </script>\n  </body>\n</html>",
+			"settings":
+			{
+				"buffer_size": 2202,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "javascript/js/app/examples/HaloWorld.js",
+			"settings":
+			{
+				"buffer_size": 23288,
 				"line_ending": "Unix"
 			}
 		}
@@ -401,9 +432,29 @@
 	"command_palette":
 	{
 		"height": 400.0,
-		"last_filter": "",
+		"last_filter": "color",
 		"selected_items":
 		[
+			[
+				"color",
+				"Colorsublime: Install Theme"
+			],
+			[
+				"js",
+				"Set Syntax: JSON"
+			],
+			[
+				"html",
+				"Set Syntax: HTML"
+			],
+			[
+				"inst",
+				"Colorsublime: Install Theme"
+			],
+			[
+				"bash",
+				"Set Syntax: Shell Script (Bash)"
+			],
 			[
 				"jac",
 				"Set Syntax: JavaScript"
@@ -411,10 +462,6 @@
 			[
 				"java",
 				"Set Syntax: JavaScript"
-			],
-			[
-				"html",
-				"Set Syntax: HTML"
 			],
 			[
 				"py",
@@ -435,10 +482,6 @@
 			[
 				"p",
 				"Set Syntax: Python"
-			],
-			[
-				"bash",
-				"Set Syntax: Shell Script (Bash)"
 			],
 			[
 				"forma",
@@ -581,10 +624,6 @@
 				"Format Code"
 			],
 			[
-				"js",
-				"Set Syntax: JSON"
-			],
-			[
 				"code",
 				"Format Code"
 			],
@@ -601,10 +640,6 @@
 				"Format Code"
 			],
 			[
-				"inst",
-				"Package Control: Install Package"
-			],
-			[
 				"packare",
 				"Package Control: Remove Package"
 			],
@@ -619,10 +654,6 @@
 			[
 				"JSO",
 				"Set Syntax: JSON"
-			],
-			[
-				"color",
-				"Color Picker"
 			],
 			[
 				"isntall",
@@ -773,7 +804,7 @@
 				"Package Control: Install Package"
 			]
 		],
-		"width": 583.0
+		"width": 348.0
 	},
 	"console":
 	{
@@ -794,30 +825,49 @@
 	},
 	"expanded_folders":
 	[
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/python"
 	],
 	"file_history":
 	[
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/data/dev/miniTreeTest.dat",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/js/app/iterations/Step5.js",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/js/app/Step7.js",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/js/app/examples/three.js webgl - multiple views.html",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/index.html",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyVis.sublime-project",
+		"/Users/krbalmryde/.bash_profile",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/.gitignore",
+		"/Users/krbalmryde/.bash_aliases",
+		"/Users/krbalmryde/.bash_functions",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/README.md",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/js/extras/ParticleGeometry.js",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/src/Step6.js",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis-bc/javascript/js/app/iterations/Step6.js",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis-bc/.gitignore",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/js/config.js",
+		"/Users/krbalmryde/Dropbox/Class-projects/cs424/projects/SweetHomeChicago/home.html",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/src/Step7.js",
+		"/Users/krbalmryde/Dropbox/Class-projects/cs424/projects/SweetHomeChicago/index.html",
+		"/Users/krbalmryde/Dropbox/Class-projects/cs424/HW1/chicago.js",
+		"/Users/krbalmryde/Dropbox/Class-projects/cs424/HW1/step-7.html",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/data/rockstar/tree/tree_0_0_0.dat",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/python/HaloUtils.py",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/data/rockstar/tree/locations.dat",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/data/dev/tree679582.js",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/data/dev/tree679582.json",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/data/#tree679582.dat",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/python/vtkExtractHaloContents.py",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/python/vtk/vtkDarkSkyParticles.py",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/js/extras/ParticleGeometry.js",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/python/PrepProcDMH.py",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/data/dev/Path257.json",
-		"/Users/krbalmryde/.bash_functions",
-		"/Users/krbalmryde/.bash_aliases",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/data/rockstar/tree/tree_0_0_0.dat",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/data/dev/biggerTreeTest.dat",
-		"/Users/krbalmryde/.bash_profile",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/js/utils/Tree675571.js",
 		"/Users/krbalmryde/.profile",
 		"/Users/krbalmryde/.bashrc",
 		"/Users/krbalmryde/.bash_rc",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/data/dev/biggerTreeTest.json",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/data/dev/miniTreeTest.dat",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/data/rockstar/tree/locations.dat",
 		"/Users/krbalmryde/Downloads/sample/index.html",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/src/Step6.js",
 		"/Users/krbalmryde/Downloads/download.html",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/index.html",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/data/dev/pretty_miniTreeTest.json",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/src/Step5.js",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/js/utils/HaloTree.js",
@@ -825,7 +875,6 @@
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/data/dev/index.html",
 		"/Users/krbalmryde/Library/Application Support/Sublime Text 3/Packages/Default/Preferences.sublime-settings",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/python/vtk/vtkDarkSkyUtilities.py",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/data/#tree679582.dat",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/data/dev/miniTreeTest.dat.py",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/data/rockstar/tree/untitled.json",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/data/rockstar/hlists/hlist_0.99000.list",
@@ -845,7 +894,6 @@
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyPy/PrepProcDMH.py",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyPy/HaloUtils.py",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/assets/foo.json",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyVis.sublime-project",
 		"/Users/krbalmryde/.ipython/profile_default/startup/00-profile.py",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/src/Step4.js",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/src/Step3.js",
@@ -853,7 +901,6 @@
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/src/Step2.js",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/data/rockstar/hlists/hlist_0.13000.list",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyPy/vtkDarkSkyHalos.py",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/.gitignore",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/assets/FilterCoords.py",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/assets/pretty_Halo_257.0_tAll.json",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/assets/pretty_Halo_257.0_t12.json",
@@ -909,26 +956,11 @@
 		"/Users/Shared/adi/adi.pb",
 		"/Users/krbalmryde/Downloads/UnityPackages/install.ini",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/VTKDarkSkyFlow.py",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/utils/DarkSkyUtilities.py",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/vtkHedgeHog.py",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/VTKDarkSkyParticles.py",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/vtkDarkSkyHalos.py",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/VTKDarkSky-StreamLines.py",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/VTKDarkSkyTime.py",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/VTKDarkSkyHalosPaths.py",
-		"/Users/krbalmryde/Library/Application Support/Sublime Text 3/Packages/User/Python.sublime-settings",
-		"/Users/krbalmryde/Library/Application Support/Sublime Text 3/Packages/User/JSON.sublime-settings",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/images/DarkSkyTimeBox1.png",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/data/rockstar/auto-rockstar.cfg",
-		"/Users/krbalmryde/Dropbox/class-projects/cs594/SciVis2015/src/VTKDarkSkyHalosPaths.py",
-		"/Users/krbalmryde/Dropbox/class-projects/cs594/SciVis2015/src/VTKDarkSkyParticles.py",
-		"/Users/krbalmryde/Dropbox/Class-projects/cs594/SciVis2015/src/vtkDarkSkyHalos.py",
-		"/Users/krbalmryde/Dropbox/class-projects/cs594/SciVis2015/src/ExtractDSData.py",
-		"/Users/krbalmryde/Dropbox/class-projects/cs594/SciVis2015/doc/examples/yt/load_data.py"
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/utils/DarkSkyUtilities.py"
 	],
 	"find":
 	{
-		"height": 25.0
+		"height": 38.0
 	},
 	"find_in_files":
 	{
@@ -941,9 +973,90 @@
 	},
 	"find_state":
 	{
-		"case_sensitive": false,
+		"case_sensitive": true,
 		"find_history":
 		[
+			"\n}",
+			") {\n",
+			"0",
+			"add_chunk",
+			"add_particles",
+			"add_chunk",
+			"toggleVisibility",
+			".opacity = ",
+			".opacity = 0.8;",
+			"\"<b>\"+ ",
+			"(",
+			" ",
+			"50",
+			");\n",
+			"50",
+			"toggleVisibility",
+			"__resetHaloBranch",
+			"HaloBranch",
+			"toggleVisibility",
+			"config",
+			"updateAllTheGeometry",
+			"HaloLines",
+			"HaloBranch",
+			"colorKey",
+			"i",
+			"id",
+			"lineMesh",
+			"HaloBranch",
+			"color",
+			"createPathLine",
+			"displayHaloData",
+			"start",
+			"var",
+			"displayHaloData",
+			"i][k",
+			"i",
+			"lineMesh",
+			"createPathLine",
+			"createSphere",
+			"Traversed",
+			"Halos",
+			"[i][k]",
+			"HaloLines[i][j]",
+			"HaloLines",
+			"\\sHalo[s]",
+			"halo",
+			"Halo",
+			"halo",
+			"Halo",
+			"halo",
+			"Halo",
+			"halo",
+			"Halo",
+			"log",
+			"M500",
+			"M500c",
+			".opacity",
+			".js",
+			"lib",
+			"js/",
+			" \"",
+			"  \"",
+			" \"",
+			"(",
+			" ",
+			"     ",
+			"#tree ",
+			"createSphere",
+			"__resetView",
+			"__updateData",
+			"HaloLinesObjs",
+			"Camera",
+			"camera",
+			"Camera",
+			"camera",
+			"Camera",
+			"camera",
+			"Camera",
+			"camera",
+			"Camera",
+			"camera",
 			"js/utils",
 			"tHl",
 			"533",
@@ -990,88 +1103,7 @@
 			")",
 			" ",
 			"2269",
-			"679582",
-			"\n 0.1200",
-			" 0.1200",
-			"1200",
-			"#tree",
-			"^1.0000   493825",
-			"#tree ",
-			"^1373",
-			"^989",
-			"989",
-			"\"Tree_root_ID\": 680462.0",
-			"nextDesc_id",
-			"rootHaloID",
-			"Orig_halo_ID",
-			"root",
-			"ID\":",
-			"id\":",
-			"ID\":",
-			"2416",
-			"Orig_halo_ID",
-			"#",
-			"Tree_root_ID",
-			"first_ID",
-			"_first_ID",
-			"\"id\": 2417,",
-			" ",
-			"57.75873 30.51175 50.67266",
-			" ",
-			"257",
-			" ",
-			"ID ",
-			"ID",
-			" ",
-			"679582",
-			"l2a",
-			"jsonFn",
-			"jsonFN",
-			".id",
-			") #",
-			"] #",
-			"self",
-			";",
-			"this",
-			" ------------------- ",
-			"this",
-			"self",
-			"#",
-			"cam",
-			"x",
-			"numPoints",
-			"cameraHelper",
-			"camera",
-			"Camera",
-			"camera",
-			"onKeyPress",
-			"controls",
-			"Controls",
-			"controls",
-			"// ",
-			"        for (var i = 0; i < hits.length; i++) {\n            if (hits[i].object.position !== curTarget.object.position) {\n                hits[i].object.material.color.set( rgbToHex(255, 255, 255) );\n",
-			"guiMaterial",
-			"sphereGroup.children[0].position",
-			"curTarget.object.position",
-			"console",
-			"addSpheres",
-			"0",
-			"0123456789ABCDEF",
-			"R",
-			"target",
-			"Target",
-			"target",
-			"linesMesh",
-			"intersects",
-			"raycaster",
-			"Raycaster",
-			"raycaster",
-			"mouse",
-			"s",
-			"S",
-			"s",
-			"S",
-			"s"
+			"679582"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -1135,65 +1167,164 @@
 	"groups":
 	[
 		{
-			"selected": 0,
+			"selected": 2,
 			"sheets":
 			[
 				{
 					"buffer": 0,
+					"file": "/Users/krbalmryde/Dropbox/Class-projects/cs424/projects/SweetHomeChicago/chicago.js",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 3223,
+						"buffer_size": 33640,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								3046,
-								3046
+								6523,
+								6523
 							]
 						],
 						"settings":
 						{
-							"auto_name": "Beth -- Chicago Teacher: Jewish school in North Si",
-							"syntax": "Packages/Text/Plain text.tmLanguage"
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 1223.0,
+						"translation.y": 3278.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "javascript/js/app/Step7.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 32900,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								18223,
+								18223
+							]
+						],
+						"settings":
+						{
+							"history_list_is_closing": true,
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 10600.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "python/HaloUtils.py",
+					"semi_transient": true,
+					"settings":
+					{
+						"buffer_size": 13231,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								914,
+								914
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 4180.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
 					"type": "text"
 				},
 				{
-					"buffer": 1,
-					"file": "javascript/index.html",
+					"buffer": 3,
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2415,
+						"buffer_size": 2202,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2413,
-								2413
+								751,
+								751
 							]
 						],
 						"settings":
 						{
+							"auto_name": "",
 							"syntax": "Packages/HTML/HTML.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				}
+			]
+		},
+		{
+			"selected": 0,
+			"sheets":
+			[
+				{
+					"buffer": 4,
+					"file": "javascript/js/app/examples/HaloWorld.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 23288,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								16559,
+								16559
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 191.0,
+						"translation.y": 8177.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 2,
 					"type": "text"
 				}
 			]
@@ -1201,7 +1332,7 @@
 	],
 	"incremental_find":
 	{
-		"height": 25.0
+		"height": 26.0
 	},
 	"input":
 	{
@@ -1216,11 +1347,18 @@
 				0,
 				1,
 				1
+			],
+			[
+				1,
+				0,
+				2,
+				1
 			]
 		],
 		"cols":
 		[
 			0.0,
+			0.429535934744,
 			1.0
 		],
 		"rows":
@@ -1242,7 +1380,7 @@
 	"project": "DarkSkyVis.sublime-project",
 	"replace":
 	{
-		"height": 46.0
+		"height": 48.0
 	},
 	"save_all_on_build": true,
 	"select_file":
@@ -1251,6 +1389,18 @@
 		"last_filter": "",
 		"selected_items":
 		[
+			[
+				"step5",
+				"javascript/js/app/iterations/Step5.js"
+			],
+			[
+				"ste",
+				"javascript/js/app/Step7.js"
+			],
+			[
+				"index",
+				"javascript/index.html"
+			],
 			[
 				"rea",
 				"DarkSkyVis/README.md"
@@ -1314,10 +1464,6 @@
 			[
 				"hl",
 				"data/rockstar/hlists/hlist_0.12000.list"
-			],
-			[
-				"ste",
-				"javascript/src/Step5.js"
 			],
 			[
 				"halou",
@@ -1742,7 +1888,7 @@
 		[
 			[
 				"",
-				"~/Dropbox/Code-Projects/Utilities/Utilities.sublime-project"
+				"~/Dropbox/Code-Projects/KrbAlmryde.github.io/KrbAlmryde.sublime-project"
 			]
 		],
 		"width": 380.0

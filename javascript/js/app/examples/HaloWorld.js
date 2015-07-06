@@ -335,8 +335,7 @@ var MAIN = (function ($) {
         var container = document.createElement('div');
         document.body.appendChild(container);
 
-        camera = new THREE.PerspectiveCamera(75, window.innerWidth
-            / window.innerHeight, 1, 20000);
+        camera = new THREE.PerspectiveCamera(75, window.innerWidth, window.innerHeight, 1, 20000);
         camera.position.set(0, 0, 2000);
 
         scene = new THREE.Scene();
