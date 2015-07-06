@@ -18,6 +18,7 @@ var HaloBranch = {}, HaloSelect = {};
 var hits = [], curTarget, prevTarget;
 var nDivisions = 10, NUMTIMEPERIODS = 89;
 var config, haloStats;
+var pointCloud;
 
 // Be sure to match this with the slider's connect!!
 var colorKey = d3.scale.linear()
@@ -73,6 +74,7 @@ function onCreate() {
     /* -------------------------------*/
 
     // Load Data for Halo  // TREE679582  TREE676638
+    initHaloMap(HLIST1);
     initHaloTree(TREE676638, true);
 
     // **** Lights! ***
@@ -103,8 +105,11 @@ function initScene() {
         linesGroup = new THREE.Object3D();
         sphereGroup = new THREE.Object3D();
 
+        scene.fog = new THREE.Fog( 0x050505, 2000, 3500 );
+
         scene.add( linesGroup );
         scene.add( sphereGroup );
+        
     }
 
 }
@@ -179,7 +184,8 @@ function initCamera() {
     camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 1000 );
     {
         // **** position the camera near the first halo; ***
-        var pos = sphereGroup.children[3].position;
+        //var pos = sphereGroup.children[3].position;
+        var pos = pointCloud.position;
         camera.position.set(pos.x, pos.y+0.1, pos.z-(pos.z*0.5));
         controls = new THREE.TrackballControls( camera, renderer.domElement );
         {
@@ -920,7 +926,7 @@ function initHaloTree(DATASET, firstTime) {
         //halo.position[0] = halo.x
         halo.vec3 = THREE.Vector3(halo.x, halo.y, halo.z);  // Convenience, make a THREE.Vector3
         halo.time = parseInt(halo.scale * 100) - tree_offset;
-        console.log(halo.time, halo.id, halo.desc_id, halo.pid)
+        //console.log(halo.time, halo.id, halo.desc_id, halo.pid)
         //console.log("\tHalo.id ", halo.id, "Halo.scale",halo.scale, "Halo.time",halo.time);
 
         // if (halo.x > 50.0 && halo.time)
@@ -941,6 +947,42 @@ function initHaloTree(DATASET, firstTime) {
 
 }
 
+function initHaloMap(DATASET) {
+    console.log("Init The Halo Map")
+    var forestGeometry = new THREE.Geometry();
+
+    for (var i = 0; i < DATASET.length; i++) {
+
+        var _halo = DATASET[i];
+        _halo.time = 1.0;  // We know a priori that this is the last time period
+        console.log(_halo);
+        var particle = new THREE.Vector3();
+        particle.x = _halo.position[0];
+        particle.y = _halo.position[1];
+        particle.z = _halo.position[2];
+
+        particle.vx = _halo.velocity[0];
+        particle.vy = _halo.velocity[1];
+        particle.vz = _halo.velocity[2];
+
+        particle.halo_id = _halo.id;
+        particle.halo_time = _halo.time;
+
+        forestGeometry.vertices.push(particle);
+        //console.log("\tHalo.id ", halo.id, "Halo.scale",halo.scale, "Halo.time",halo.time);
+    }
+    var material = new THREE.PointCloudMaterial( {
+        color: rgbToHex(255,0,0),
+        size: 0.5,
+        blending: THREE.AdditiveBlending,
+        transparent: true
+    });
+
+    pointCloud = new THREE.PointCloud( forestGeometry, material );
+    scene.add(pointCloud);
+    console.log(pointCloud );
+
+}
 /* ================================== *
  *          createHaloGeometry
  *  Geometry rendering function. Builds
@@ -1050,7 +1092,6 @@ function createSphere(id, color, index) {
 
 }
 
-
 function createPathLine(points, color, id, period) {
 
     // if points is defined at all...
@@ -1102,7 +1143,7 @@ function displayHaloData() {
 
 
             var id = TimePeriods[i][j];
-            console.log(i, id)
+            //console.log(i, id)
             // Set Halo Line Visibility
             if (HaloLines[id]){
                 // console.log("\tdisplaying Halo line?", i, id, config.showPaths, EPOCH_HEAD, EPOCH_TAIL)
@@ -1133,7 +1174,7 @@ function updateAllTheGeometry() {
         toggleVisibility(HaloSelect,config.showHalos, 0.05);
     } else{
         displayHaloData();
-    };
+    }
 
 
 }

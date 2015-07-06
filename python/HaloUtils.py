@@ -292,6 +292,7 @@ def main():
     RAW = "http://darksky.slac.stanford.edu/scivis2015/data/ds14_scivis_0128"
     HALO = op.join(RAW, "rockstar", "hlists", "hlist_1.00000.list")
         # PARTICLE = op.join(RAW, "ds14_scivis_0128_e4_dt04_" + time + "00")
+    print HALO
     halos = list()
     for halo in tk.loadtxt(HALO):
         _halo = addHalo(halo)
@@ -304,7 +305,7 @@ def main():
             'rs': _halo["rs"]
         }
 
-        halos.append(addHalo(entry))
+        halos.append(entry)
 
     # halos = [addHalo(halo) for halo in tk.loadtxt(HALO)]
     jsonFN = "../javascript/js/assets/hlist_1.0.json"
