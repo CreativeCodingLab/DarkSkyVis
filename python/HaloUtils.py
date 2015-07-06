@@ -294,6 +294,8 @@ def main():
         # PARTICLE = op.join(RAW, "ds14_scivis_0128_e4_dt04_" + time + "00")
     halos = list()
     for halo in tk.loadtxt(HALO):
+        _halo = addHalo(halo)
+        entry = {'id': _halo['id'], 'position':_halo['position'], 'velocity':_halo['velocity'], 'z':_halo['x'], }
         halos.appen(addHalo(halo))
 
     # halos = [addHalo(halo) for halo in tk.loadtxt(HALO)]

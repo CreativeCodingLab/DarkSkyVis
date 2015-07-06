@@ -11,15 +11,27 @@
 	"folders":
 	[
 		{
+			"follow_symlinks": true,
 			"path": "."
 		},
 		{
+			"folder_exclude_patterns":
+			[
+				".idea"
+			],
+			"follow_symlinks": true,
 			"path": "javascript"
 		},
 		{
+			"folder_exclude_patterns":
+			[
+				".idea"
+			],
+			"follow_symlinks": true,
 			"path": "python"
 		},
 		{
+			"follow_symlinks": true,
 			"path": "data"
 		}
 	],

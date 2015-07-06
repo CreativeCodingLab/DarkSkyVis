@@ -9,7 +9,7 @@ var container;
 var EPOCH_HEAD, EPOCH_TAIL;
 var scene, renderer;
 var camera, slider, controls;
-var mouse, raycaster, ambient;
+var mouse, raycaster, light;
 var HaloLUT, TimePeriods, __traversed={};
 var linesGroup, sphereGroup;
 var Lines = [];
@@ -138,8 +138,13 @@ function initContainer() {
 
 function initLights() {
 
-    ambient = new THREE.AmbientLight(0xFFFFFF); //rgbToHex(197, 176, 255)
-    scene.add(ambient);
+    // ambient = new THREE.AmbientLight(0xFFFFFF); //rgbToHex(197, 176, 255)
+    // scene.add(ambient);
+
+    light = new THREE.DirectionalLight( 0xffffff, 1 );
+    light.position.set( 1, 1, 1 ).normalize();
+    scene.add( light );
+
 
 }
 
@@ -203,7 +208,7 @@ function initListeners() {
     window.addEventListener( 'resize', onReshape, false );
     window.addEventListener( 'mousemove', onMouseMove, false );
     window.addEventListener( 'click', onMouseClick, true );
-    window.addEventListener( 'dblclick', onMouseDblClick, true );
+    window.addEventListener( 'dblclick', onMouseDoubleClick, true );
     window.addEventListener( 'keypress', onKeyPress, false );
 
 }
@@ -256,7 +261,6 @@ function displayHaloStats() {
 
 
 function initGUI() {
-
 
     function __resetView(toHead) {
 
@@ -452,12 +456,10 @@ function initGUI() {
             });
         })
     }
-
 }
 
 
 function toggleVisibility(HaloObject, showIt, opacity) {
-
 
     for (var i=EPOCH_HEAD; i<EPOCH_TAIL+1; i++) {
 
@@ -474,13 +476,11 @@ function toggleVisibility(HaloObject, showIt, opacity) {
 
         }
     }
-
 }
 
 
 function initSlider() {
-
-    // console.log("\t initSlider()");
+  // console.log("\t initSlider()");
     slider = $('.tslider');
     slider.noUiSlider({
         start: [0, 50],
@@ -512,8 +512,6 @@ function initSlider() {
     slider.Link('upper').to($('#value-upper'));
     EPOCH_HEAD = parseInt(slider.val()[0]);
     EPOCH_TAIL = parseInt(slider.val()[1]);
-
-
 }
 
 
@@ -540,7 +538,7 @@ function onMouseMove( event ) {
 
 }
 
-function onMouseDblClick() {
+function onMouseDoubleClick() {
 
     console.log("Double Click!!", curTarget.object.halo_id);
     // update the picking ray with the camera and mouse position
