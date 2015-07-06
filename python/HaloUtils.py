@@ -295,11 +295,19 @@ def main():
     halos = list()
     for halo in tk.loadtxt(HALO):
         _halo = addHalo(halo)
-        entry = {'id': _halo['id'], 'position':_halo['position'], 'velocity':_halo['velocity'], 'z':_halo['x'], }
-        halos.appen(addHalo(halo))
+        entry = {
+            'id': _halo['id'],
+            'position':_halo['position'],
+            'velocity':_halo['velocity'],
+            'rvir': _halo["rvir"],
+            'mvir': _halo["mvir"],
+            'rs': _halo["rs"]
+        }
+
+        halos.append(addHalo(entry))
 
     # halos = [addHalo(halo) for halo in tk.loadtxt(HALO)]
-    jsonFN = "hlist_1.0.json"
+    jsonFN = "../javascript/js/assets/hlist_1.0.json"
     with open(jsonFN, 'w') as haloJSON:
         print jsonFN, len(halos)
         haloJSON.write( json.dumps( halos ) )

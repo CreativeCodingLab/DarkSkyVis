@@ -141,7 +141,7 @@ function initLights() {
     // ambient = new THREE.AmbientLight(0xFFFFFF); //rgbToHex(197, 176, 255)
     // scene.add(ambient);
 
-    light = new THREE.DirectionalLight( 0xffffff, 1 );
+    light = new THREE.DirectionalLight( 0xffffff, 1);
     light.position.set( 1, 1, 1 ).normalize();
     scene.add( light );
 
@@ -196,7 +196,7 @@ function initCamera() {
             controls.keys = [ 65, 83, 68 ];
             controls.enabled = true;
         }
-        camera.lookAt(pos);
+        camera.lookAt(pos)
         controls.target.set(pos.x, pos.y, pos.z);
         controls.update();
     }
