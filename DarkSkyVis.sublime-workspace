@@ -4,6 +4,18 @@
 		"selected_items":
 		[
 			[
+				"noI",
+				"noUiSlider"
+			],
+			[
+				"upd",
+				"updateProjectionMatrix"
+			],
+			[
+				"lin",
+				"linesGroup"
+			],
+			[
 				"show",
 				"showPaths"
 			],
@@ -384,42 +396,25 @@
 	"buffers":
 	[
 		{
-			"file": "/Users/krbalmryde/Dropbox/Class-projects/cs424/projects/SweetHomeChicago/chicago.js",
+			"file": "javascript/js/app/Step8.js",
 			"settings":
 			{
-				"buffer_size": 33640,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "javascript/js/app/Step7.js",
-			"settings":
-			{
-				"buffer_size": 32900,
+				"buffer_size": 31376,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "python/HaloUtils.py",
+			"contents": "\n<!DOCTYPE html>\n<html lang=\"en\">\n    <head>\n        <title>three.js webgl - interactive cubes</title>\n        <meta charset=\"utf-8\">\n        <meta name=\"viewport\" content=\"width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0\">\n        <style>\n            body {\n                font-family: Monospace;\n                background-color: #f0f0f0;\n                margin: 0px;\n                overflow: hidden;\n            }\n        </style>\n    </head>\n    <body>\n\n        <script src=\"../build/three.min.js\"></script>\n\n        <script src=\"js/libs/stats.min.js\"></script>\n\n        <script>\n\n            var container, stats;\n            var camera, scene, raycaster, renderer;\n\n            var mouse = new THREE.Vector2(), INTERSECTED;\n            var radius = 100, theta = 0;\n\n            init();\n            animate();\n\n            function init() {\n\n                container = document.createElement( 'div' );\n                document.body.appendChild( container );\n\n                var info = document.createElement( 'div' );\n                info.style.position = 'absolute';\n                info.style.top = '10px';\n                info.style.width = '100%';\n                info.style.textAlign = 'center';\n                info.innerHTML = '<a href=\"http://threejs.org\" target=\"_blank\">three.js</a> webgl - interactive cubes';\n                container.appendChild( info );\n\n                camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, - 500, 1000 );\n\n                scene = new THREE.Scene();\n\n                var light = new THREE.DirectionalLight( 0xffffff, 1 );\n                light.position.set( 1, 1, 1 ).normalize();\n                scene.add( light );\n\n                var geometry = new THREE.BoxGeometry( 20, 20, 20 );\n\n                for ( var i = 0; i < 2000; i ++ ) {\n\n                    var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );\n\n                    object.position.x = Math.random() * 800 - 400;\n                    object.position.y = Math.random() * 800 - 400;\n                    object.position.z = Math.random() * 800 - 400;\n\n                    object.rotation.x = Math.random() * 2 * Math.PI;\n                    object.rotation.y = Math.random() * 2 * Math.PI;\n                    object.rotation.z = Math.random() * 2 * Math.PI;\n\n                    object.scale.x = Math.random() + 0.5;\n                    object.scale.y = Math.random() + 0.5;\n                    object.scale.z = Math.random() + 0.5;\n\n                    scene.add( object );\n\n                }\n\n                raycaster = new THREE.Raycaster();\n\n                renderer = new THREE.WebGLRenderer();\n                renderer.setClearColor( 0xf0f0f0 );\n                renderer.setPixelRatio( window.devicePixelRatio );\n                renderer.setSize( window.innerWidth, window.innerHeight );\n                renderer.sortObjects = false;\n                container.appendChild(renderer.domElement);\n\n                stats = new Stats();\n                stats.domElement.style.position = 'absolute';\n                stats.domElement.style.top = '0px';\n                container.appendChild( stats.domElement );\n\n                document.addEventListener( 'mousemove', onDocumentMouseMove, false );\n\n                //\n\n                window.addEventListener( 'resize', onWindowResize, false );\n\n            }\n\n            function onWindowResize() {\n\n                camera.left = window.innerWidth / - 2;\n                camera.right = window.innerWidth / 2;\n                camera.top = window.innerHeight / 2;\n                camera.bottom = window.innerHeight / - 2;\n\n                camera.updateProjectionMatrix();\n\n                renderer.setSize( window.innerWidth, window.innerHeight );\n\n            }\n\n            function onDocumentMouseMove( event ) {\n\n                event.preventDefault();\n\n                mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;\n                mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;\n\n            }\n\n            //\n\n            function animate() {\n\n                requestAnimationFrame( animate );\n\n                render();\n                stats.update();\n\n            }\n\n            function render() {\n\n                theta += 0.1;\n\n                camera.position.x = radius * Math.sin( THREE.Math.degToRad( theta ) );\n                camera.position.y = radius * Math.sin( THREE.Math.degToRad( theta ) );\n                camera.position.z = radius * Math.cos( THREE.Math.degToRad( theta ) );\n                camera.lookAt( scene.position );\n\n                camera.updateMatrixWorld();\n\n                // find intersections\n\n                raycaster.setFromCamera( mouse, camera );\n\n                var intersects = raycaster.intersectObjects( scene.children );\n\n                if ( intersects.length > 0 ) {\n\n                    if ( INTERSECTED != intersects[ 0 ].object ) {\n\n                        if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );\n\n                        INTERSECTED = intersects[ 0 ].object;\n                        INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();\n                        INTERSECTED.material.emissive.setHex( 0xff0000 );\n\n                    }\n\n                } else {\n\n                    if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );\n\n                    INTERSECTED = null;\n\n                }\n\n                renderer.render( scene, camera );\n\n            }\n\n        </script>\n\n    </body>\n</html>\n",
 			"settings":
 			{
-				"buffer_size": 13231,
+				"buffer_size": 5704,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"contents": "<!DOCTYPE html>\n<html>\n  <head>\n    <title>Force-Directed Layout</title>\n    <script type=\"text/javascript\" src=\"http://mbostock.github.com/d3/d3.js?1.29.1\"></script>\n    <script type=\"text/javascript\" src=\"http://mbostock.github.com/d3/d3.geom.js?1.29.1\"></script>\n    <script type=\"text/javascript\" src=\"http://mbostock.github.com/d3/d3.layout.js?1.29.1\"></script>\n    <style type=\"text/css\">\n\ncircle {\n  stroke-width: 1.5px;\n}\n\nline {\n  stroke: #999;\n}\n\n    </style>\n  </head>\n  <body>\n    <script type=\"text/javascript\">\n\n        var w = 960,\n            h = 500,\n            r = 6,\n            fill = d3.scale.category20();\n\n        var force = d3.layout.force()\n            .charge(-120)\n            .linkDistance(30)\n            .size([w, h]);\n\n        var svg = d3.select(\"body\").append(\"svg:svg\")\n            .attr(\"width\", w)\n            .attr(\"height\", h);\n\n        d3.json(\"graph.json\", function(json) {\n          var link = svg.selectAll(\"line\")\n              .data(json.links)\n            .enter().append(\"svg:line\");\n\n          var node = svg.selectAll(\"circle\")\n              .data(json.nodes)\n            .enter().append(\"svg:circle\")\n              .attr(\"r\", r - .75)\n              .style(\"fill\", function(d) { return fill(d.group); })\n              .style(\"stroke\", function(d) { return d3.rgb(fill(d.group)).darker(); })\n              .call(force.drag);\n\n          force\n              .nodes(json.nodes)\n              .links(json.links)\n              .on(\"tick\", tick)\n              .start();\n\n          function tick(e) {\n\n            // Push sources up and targets down to form a weak tree.\n            var k = 6 * e.alpha;\n            json.links.forEach(function(d, i) {\n              d.source.y -= k;\n              d.target.y += k;\n            });\n\n            node.attr(\"cx\", function(d) { return d.x; })\n                .attr(\"cy\", function(d) { return d.y; });\n\n            link.attr(\"x1\", function(d) { return d.source.x; })\n                .attr(\"y1\", function(d) { return d.source.y; })\n                .attr(\"x2\", function(d) { return d.target.x; })\n                .attr(\"y2\", function(d) { return d.target.y; });\n          }\n        });\n\n    </script>\n  </body>\n</html>",
 			"settings":
 			{
-				"buffer_size": 2202,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "javascript/js/app/examples/HaloWorld.js",
-			"settings":
-			{
-				"buffer_size": 23288,
+				"buffer_size": 0,
 				"line_ending": "Unix"
 			}
 		}
@@ -432,24 +427,28 @@
 	"command_palette":
 	{
 		"height": 400.0,
-		"last_filter": "color",
+		"last_filter": "",
 		"selected_items":
 		[
+			[
+				"js",
+				"Set Syntax: JavaScript"
+			],
+			[
+				"inst",
+				"Package Control: Install Package"
+			],
+			[
+				"ja",
+				"Set Syntax: JavaScript"
+			],
 			[
 				"color",
 				"Colorsublime: Install Theme"
 			],
 			[
-				"js",
-				"Set Syntax: JSON"
-			],
-			[
 				"html",
 				"Set Syntax: HTML"
-			],
-			[
-				"inst",
-				"Colorsublime: Install Theme"
 			],
 			[
 				"bash",
@@ -470,10 +469,6 @@
 			[
 				"mar",
 				"Set Syntax: MultiMarkdown"
-			],
-			[
-				"ja",
-				"Set Syntax: JavaScript"
 			],
 			[
 				"fo",
@@ -804,7 +799,7 @@
 				"Package Control: Install Package"
 			]
 		],
-		"width": 348.0
+		"width": 457.0
 	},
 	"console":
 	{
@@ -825,32 +820,47 @@
 	},
 	"expanded_folders":
 	[
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/python"
 	],
 	"file_history":
 	[
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/.gitignore",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/python/HaloUtils.py",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/js/app/Useful.js",
+		"/Users/krbalmryde/Dropbox/Class-projects/cs424/HW3/RightHereRightNow.github.io/APP/framework/markers/HaloController.js",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/js/config.js",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/css/style.css",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/js/app/Scene.js",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/index.html",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/js/app/Slider.js",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/js/app/Camera.js",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/js/app/Controls.js",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/js/app/Epoch.js",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/js/app/Renderer.js",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/js/app/Container.js",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyVis.sublime-project",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/index_require.html",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/data/dev/tree679582.dat",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/python/hlist_1.0.json",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/js/app/iterations/Step7.js",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/js/app/examples/HaloWorld.js",
+		"/Users/krbalmryde/Dropbox/Class-projects/cs424/projects/SweetHomeChicago/chicago.js",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/js/app/Step7.js",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/data/dev/miniTreeTest.dat",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/js/app/iterations/Step5.js",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/js/app/Step7.js",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/js/app/examples/three.js webgl - multiple views.html",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/index.html",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyVis.sublime-project",
 		"/Users/krbalmryde/.bash_profile",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/.gitignore",
 		"/Users/krbalmryde/.bash_aliases",
 		"/Users/krbalmryde/.bash_functions",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/README.md",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/src/Step6.js",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis-bc/javascript/js/app/iterations/Step6.js",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis-bc/.gitignore",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/js/config.js",
 		"/Users/krbalmryde/Dropbox/Class-projects/cs424/projects/SweetHomeChicago/home.html",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/src/Step7.js",
 		"/Users/krbalmryde/Dropbox/Class-projects/cs424/projects/SweetHomeChicago/index.html",
 		"/Users/krbalmryde/Dropbox/Class-projects/cs424/HW1/chicago.js",
 		"/Users/krbalmryde/Dropbox/Class-projects/cs424/HW1/step-7.html",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/data/rockstar/tree/tree_0_0_0.dat",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/python/HaloUtils.py",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/data/rockstar/tree/locations.dat",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/data/dev/tree679582.js",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/data/dev/tree679582.json",
@@ -940,23 +950,7 @@
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyPy/vtkDarkSkyParticles.py",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyPy/utils/vtkDarkSkyUtilities.py",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyVis.xcodeproj/project.pbxproj",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/vtkExtractHaloContents.py",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/utils/vtkDarkSkyUtilities.py",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/vtkDarkSkyTime.py",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/vtkDarkSkyParticles.py",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/vtkDarkSkyFlow.py",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/vtkDarkSkyHalosPaths.py",
-		"/Users/krbalmryde/Library/Application Support/Sublime Text 3/Packages/User/Preferences.sublime-settings",
-		"/Users/krbalmryde/Downloads/DataAnimation/DataAnimation.cxx",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyVis/DarkSkyVis/SDFReader.mm",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyVis/DarkSkyVis/SDFReader.h",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyVis/DarkSkyVis/DarkSkyVis.mm",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/docs/notes_and_musings.txt",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/vtkTest.py",
-		"/Users/Shared/adi/adi.pb",
-		"/Users/krbalmryde/Downloads/UnityPackages/install.ini",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/VTKDarkSkyFlow.py",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/utils/DarkSkyUtilities.py"
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/vtkExtractHaloContents.py"
 	],
 	"find":
 	{
@@ -976,6 +970,74 @@
 		"case_sensitive": true,
 		"find_history":
 		[
+			"mvir",
+			"rvir",
+			"light",
+			"camera.position",
+			"cameraPosition",
+			"onMouseDblClick",
+			"slider.val",
+			"slider.val()",
+			"EPOCH.",
+			".",
+			"EPOCH_",
+			"this",
+			"this.",
+			"__",
+			"function ",
+			": function",
+			"this.this.",
+			"this.this._lines",
+			"_lines",
+			"this.this.Spheres",
+			".Spheres",
+			"self.this.",
+			"Spheres",
+			"this.Spheres",
+			"self.this.Lines",
+			"this.Lines",
+			"this.this.Lines",
+			"Lines",
+			"LUT",
+			"this,",
+			"this.",
+			"HaloLUT",
+			"EPOCH.Periods",
+			"EPOCH",
+			"TimePeriods",
+			"Lines",
+			"_lines",
+			"self.",
+			";",
+			"this.",
+			"TimePeriods",
+			"'#",
+			"jquery.",
+			"onReshape",
+			".js",
+			"<script type='text/javascript' src=\"js/lib/",
+			"function ",
+			"init",
+			"initScene",
+			"y",
+			"x",
+			"scene",
+			"__updateData",
+			"curTarget",
+			"HaloLUT",
+			"linesGroup",
+			"__traversed",
+			"this.",
+			"HaloSpheres",
+			"HaloLines",
+			"__resetHaloBranch",
+			"intoTheAbyss",
+			"onMouseDblClick",
+			"add_chunk",
+			"address",
+			"add_chunk",
+			"xmlhttp",
+			"sphereGroup",
 			"\n}",
 			") {\n",
 			"0",
@@ -1035,75 +1097,7 @@
 			".opacity",
 			".js",
 			"lib",
-			"js/",
-			" \"",
-			"  \"",
-			" \"",
-			"(",
-			" ",
-			"     ",
-			"#tree ",
-			"createSphere",
-			"__resetView",
-			"__updateData",
-			"HaloLinesObjs",
-			"Camera",
-			"camera",
-			"Camera",
-			"camera",
-			"Camera",
-			"camera",
-			"Camera",
-			"camera",
-			"Camera",
-			"camera",
-			"js/utils",
-			"tHl",
-			"533",
-			"Halo.id  ",
-			"#tree",
-			"intoTheAbyss",
-			"35434",
-			"i",
-			"haloLines",
-			"NUMTIMEPOINTS",
-			"NUMTIMEPeriods",
-			"TimePoints",
-			"TIMEPOINTS",
-			"TimePoints",
-			"TimePeriods",
-			"3c, 4a",
-			"3a",
-			"2a, ",
-			"1a, ",
-			"halo",
-			"target",
-			"obj",
-			"TimePath",
-			"xyz",
-			"nDivisions",
-			"haloSpheres",
-			",",
-			"#tree ",
-			"targetHalo",
-			"tHl",
-			"halo",
-			"getHaloMinMaxXYZ",
-			"intoTheVoid",
-			"tHl.",
-			".position",
-			"hl.",
-			"haloLines",
-			"haloObjs",
-			"[];\n",
-			"\"scale\": ",
-			"scale",
-			"id",
-			"ID",
-			")",
-			" ",
-			"2269",
-			"679582"
+			"js/"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -1167,24 +1161,24 @@
 	"groups":
 	[
 		{
-			"selected": 2,
+			"selected": 0,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "/Users/krbalmryde/Dropbox/Class-projects/cs424/projects/SweetHomeChicago/chicago.js",
+					"file": "javascript/js/app/Step8.js",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 33640,
+						"buffer_size": 31376,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								6523,
-								6523
+								2020,
+								2020
 							]
 						],
 						"settings":
@@ -1194,137 +1188,66 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 3278.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 4,
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "javascript/js/app/Step7.js",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 32900,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								18223,
-								18223
-							]
-						],
-						"settings":
-						{
-							"history_list_is_closing": true,
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 10600.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 1,
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "python/HaloUtils.py",
-					"semi_transient": true,
-					"settings":
-					{
-						"buffer_size": 13231,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								914,
-								914
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Python/Python.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 4180.0,
+						"translation.y": 2947.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
 					"type": "text"
 				},
 				{
-					"buffer": 3,
+					"buffer": 1,
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2202,
+						"buffer_size": 5704,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								751,
-								751
+								444,
+								444
 							]
 						],
 						"settings":
 						{
-							"auto_name": "",
 							"syntax": "Packages/HTML/HTML.tmLanguage",
-							"tab_size": 2,
+							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 3,
+					"stack_index": 2,
 					"type": "text"
-				}
-			]
-		},
-		{
-			"selected": 0,
-			"sheets":
-			[
+				},
 				{
-					"buffer": 4,
-					"file": "javascript/js/app/examples/HaloWorld.js",
+					"buffer": 2,
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 23288,
+						"buffer_size": 0,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								16559,
-								16559
+								0,
+								0
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
+							"syntax": "Packages/Text/Plain text.tmLanguage"
 						},
 						"translation.x": 0.0,
-						"translation.y": 8177.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 2,
+					"stack_index": 1,
 					"type": "text"
 				}
 			]
@@ -1347,18 +1270,11 @@
 				0,
 				1,
 				1
-			],
-			[
-				1,
-				0,
-				2,
-				1
 			]
 		],
 		"cols":
 		[
 			0.0,
-			0.429535934744,
 			1.0
 		],
 		"rows":
@@ -1390,16 +1306,60 @@
 		"selected_items":
 		[
 			[
-				"step5",
-				"javascript/js/app/iterations/Step5.js"
+				"sty",
+				"javascript/css/style.css"
+			],
+			[
+				"sc",
+				"javascript/js/app/Scene.js"
+			],
+			[
+				"ca",
+				"javascript/js/app/Camera.js"
+			],
+			[
+				"sli",
+				"javascript/js/app/Slider.js"
+			],
+			[
+				"conf",
+				"javascript/js/config.js"
+			],
+			[
+				"con",
+				"javascript/js/app/Container.js"
+			],
+			[
+				"ren",
+				"javascript/js/app/Renderer.js"
+			],
+			[
+				"sce",
+				"javascript/js/app/Scene.js"
+			],
+			[
+				"tree",
+				"data/dev/tree679582.dat"
 			],
 			[
 				"ste",
-				"javascript/js/app/Step7.js"
+				"javascript/js/app/iterations/Step7.js"
+			],
+			[
+				"us",
+				"javascript/js/app/Useful.js"
 			],
 			[
 				"index",
 				"javascript/index.html"
+			],
+			[
+				"inde",
+				"javascript/index.html"
+			],
+			[
+				"step5",
+				"javascript/js/app/iterations/Step5.js"
 			],
 			[
 				"rea",
@@ -1430,10 +1390,6 @@
 				"data/dev/miniTreeTest.dat"
 			],
 			[
-				"inde",
-				"javascript/index.html"
-			],
-			[
 				"pre",
 				"data/dev/pretty_miniTreeTest.json"
 			],
@@ -1444,10 +1400,6 @@
 			[
 				"min",
 				"data/dev/miniTreeTest.dat"
-			],
-			[
-				"tree",
-				"data/#tree679582.dat"
 			],
 			[
 				"hal",
@@ -1842,10 +1794,6 @@
 				"osx/CocoaGL.mm"
 			],
 			[
-				"ren",
-				"osx/RendererOSX.mm"
-			],
-			[
 				"ma",
 				"niftiViewer/niftiViewer/Main.mm"
 			],
@@ -1868,14 +1816,6 @@
 			[
 				"ass2",
 				"CLASS/cs372/ass2.hs"
-			],
-			[
-				"javab",
-				"Scripts/Java/JavaBatRecursion/JavaBat_Recursion.java"
-			],
-			[
-				"pig",
-				"Scripts/CLOJURE/piglatin.clj"
 			]
 		],
 		"width": 0.0
@@ -1909,7 +1849,7 @@
 	"show_minimap": false,
 	"show_open_files": true,
 	"show_tabs": true,
-	"side_bar_visible": true,
+	"side_bar_visible": false,
 	"side_bar_width": 219.0,
 	"status_bar_visible": true,
 	"template_settings":

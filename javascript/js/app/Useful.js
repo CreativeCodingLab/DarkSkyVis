@@ -4,6 +4,7 @@ function GUIcontrols() {
     this.showPaths = false;
     this.showHalos = true;
     this.showStats = false;
+    this.showHaloMap = true;
     this.enableSelection = false;
 
     this.color0 = rgbToHex(255,0,0);
@@ -30,9 +31,9 @@ GUIcontrols.prototype.__resetView = function(toHead) {
             for (var i = EPOCH_HEAD; i <= EPOCH_TAIL; i++) {
 
                 if (halo) break;
-                for (var j = 0; j < TimePeriods[i].length; j++) {
+                for (var j = 0; j < EPOCH_Periods[i].length; j++) {
 
-                    var id = TimePeriods[i][j];
+                    var id = EPOCH_Periods[i][j];
                     halo = HaloSpheres[id];
                     if (halo) break;
                 }
@@ -42,9 +43,9 @@ GUIcontrols.prototype.__resetView = function(toHead) {
         (function () {
 
             var i = (EPOCH_HEAD < EPOCH_TAIL) ? (EPOCH_HEAD + parseInt((EPOCH_TAIL - EPOCH_HEAD) / 2)) : 0;
-            for (var j = 0; j < TimePeriods[i].length; j++) {
+            for (var j = 0; j < EPOCH_Periods[i].length; j++) {
 
-                var id = TimePeriods[i][j];
+                var id = EPOCH_Periods[i][j];
                 halo = HaloSpheres[id];
                 if (halo) break;
             }
@@ -55,9 +56,9 @@ GUIcontrols.prototype.__resetView = function(toHead) {
             for (var i = EPOCH_TAIL; i >= EPOCH_HEAD; i--) {
 
                 if (halo) break;
-                for (var j = 0; j < TimePeriods[i].length; j++) {
+                for (var j = 0; j < EPOCH_Periods[i].length; j++) {
 
-                    var id = TimePeriods[i][j];
+                    var id = EPOCH_Periods[i][j];
                     halo = HaloSpheres[id];
                     if (halo) break;
                 }
@@ -80,8 +81,8 @@ GUIcontrols.prototype.__resetView = function(toHead) {
 GUIcontrols.prototype.__updateData = function(dataset) {
 
     initHaloTree(dataset, false);
-    createHaloGeometry(TimePeriods);
-    __resetView(0);
+    createHaloGeometry(EPOCH_Periods);
+    this.__resetView(0);
 };
 
 
@@ -95,3 +96,73 @@ function rgbToHex(R,G,B){
     return "#" + toHex(R) + toHex(G) + toHex(B)
 }
 
+
+
+function toggleVisibility(HaloObject, isVisible, opacity) {
+
+    for (var i=EPOCH_HEAD; i<EPOCH_TAIL+1; i++) {
+
+        for (var j = 0; j < EPOCH_Periods[i].length; j++) {
+
+            var id = EPOCH_Periods[i][j];
+            if(HaloObject[id]){
+                HaloObject[id].visible = isVisible;
+                if (opacity){
+                    console.log("toggleVisibility", i, opacity);
+                    HaloObject[id].material.opacity = opacity;
+                }
+            }
+
+        }
+    }
+}
+
+
+function tweenToPosition(durationA, durationB) {
+
+    console.log("we are tweenToPosition!");
+    TWEEN.removeAll();
+
+    durationA = (durationA) ? durationA: 1500;
+    durationB = (durationB) ? durationB : 500;
+
+    var cameraPosition = camera.position;  // The current Camera position
+    var currentLookAt = controls.target;   // The current lookAt position
+
+    var haloDestination = {   // Our destination
+        x: curTarget.object.position.x,
+        y: curTarget.object.position.y,
+        z: curTarget.object.position.z  // put us a little bit away from the point
+    };
+
+    var zoomDestination = {
+        x: haloDestination.x,
+        y: haloDestination.y,
+        z: haloDestination.z - (haloDestination.z * .03)  // put us a little bit away from the point
+    };
+
+    // Frist we position the camera so it is looking at our Halo of interest
+    var tweenLookAt = new TWEEN.Tween(currentLookAt)
+        .to(haloDestination, durationA)
+        .onUpdate(function() {
+
+            controls.target.set(currentLookAt.x, currentLookAt.y, currentLookAt.z);
+        });
+
+    // Then we zoom in
+    var tweenPosition = new TWEEN.Tween(cameraPosition)
+        .to(zoomDestination, durationB)
+        .onUpdate(function() {
+
+            camera.position.set(cameraPosition.x, cameraPosition.y, cameraPosition.z);
+            controls.update();
+        });
+
+    //tweenLookAt.chain(tweenPosition);
+    tweenLookAt.start();
+
+}
+
+function updateLightPosition() {
+    light.position.set(camera.position.x, camera.position.y, camera.position.z);
+}
