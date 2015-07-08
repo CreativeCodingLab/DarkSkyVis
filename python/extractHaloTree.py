@@ -7,7 +7,8 @@ from glob import glob
 import thingking as tk
 import StringIO as sio
 
-RAW = "http://darksky.slac.stanford.edu/scivis2015/data/ds14_scivis_0128"
+RAW = "http://darksky.slac.stanford.edu/scivis2015/data/ds14_scivis_0128/rockstar/trees"
+TREE = op.join(RAW, "tree_0_0_0.dat")
 
 def l2a(l):
     return np.array(l)
@@ -146,7 +147,7 @@ def main():
         target = int(sys.argv[1])
     else:
         raise Exception
-    buff = extractTreeFromForest("../data/rockstar/tree/tree_0_0_0.dat", target)
+    buff = extractTreeFromForest(TREE, target)
     treeFP = sio.StringIO(buff)  # np.loadtxt treats StringIO objects as File objects
 
     halos = list()
