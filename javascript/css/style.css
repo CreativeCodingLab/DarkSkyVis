@@ -22,7 +22,7 @@ div.haloStats {
     color: #efff9e;
 }
 strong, b {
-    color: #0bc9ff;
+    color: #8f4426;
     font-weight: bold;
 }
 
@@ -36,26 +36,49 @@ strong, b {
     left: 2px
 }
 
-
+/**********************************
+ * Shamelessly stolen Spinner code
+ * http://www.html5rocks.com/en/tutorials/es6/promises/#toc-lib-compatibility
+ ***********************************/
+#loading {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 100;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(10,10,10, 0.5);
+    background-image: url("assets/loading.jpg");
+    /*background-image: url("http://i.stack.imgur.com/MnyxU.gif");*/
+    background-repeat: no-repeat;
+    background-position: center;
+}
 /**********************************
  * Settings for the Slider values
  ***********************************/
 
 .slider-value {
+    display: block;
     position: absolute;
-    right: 35px;
-    font-weight: bold;
+    border: 1px solid #D9D9D9;
+    font: 400 12px/12px Arial;
+    border-radius: 3px;
+    background: #fff;
+    padding: 5px;
+    text-align: center;
+    width: 50px;
 }
 
 /* vertical */
 .top {
-    right: 25px;
-    top:25px;
+    top: 20px;
+    left: -50px;
     color:green;
 }
 .bottom {
-    right: 22px;
-    top:85%;
+    top: -40px;
+    padding: 5px;
+    left: -50px;
     color:red;
 }
 
@@ -77,7 +100,7 @@ strong, b {
      /*width:25%;*/
      height:75%;
      right:50px;
-     top:40px;
+     top:10%;
 }
 
 /**********************************
@@ -122,4 +145,3 @@ strong, b {
             #00FF00  80%
     );
 }
-

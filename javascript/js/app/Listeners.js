@@ -37,16 +37,14 @@ function onMouseDoubleClick() {
         toggleVisibility(HaloLines, false);
         toggleVisibility(HaloSpheres, false);
 
-        __resetHaloBranch();
-
-
         var id = curTarget.object.halo_id;
         var period = curTarget.object.halo_period;
         // just need to use the halo-id's to turn the spheres on, no sense in rebuilding existing data.
         var points = intoTheAbyss(id, period, []);
         createSpline(points, id, period);
-    }
 
+    } else
+        tweenToPosition(1500, 500, false);
 
 }
 

@@ -10,6 +10,8 @@ import StringIO as sio
 RAW = "http://darksky.slac.stanford.edu/scivis2015/data/ds14_scivis_0128/rockstar/trees"
 TREE = op.join(RAW, "tree_0_0_0.dat")
 
+
+
 def l2a(l):
     return np.array(l)
 

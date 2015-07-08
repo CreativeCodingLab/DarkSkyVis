@@ -22,14 +22,36 @@ function GUIcontrols() {
     this.color2 = rgbToHex(0,0,255);
     this.color3 = rgbToHex(0,255,0);
 
-    this.Path257 = function () { this.__updateData(PATH257) };
-    this.SampleTree = function () { this.__updateData(HALOTREE) };
-    this.Tree676638 = function () { this.__updateData(TREE676638) };
-    //this.Tree676638 = function () { __updateData(TREE679582) };
+    this.dataset = "676638";
     this.goToHead = function () { this.__resetView(0) };
     this.goToCenter = function () { this.__resetView(1) };
     this.goToTail = function () { this.__resetView(2) };
+    this.animateTime = function () {};
 }
+
+GUIcontrols.prototype.__animateSlider = function(offset) {
+    var step = slider.noUiSlider('step');
+    console.log("animate", step, slider.val());
+    // Frist we position the camera so it is looking at our Halo of interest
+    var tweenToTail = new TWEEN.Tween({x: EPOCH_HEAD, y: EPOCH_TAIL})
+        .to({x: 88 - offset, y: 88}, 3500)
+        .onUpdate(function() {
+            slider.val([this.x, this.y]);
+        });
+
+    // Then we zoom in
+    var tweenToHead = new TWEEN.Tween({x: 88 - offset, y: 88})
+        .to({x: 0, y: offset}, 3500)
+        .onUpdate(function() {
+            slider.val([this.x, this.y]);
+        });
+
+    tweenToTail.chain(tweenToHead);
+    tweenToTail.start();
+
+}
+
+
 
 GUIcontrols.prototype.__resetView = function(toHead) {
 
@@ -85,41 +107,49 @@ GUIcontrols.prototype.__resetView = function(toHead) {
 
     displayHaloStats();
     displayHalos();
-    tweenToPosition();
+    tweenToPosition(1500, 500, true);
 };
 
 
-GUIcontrols.prototype.__updateData = function(dataset) {
-
-    initHaloTree(dataset, false);
-    createHaloGeometry(EPOCH_PERIODS);
-    this.__resetView(0);
+GUIcontrols.prototype.__updateData = function() {
+    var that = this;
+    DEFERRED = true;
+    var URL = "js/assets/tree_" + this.dataset.split(' ')[0] + ".json";
+    getHaloTreeData(URL)
+        .then(function(response) {
+            //console.log("Fuck Yeah!", typeof response, response);
+            initHaloTree(response, false);
+        }).then(function() {
+            showSpinner(false);
+            // Always hide the spinner
+            that.__resetView(0);
+        });
 };
 
 
 // kind of a misleading function name
 function displayHalos() {
+    if (!DEFERRED) {
+        for (var i = 0; i < EPOCH_PERIODS.length; i++) {
 
-    for (var i = 0; i < EPOCH_PERIODS.length; i++) {
+            for (var j = 0; j < EPOCH_PERIODS[i].length; j++) {
 
-        for (var j = 0; j < EPOCH_PERIODS[i].length; j++) {
-
-            var id = EPOCH_PERIODS[i][j];
-            //console.log(i, id)
-            // Set Halo Line Visibility
-            if (HaloLines[id]){
-                // console.log("\tdisplaying Halo line?", i, id, config.showPaths, EPOCH_HEAD, EPOCH_TAIL)
-                HaloLines[id].visible = (i >= EPOCH_HEAD && i < EPOCH_TAIL)? config.showPaths : false;
-            }
-            // Set Halo Spheres Visibility
-            HaloSpheres[id].visible = (i >= EPOCH_HEAD && i <= EPOCH_TAIL)? config.showHalos : false;
-            if (curTarget && HaloSpheres[id].position !== curTarget.object.position){
-                HaloSpheres[id].material.color.set(colorKey(i));
-                HaloSpheres[id].material.opacity = 0.4;
+                var id = EPOCH_PERIODS[i][j];
+                //console.log(i, id)
+                // Set Halo Line Visibility
+                if (HaloLines[id]){
+                    // console.log("\tdisplaying Halo line?", i, id, config.showPaths, EPOCH_HEAD, EPOCH_TAIL)
+                    HaloLines[id].visible = (i >= EPOCH_HEAD && i < EPOCH_TAIL)? config.showPaths : false;
+                }
+                // Set Halo Spheres Visibility
+                HaloSpheres[id].visible = (i >= EPOCH_HEAD && i <= EPOCH_TAIL)? config.showHalos : false;
+                if (curTarget && HaloSpheres[id].position !== curTarget.object.position){
+                    HaloSpheres[id].material.color.set(colorKey(i));
+                    HaloSpheres[id].material.opacity = 0.4;
+                }
             }
         }
     }
-
 }
 
 
@@ -129,7 +159,7 @@ function displayHaloStats() {
     var haloData = HaloLUT[curTarget.object.halo_id];
 
     var result = "<b> time:</b> " + haloData['time'] + "</br>" +
-        "<b>'        id:'</b> " + haloData['id'] + "</br>" +
+        "<b>        id:</b> " + haloData['id'] + "</br>" +
         "<b>   desc_id:</b> " + haloData['desc_id'] + "</br>" +
         "<b>  num_prog:</b> " + haloData['num_prog'] + "</br>" +
         "<b>       pid:</b> " + haloData['pid'] + "</br>" +
@@ -147,11 +177,6 @@ function displayHaloStats() {
         "<b>      vmax:</b> " +  haloData['vmax'] + "</br>" +
         "<b>  sam_mvir:</b> " +  haloData['sam_mvir'] + "</br>" +
         "<b>      Spin:</b> " +  haloData['Spin'] + "</br>"
-
-    // var result = $.map(haloData, function(value, index) {
-
-    //     return  "<b>"+ index  +":</b> " + value;
-    // }).join("</br>");
 
     haloStats.html(result);
 }
@@ -177,13 +202,11 @@ function toggleVisibility(HaloObject, isVisible, opacity) {
 }
 
 
-function tweenToPosition(durationA, durationB) {
+function tweenToPosition(durationA, durationB, zoom) {
 
     console.log("we are tweenToPosition!");
     TWEEN.removeAll();
 
-    durationA = (durationA) ? durationA: 1500;
-    durationB = (durationB) ? durationB : 500;
 
     var cameraPosition = camera.position;  // The current Camera position
     var currentLookAt = controls.target;   // The current lookAt position
@@ -217,7 +240,8 @@ function tweenToPosition(durationA, durationB) {
             controls.update();
         });
 
-    tweenLookAt.chain(tweenPosition);
+    if (zoom)
+        tweenLookAt.chain(tweenPosition);
     tweenLookAt.start();
 
 }
@@ -228,7 +252,7 @@ function updateLightPosition() {
 
 
 
-function __resetHaloBranch() {
+function resetHaloBranchs() {
 
     for (var id in HaloSelect) {
 
@@ -350,5 +374,35 @@ function get(url) {
 }
 
 function getHaloTreeData(url) {
+    showSpinner(true);
     return get(url).then(JSON.parse);
+}
+
+
+
+
+//function onReady(callback) {
+//    var intervalID = window.setInterval(checkReady, 1000);
+//
+//    function checkReady() {
+//        if (document.getElementsByTagName('body')[0] !== undefined) {
+//            window.clearInterval(intervalID);
+//            callback.call(this);
+//        }
+//    }
+//}
+//
+//onReady(function () {
+//    show('page', true);
+//    show('#loading', false);
+//});
+
+function showSpinner(value, message) {
+    message = message || 0;
+    console.log("Loading!!", value)
+    //document.getElementById(id).style.display = value ? 'block' : 'none';
+    var loading = $("#loading")[0];
+    loading.style.display = value ? 'block' : 'none';
+    if (message > 30)
+        loading.style.backgroundImage = 'url("http://i.stack.imgur.com/MnyxU.gif")';
 }

@@ -183,19 +183,15 @@ function initSlider() {
         );
     }
 
-    //slider.Link('lower').to($('#value-lower'));
-    //slider.Link('upper').to($('#value-upper'));
     EPOCH_HEAD = parseInt(slider.val()[0]);
     EPOCH_TAIL = parseInt(slider.val()[1]);
 }
-
 function initGUI() {
     console.log("initGUI()");
     var gui = new dat.GUI({ autoPlace: false });
     $('.ma-gui').append($(gui.domElement));
     var guiBox = gui.addFolder("Halos in a Dark Sky");
     guiBox.open();
-
 
     config = new GUIcontrols();
 
@@ -237,30 +233,19 @@ function initGUI() {
         })
     }
 
-
     // Add or Remove Datasets
     var dataSetBox = guiBox.addFolder("Choose a Dataset");
     {
-        var small = dataSetBox.add(config, "dataset", [
-            "None", "676879", "675650", "675608", "676638"
+        var data = dataSetBox.add(config, "dataset", [
+            "676879 157K", "675650 209K",
+            "675608 252K", "676638 777K",
+            "682265 3.9K", "679619 2.8M",
+            "677545 2.9M", "677521 3.6M",
+            "680462 4.0M", "679582 6.0M",
         ]);
-        small.name("Small");
-        small.onFinishChange(function(value) {
+        data.name("Tree #");
+        data.onFinishChange(function(value) {
             console.log("woo! Small", value);
-            config.__updateData();
-        });
-
-        var medium = dataSetBox.add(config, "dataset", [ "None", "679619", "677545", "677521" ]);
-        medium.name("Medium");
-        medium.onFinishChange(function(value) {
-            console.log("woo! Medium", value);
-            config.__updateData();
-        });
-
-        var large = dataSetBox.add(config, "dataset", [ "None", "680462", "679582" ]);
-        large.name("Large");
-        large.onFinishChange(function(value) {
-            console.log("woo! Large", value);
             config.__updateData();
         });
 
@@ -271,30 +256,39 @@ function initGUI() {
 
     var haloFocusBox = guiBox.addFolder("Choose Focus point!");
     {
-        haloFocusBox.add(config, "goToHead");
-        haloFocusBox.add(config, "goToCenter");
-        haloFocusBox.add(config, "goToTail");
+        haloFocusBox.add(config, "goToHead").name("Jump to Head");
+        haloFocusBox.add(config, "goToCenter").name("Jump to Center");
+        haloFocusBox.add(config, "goToTail").name("Jump to Tail");
         haloFocusBox.open();
     }
 
     var haloSelectionBox = guiBox.addFolder("Interaction Components");
-    var selectionController = haloSelectionBox.add(config, "enableSelection").name("Enable Selection");
     {
-        selectionController.onFinishChange(function() {
+        var selectionController = haloSelectionBox.add(config, "enableSelection").name("Enable Selection");
+        {
+            selectionController.onFinishChange(function() {
+                resetHaloBranchs();
+                console.log("selectionController.onFinishChange");
+                if (config.enableSelection) {
 
-            console.log("selectionController.onFinishChange");
-            if (config.enableSelection) {
+                    console.log("Selection Mode is active!");
+                    renderer.setClearColor(rgbToHex(150,150,150), 1);
+                } else {
+                    toggleVisibility(HaloLines, config.showPaths);
+                    toggleVisibility(HaloSpheres, config.showHalos);
+                    renderer.setClearColor(rgbToHex(50,50,50), 1);
+                }
 
-                console.log("Selection Mode is active!");
-                renderer.setClearColor(rgbToHex(150,150,150), 1);
-            } else {
-                __resetHaloBranch();
-                toggleVisibility(HaloLines, config.showPaths);
-                toggleVisibility(HaloSpheres, config.showHalos);
-                renderer.setClearColor(rgbToHex(50,50,50), 1);
-            }
+            })
+        }
 
-        })
+        var animateTime = haloSelectionBox.add(config, "animateTime").name("Animate Time!");
+        {
+            animateTime.onFinishChange(function() {
+                console.log((EPOCH_TAIL - EPOCH_HEAD), EPOCH_TAIL, EPOCH_HEAD)
+                config.__animateSlider((EPOCH_TAIL - EPOCH_HEAD));
+            })
+        }
     }
     //var colorBox = guiBox.addFolder("Cosmetic");
     //{
@@ -316,3 +310,4 @@ function initGUI() {
     //    })
     //}
 }
+
