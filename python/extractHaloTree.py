@@ -140,34 +140,35 @@ def extractTreeFromForest(fileName, target):
                     return buf
 
 def main():
+    # 677521
     # for the time being, assume we are using tree_parse_test.dat
     if len(sys.argv) > 1:
         target = int(sys.argv[1])
-    else
+    else:
         raise Exception
-    buff = extractTreeFromForest("../data/dev/tree_parse_test.dat", target)
+    buff = extractTreeFromForest("../data/rockstar/tree/tree_0_0_0.dat", target)
     treeFP = sio.StringIO(buff)  # np.loadtxt treats StringIO objects as File objects
 
     halos = list()
-    for halo in np.loadtxt(treeFP):
-        _halo = addHalo(halo)
-        entry = {
-            'id': _halo['id'],
-            'position':_halo['position'],
-            'velocity':_halo['velocity'],
-            'rvir': _halo["rvir"],
-            'mvir': _halo["mvir"],
-            'rs': _halo["rs"]
-        }
-
-        halos.append(entry)
+    for h in np.loadtxt(treeFP):
+        # _halo = addHalo(h)
+        # # Just take what we need from the halos and leave the rest for now
+        # entry = {
+        #     'id': _halo['id'],
+        #     'position':_halo['position'],
+        #     'velocity':_halo['velocity'],
+        #     'rvir': _halo["rvir"],
+        #     'mvir': _halo["mvir"],
+        #     'rs': _halo["rs"]
+        # }
+        # halos.append(entry)
+        halos.append(addHalo(h))
 
     # halos = [addHalo(halo) for halo in tk.loadtxt(HALO)]
     varName = "_".join( ["tree", str(target)] )
-    outFN = os.path.join("../javascript/js/assets", varName + ".js")
+    outFN = op.join("../javascript/js/assets", varName + ".json")
     with open(outFN, 'w') as haloFP:
         print outFN, len(halos)
-        haloFP.write( "var " + varName + " = " )  # So we can load it in as Json
         haloFP.write( json.dumps( halos ) )
 
 
