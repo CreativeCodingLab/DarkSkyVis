@@ -18,7 +18,7 @@ var Lines = [];
 var linesGroup, sphereGroup;
 var HaloLines = {}, HaloSpheres = {};
 var HaloBranch = {}, HaloSelect = {};
-var HaloLUT, EPOCH_Periods, __traversed={};
+var HaloLUT, EPOCH_PERIODS, __traversed={};
 
 var hits = [], curTarget, prevTarget;
 
@@ -138,11 +138,7 @@ function render() {
 
             // Hit object is NOT the currently selected object
             if (hits[i].object.position !== curTarget.object.position && hits[i].object.visible){
-                hits[i].object.material.opacity = 0.4;
-            // Hit object is the currently selected object
-            // KRA: Going to try removing this to see if it makes a difference, or we can just do
-            //} else if (hits[i].object.position === curTarget.object.position && hits[i].object.visible){
-            //    curTarget.object.material.opacity = 0.8;
+                hits[i].object.material.opacity = 0.2;
             }
         }
     }
@@ -158,9 +154,6 @@ function render() {
             // Hit object is not our currently selected object
             if (hits[i].object.position !== curTarget.object.position && hits[i].object.visible){
                 hits[i].object.material.opacity = 0.4;
-            // Hit object is our currently selected object
-            } else if (hits[i].object.position === curTarget.object.position && hits[i].object.visible){
-                hits[i].object.material.opacity = 0.7;
             }
         }
     }
@@ -180,7 +173,10 @@ function initHaloTree(DATASET, firstTime) {
 
     console.log("\n\ninitHaloTree!!", firstTime, DATASET.length);
 
-
+    //getHaloTreeData("js/assets/hlist_1.0.json")
+    //    .then(function(response) {
+    //        console.log("Fuck Yeah!", typeof response, response);
+    //    });
     // Helper Function, closure
     function __prepGlobalStructures() {
 
@@ -193,22 +189,22 @@ function initHaloTree(DATASET, firstTime) {
         HaloLUT = {length: 0};  // just to keep track of how many objects we have
 
 
-        EPOCH_Periods = [];
+        EPOCH_PERIODS = [];
         for (var i = 0; i < NUMTIMEPERIODS; i++) {
 
             Lines[i] = [];
-            EPOCH_Periods[i] = [];
+            EPOCH_PERIODS[i] = [];
         }
     }
 
     function __resetGlobalStructures() {
 
         console.log("calling __resetGlobalStructures()!");
-        for (var i = 0; i < EPOCH_Periods.length; i++) {
+        for (var i = 0; i < EPOCH_PERIODS.length; i++) {
 
-            for (var j = 0; j < EPOCH_Periods[i].length; j++) {
+            for (var j = 0; j < EPOCH_PERIODS[i].length; j++) {
 
-                var id = EPOCH_Periods[i][j];
+                var id = EPOCH_PERIODS[i][j];
                 if (HaloLines[id]) {
 
                     linesGroup.remove(HaloLines[id]);
@@ -262,14 +258,14 @@ function initHaloTree(DATASET, firstTime) {
         HaloLUT[halo.id] = halo;
         HaloLUT.length++;
 
-        EPOCH_Periods[halo.time].push(halo.id);
+        EPOCH_PERIODS[halo.time].push(halo.id);
     }
 
-    console.log("\n\tTimePeriods", EPOCH_Periods,"\n");
+    console.log("\n\tTimePeriods", EPOCH_PERIODS,"\n");
     console.log("\tHaloLUT", HaloLUT.length,"\n");
 
     // **** Make some Spline Geometry ***
-    createHaloGeometry(EPOCH_Periods);
+    createHaloGeometry(EPOCH_PERIODS);
 
 }
 
@@ -348,7 +344,7 @@ function createHaloGeometry(TimePeriods) {
     }
 
     // set the visibility of the halo data
-    displayHaloData();
+    displayHalos();
 
 }
 
@@ -460,31 +456,6 @@ function createPathLine(points, color, id, period) {
 
 }
 
-// kind of a misleading function name
-function displayHaloData() {
-
-    for (var i = 0; i < EPOCH_Periods.length; i++) {
-
-        for (var j = 0; j < EPOCH_Periods[i].length; j++) {
-
-
-            var id = EPOCH_Periods[i][j];
-            //console.log(i, id)
-            // Set Halo Line Visibility
-            if (HaloLines[id]){
-                // console.log("\tdisplaying Halo line?", i, id, config.showPaths, EPOCH_HEAD, EPOCH_TAIL)
-                HaloLines[id].visible = (i >= EPOCH_HEAD && i < EPOCH_TAIL)? config.showPaths : false;
-            }
-            // Set Halo Spheres Visibility
-            HaloSpheres[id].visible = (i >= EPOCH_HEAD && i <= EPOCH_TAIL)? config.showHalos : false;
-            if (curTarget && HaloSpheres[id].position !== curTarget.object.position){
-                HaloSpheres[id].material.color.set(colorKey(i));
-                HaloSpheres[id].material.opacity = 0.4;
-            }
-        }
-    }
-
-}
 
 
 /* ================================== *
@@ -499,7 +470,7 @@ function updateAllTheGeometry() {
         toggleVisibility(HaloBranch,config.showPaths, 0.5);
         toggleVisibility(HaloSelect,config.showHalos, 0.05);
     } else{
-        displayHaloData();
+        displayHalos();
     }
 
 
