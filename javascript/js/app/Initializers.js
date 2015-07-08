@@ -8,7 +8,7 @@
 // *****************************
 
 function initScene() {
-
+    console.log("initScene()")
     scene = new THREE.Scene();
 
     // **** Adding our Group object ***
@@ -27,12 +27,12 @@ function initScene() {
 
 
 function initRenderer() {
-
+    console.log("initRenderer()")
     renderer = new THREE.WebGLRenderer( { antialias: true } );
     {
         renderer.setPixelRatio( window.devicePixelRatio );
         renderer.setSize( window.innerWidth, window.innerHeight );
-        renderer.setClearColor(rgbToHex(50,50,50), 1);
+        renderer.setClearColor(rgbToHex(10,10,10), 1);
         renderer.gammaInput = true;
         renderer.gammaOutput = true;
     }
@@ -41,7 +41,7 @@ function initRenderer() {
 
 
 function initContainer() {
-
+    console.log("initContainer()")
     container = document.getElementById( 'Sandbox' );
     container.appendChild( renderer.domElement );
 
@@ -53,7 +53,7 @@ function initContainer() {
 
 
 function initLights() {
-
+    console.log("initLights()")
     // ambient = new THREE.AmbientLight(0xFFFFFF); //rgbToHex(197, 176, 255)
     // scene.add(ambient);
 
@@ -65,7 +65,7 @@ function initLights() {
 }
 
 function initRayCaster() {
-
+    console.log("initRayCaster()")
     raycaster = new THREE.Raycaster();
     {
         mouse = new THREE.Vector2();
@@ -82,16 +82,15 @@ function initRayCaster() {
                 if ( halo ) break;
             }
         }
-
         prevTarget = curTarget = {object: halo};
         curTarget.object.material.opacity = 0.7;
-        tweenToPosition(250, 250);
+        tweenToPosition(250, 250, false);
     }
 
 }
 
 function initCamera() {
-
+    console.log("initCamera()")
     camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 1000 );
     {
         // **** position the camera near the first halo; ***
@@ -114,7 +113,7 @@ function initCamera() {
             controls.keys = [ 65, 83, 68 ];
             controls.enabled = true;
         }
-        camera.lookAt(pos)
+        camera.lookAt(pos);
         controls.target.set(pos.x, pos.y, pos.z);
         controls.update();
         updateLightPosition();
@@ -123,7 +122,7 @@ function initCamera() {
 }
 
 function initListeners() {
-
+    console.log("initListeners()")
     window.addEventListener( 'resize', onReshape, false );
     window.addEventListener( 'mousemove', onMouseMove, false );
     window.addEventListener( 'click', onMouseClick, true );
@@ -133,7 +132,6 @@ function initListeners() {
 }
 
 function initStatsInfo() {
-
     console.log("initStatsInfo\n");
     haloStats = d3.select("#Sandbox")
         .append("div")
@@ -145,7 +143,7 @@ function initStatsInfo() {
 }
 
 function initSlider() {
-    // console.log("\t initSlider()");
+     console.log("initSlider()");
     slider = $('.tslider');
     slider.noUiSlider({
         start: [0, 50],
@@ -173,24 +171,35 @@ function initSlider() {
         density: 3
     });
 
-    slider.Link('lower').to($('#value-lower'));
-    slider.Link('upper').to($('#value-upper'));
+    slider.Link('upper').to("-inline-<div class='slider-value top'></div>", _insert);
+    slider.Link('lower').to("-inline-<div class='slider-value bottom'></div>", _insert);
+
+    function _insert(value) {
+        // The tooltip HTML is 'this', so additional
+        // markup can be inserted here.
+        $(this).html(
+            '<strong>Value: </strong>' +
+            '<span>' + value + '</span>'
+        );
+    }
+
+    //slider.Link('lower').to($('#value-lower'));
+    //slider.Link('upper').to($('#value-upper'));
     EPOCH_HEAD = parseInt(slider.val()[0]);
     EPOCH_TAIL = parseInt(slider.val()[1]);
 }
 
 function initGUI() {
-
+    console.log("initGUI()");
     var gui = new dat.GUI({ autoPlace: false });
-    console.log("ma gui", gui);
-    var guiContainer = $('.ma-gui').append($(gui.domElement));
+    $('.ma-gui').append($(gui.domElement));
     var guiBox = gui.addFolder("Halos in a Dark Sky");
     guiBox.open();
 
 
     config = new GUIcontrols();
 
-    var spheresController = guiBox.add(config, "showHalos");
+    var spheresController = guiBox.add(config, "showHalos").name("Display Halos");
     {
         spheresController.onFinishChange(function(){
             console.log("spheresController.onFinishChange");
@@ -202,7 +211,7 @@ function initGUI() {
     }
 
 
-    var linesController = guiBox.add(config, "showPaths");
+    var linesController = guiBox.add(config, "showPaths").name("Display Paths");
     {
         linesController.onFinishChange(function(){
             console.log("linesController.onFinishChange");
@@ -213,8 +222,7 @@ function initGUI() {
         });
     }
 
-
-    var statsController = guiBox.add(config, "showStats");
+    var statsController = guiBox.add(config, "showStats").name("Display Props");
     {
         statsController.onFinishChange(function() {
 
@@ -229,7 +237,48 @@ function initGUI() {
         })
     }
 
-    var selectionController = guiBox.add(config, "enableSelection");
+
+    // Add or Remove Datasets
+    var dataSetBox = guiBox.addFolder("Choose a Dataset");
+    {
+        var small = dataSetBox.add(config, "dataset", [
+            "None", "676879", "675650", "675608", "676638"
+        ]);
+        small.name("Small");
+        small.onFinishChange(function(value) {
+            console.log("woo! Small", value);
+            config.__updateData();
+        });
+
+        var medium = dataSetBox.add(config, "dataset", [ "None", "679619", "677545", "677521" ]);
+        medium.name("Medium");
+        medium.onFinishChange(function(value) {
+            console.log("woo! Medium", value);
+            config.__updateData();
+        });
+
+        var large = dataSetBox.add(config, "dataset", [ "None", "680462", "679582" ]);
+        large.name("Large");
+        large.onFinishChange(function(value) {
+            console.log("woo! Large", value);
+            config.__updateData();
+        });
+
+        dataSetBox.open();
+    }
+
+
+
+    var haloFocusBox = guiBox.addFolder("Choose Focus point!");
+    {
+        haloFocusBox.add(config, "goToHead");
+        haloFocusBox.add(config, "goToCenter");
+        haloFocusBox.add(config, "goToTail");
+        haloFocusBox.open();
+    }
+
+    var haloSelectionBox = guiBox.addFolder("Interaction Components");
+    var selectionController = haloSelectionBox.add(config, "enableSelection").name("Enable Selection");
     {
         selectionController.onFinishChange(function() {
 
@@ -247,40 +296,23 @@ function initGUI() {
 
         })
     }
-
-
-    var dataSetBox = guiBox.addFolder("Choose a dataset!");
-    {
-        dataSetBox.add(config, "Tree676638");
-        dataSetBox.add(config, "Path257");
-        dataSetBox.add(config, "SampleTree");
-    }
-
-    var haloFocusBox = guiBox.addFolder("Choose a focus point!");
-    {
-        haloFocusBox.add(config, "goToHead");
-        haloFocusBox.add(config, "goToCenter");
-        haloFocusBox.add(config, "goToTail");
-        haloFocusBox.open();
-    }
-
-    var colorBox = guiBox.addFolder("Cosmetic");
-    {
-        colorBox.addColor(config, "color0");
-        colorBox.addColor(config, "color1");
-        colorBox.addColor(config, "color2");
-        colorBox.addColor(config, "color3").onChange(function(){
-            console.log("wooo color!", config.color3);
-            var foo = $(".noUi-connect");
-            console.log("\twooo we got it!!", foo, config.color3);
-            foo.css( "background-image", function() {
-
-                return "-webkit-linear-gradient( "
-                    + config.color0  + " 0%, "
-                    + config.color1  +  " 25%, "
-                    + config.color2  +  " 50%, "
-                    + config.color3  +  " 75%);!important";
-            });
-        })
-    }
+    //var colorBox = guiBox.addFolder("Cosmetic");
+    //{
+    //    colorBox.addColor(config, "color0");
+    //    colorBox.addColor(config, "color1");
+    //    colorBox.addColor(config, "color2");
+    //    colorBox.addColor(config, "color3").onChange(function(){
+    //        console.log("wooo color!", config.color3);
+    //        var foo = $(".noUi-connect");
+    //        console.log("\twooo we got it!!", foo, config.color3);
+    //        foo.css( "background-image", function() {
+    //
+    //            return "-webkit-linear-gradient( "
+    //                + config.color0  + " 0%, "
+    //                + config.color1  +  " 25%, "
+    //                + config.color2  +  " 50%, "
+    //                + config.color3  +  " 75%);!important";
+    //        });
+    //    })
+    //}
 }
