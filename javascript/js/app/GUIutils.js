@@ -136,7 +136,11 @@ GUIcontrols.prototype.__resetView = function(toPosition) {
         // displayHalos();
         tweenToPosition(1500, 500, true);
     } else {
-        console.log("\t:( halo is", halo)
+        alert(
+              "No Halos found in Selected Range!\n" +
+              "Please Adjust Range and press\n"
+              "'Reset Position' -> 'Jump to Head'"
+              )
     }
 };
 
