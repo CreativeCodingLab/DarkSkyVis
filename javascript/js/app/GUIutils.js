@@ -138,7 +138,7 @@ GUIcontrols.prototype.__resetView = function(toPosition) {
     } else {
         alert(
               "No Halos found in Selected Range!\n" +
-              "Please Adjust Range and press\n"
+              "Please Adjust Range and press\n" +
               "'Reset Position' -> 'Jump to Head'"
               )
     }

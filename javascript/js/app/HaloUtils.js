@@ -15,8 +15,9 @@
 function createHaloGeometry(TimePeriods) {
     console.log("\tcreateHaloGeometry(TimePeriods)");
 
+    var Lines = []
     for (var i = 0; i < TimePeriods.length; i++) {
-
+        Lines[i] = []
         for (var j = 0; j < TimePeriods[i].length; j++) {
 
 
@@ -285,18 +286,21 @@ function resetHaloBranchs() {
 function prepGlobalStructures() {
 
     console.log("calling prepGlobalStructures()!");
-    Lines = [];
+    // Lines = [];
     HaloBranch = {};
     HaloSpheres = {};
     HaloLines = {};
     __traversed = {};
-    HaloLUT = {length: 0};  // just to keep track of how many objects we have
+    // just to keep track of how many objects we have
+    // Has a length component so we know how many halos there are
+    // The min and Max components represent the min/max time in dataset
+    HaloLUT = {length: 0, min: 0, max: 0};
 
 
     EPOCH_PERIODS = [];
     for (var i = 0; i < NUMTIMEPERIODS; i++) {
 
-        Lines[i] = [];
+        // Lines[i] = [];
         EPOCH_PERIODS[i] = [];
     }
 }

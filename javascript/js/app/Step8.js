@@ -18,19 +18,16 @@ var EPOCH_PERIODS, EPOCH_HEAD, EPOCH_TAIL;
 var nDivisions = 10, NUMTIMEPERIODS = 89;
 
 // Halo Components
-// Lines is used to construct Halo Lines
-var Lines = [];
-
 // linesGroup and sphereGroup contain the
 var linesGroup, sphereGroup;
-
 // HaloLines act as a LUT containing the Line Geometry
 // HaloSpheres acts as a LUT containing the Sphere geometry
 var HaloLines = {}, HaloSpheres = {};
 // HaloBranch is the object acts like HaloSpheres
 // HaloSelect is a global lookup which keeps track of all SELECTED Halos
 var HaloBranch = {}, HaloSelect = {};
-var HaloLUT, __traversed={};            // HaloLUT is a global lookup table to keep track of all loaded halos
+// HaloLUT is a global lookup table to keep track of all loaded halos
+var HaloLUT, __traversed={};
 
 // Click objects
 var hits = [], curTarget, prevTarget;

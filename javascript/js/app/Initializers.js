@@ -197,46 +197,56 @@ function initGUI() {
 
     config = new GUIcontrols();
 
-    var spheresController = guiBox.add(config, "showHalos").name("Display Halos");
+    /*
+     * Halo Display Box
+     */
+    var displayBox = guiBox.addFolder("Display Halo Properties")
     {
-        spheresController.onFinishChange(function(){
-            console.log("spheresController.onFinishChange");
-            if (config.enableSelection)
-                toggleVisibility(HaloSelect,config.showHalos);
-            else
-                toggleVisibility(HaloSpheres,config.showHalos);
-        });
+        //Turn Halo Spheres On/Off
+        var spheresController = displayBox.add(config, "showHalos").name("Halos");
+        {
+            spheresController.onFinishChange(function(){
+                console.log("spheresController.onFinishChange");
+                if (config.enableSelection)
+                    toggleVisibility(HaloSelect,config.showHalos);
+                else
+                    toggleVisibility(HaloSpheres,config.showHalos);
+            });
+        }
+
+        // Turn Halo Lines On/Off
+        var linesController = displayBox.add(config, "showPaths").name("Paths");
+        {
+            linesController.onFinishChange(function(){
+                console.log("linesController.onFinishChange");
+                if (config.enableSelection)
+                    toggleVisibility(HaloBranch,config.showPaths);
+                else
+                    toggleVisibility(HaloLines,config.showPaths);
+            });
+        }
+
+        // Halo Properties display
+        var statsController = displayBox.add(config, "showStats").name("Properties");
+        {
+            statsController.onFinishChange(function() {
+                console.log("statsController.onFinishChange");
+                haloStats
+                    .style("display", function(){
+                        if (config.showStats )
+                            return "block";
+                        else
+                            return "none";
+                    })
+            })
+        }
+        displayBox.open();
     }
 
 
-    var linesController = guiBox.add(config, "showPaths").name("Display Paths");
-    {
-        linesController.onFinishChange(function(){
-            console.log("linesController.onFinishChange");
-            if (config.enableSelection)
-                toggleVisibility(HaloBranch,config.showPaths);
-            else
-                toggleVisibility(HaloLines,config.showPaths);
-        });
-    }
-
-    var statsController = guiBox.add(config, "showStats").name("Display Props");
-    {
-        statsController.onFinishChange(function() {
-            console.log("statsController.onFinishChange");
-            haloStats.style.display = config.showStats ? 'block' : 'none';
-
-            // haloStats
-            //     .style("display", function(){
-            //         if (config.showStats )
-            //             return "block";
-            //         else
-            //             return "none";
-            //     })
-        })
-    }
-
-    // Add or Remove Datasets
+    /*
+     * Add or Remove Datasets
+     */
     var dataSetBox = guiBox.addFolder("Choose a Dataset");
     {
         var data = dataSetBox.add(config, "dataset", [
@@ -255,6 +265,9 @@ function initGUI() {
     }
 
 
+    /*
+     * Position Configurations
+     */
     var haloFocusBox = guiBox.addFolder("Reset Position!");
     {
         haloFocusBox.add(config, "goToHead").name("Jump to Head");
@@ -263,8 +276,12 @@ function initGUI() {
         //haloFocusBox.open();
     }
 
+    /*
+     * Interaction Components
+     */
     var haloSelectionBox = guiBox.addFolder("Interaction Components");
     {
+        // Turn Halo Selection Mode On/Off
         var selectionController = haloSelectionBox.add(config, "enableSelection").name("Enable Selection");
         {
             selectionController.onFinishChange(function() {
@@ -283,6 +300,7 @@ function initGUI() {
             })
         }
 
+        // Animate Time Button
         var animateTime = haloSelectionBox.add(config, "animateTime").name("Animate Time!");
         {
             animateTime.onFinishChange(function() {
@@ -295,6 +313,9 @@ function initGUI() {
     }
 
 
+    /*
+     *  Color configuration stuff
+     */
     var colorBox = guiBox.addFolder("Cosmetic");
     {
         console.log("gui cosmetics",config.color0);
