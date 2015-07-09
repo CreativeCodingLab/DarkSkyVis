@@ -223,15 +223,16 @@ function initGUI() {
     var statsController = guiBox.add(config, "showStats").name("Display Props");
     {
         statsController.onFinishChange(function() {
-
             console.log("statsController.onFinishChange");
-            haloStats
-                .style("display", function(){
-                    if (config.showStats )
-                        return "block";
-                    else
-                        return "none";
-                })
+            haloStats.style.display = config.showStats ? 'block' : 'none';
+
+            // haloStats
+            //     .style("display", function(){
+            //         if (config.showStats )
+            //             return "block";
+            //         else
+            //             return "none";
+            //     })
         })
     }
 
@@ -239,15 +240,14 @@ function initGUI() {
     var dataSetBox = guiBox.addFolder("Choose a Dataset");
     {
         var data = dataSetBox.add(config, "dataset", [
-            "676879 157K", "675650 209K",
-            "675608 252K", "676638 777K",
-            "682265 3.9K", "679619 2.8M",
+            "682265 3.9K", "676879 157K",
+            "675650 209K", "675608 252K",
+            "676638 777K", "679619 2.8M",
             "677545 2.9M", "677521 3.6M",
             "680462 4.0M", "679582 6.0M",
         ]);
         data.name("Tree #");
         data.onFinishChange(function(value) {
-            console.log("woo! Small", value);
             config.__updateData();
         });
 
@@ -337,7 +337,7 @@ function initHaloTree(DATA, firstTime) {
         EPOCH_PERIODS[halo.time].push(halo.id);
     }
 
-    console.log("\n\tTimePeriods", EPOCH_PERIODS,"\n");
+    // console.log("\n\tTimePeriods", EPOCH_PERIODS,"\n");
     console.log("\tHaloLUT", HaloLUT.length,"\n");
 
     // **** Make some Spline Geometry ***

@@ -73,11 +73,11 @@ GUIcontrols.prototype.__animateSlider = function(offset) {
 
 
 
-GUIcontrols.prototype.__resetView = function(toHead) {
+GUIcontrols.prototype.__resetView = function(toPosition) {
 
-    console.log("You hit the reset button!!");
-    var halo = null;
-    if (toHead === 0) {
+    console.log("You hit the reset button!!", toPosition);
+    var halo;
+    if (toPosition === 0) {
         (function () {
             for (var i = EPOCH_HEAD; i <= EPOCH_TAIL; i++) {
 
@@ -87,12 +87,12 @@ GUIcontrols.prototype.__resetView = function(toHead) {
                     var id = EPOCH_PERIODS[i][j];
                     if (HaloSpheres[id]) {
                         halo = HaloSpheres[id];
-                        if (halo) break;
+                        if (halo !== undefined) break;
                     }
                 }
             }
         }());
-    } else if (toHead === 1) {
+    } else if (toPosition === 1) {
         (function () {
 
             var i = (EPOCH_HEAD < EPOCH_TAIL) ? (EPOCH_HEAD + parseInt((EPOCH_TAIL - EPOCH_HEAD) / 2)) : 0;
@@ -101,16 +101,16 @@ GUIcontrols.prototype.__resetView = function(toHead) {
                 var id = EPOCH_PERIODS[i][j];
                 if (HaloSpheres[id]) {
                     halo = HaloSpheres[id];
-                    if (halo) break;
+                    if (halo !== undefined) break;
                 }
             }
         }());
-    } else if (toHead === 2) {
+    } else if (toPosition === 2) {
         (function () {
 
             for (var i = EPOCH_TAIL; i >= EPOCH_HEAD; i--) {
 
-                if (halo) break;
+                if (halo !== undefined) break;
                 for (var j = 0; j < EPOCH_PERIODS[i].length; j++) {
 
                     var id = EPOCH_PERIODS[i][j];
@@ -123,16 +123,21 @@ GUIcontrols.prototype.__resetView = function(toHead) {
         }());
     }
 
-    if (curTarget.object)
-        curTarget.object = halo;
-    else
-        prevTarget = curTarget = {object: halo};
-    curTarget.object.material.opacity = 0.7;
-    console.log("prevTarget, curTarget", prevTarget, curTarget);
+    if (halo !== undefined) { // This implies we are in the wrong time-frame
+        console.log("\tnew halo is", halo)
+        if (curTarget.object)
+            curTarget.object = halo;
+        else
+            prevTarget = curTarget = {object: halo};
+        console.log("\tprevTarget, curTarget", prevTarget, curTarget);
+        curTarget.object.material.opacity = 0.7;
 
-    displayHaloStats();
-    displayHalos();
-    tweenToPosition(1500, 500, true);
+        displayHaloStats();
+        // displayHalos();
+        tweenToPosition(1500, 500, true);
+    } else {
+        console.log("\t:( halo is", halo)
+    }
 };
 
 
@@ -140,6 +145,7 @@ GUIcontrols.prototype.__updateData = function() {
     var that = this;
     DEFERRED = true;
     var URL = "js/assets/tree_" + this.dataset.split(' ')[0] + ".json";
+    console.log("\tloading", URL)
     getHaloTreeData(URL)
         .then(function(response) {
             //console.log("Fuck Yeah!", typeof response, response);

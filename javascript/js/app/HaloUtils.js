@@ -13,7 +13,7 @@
  *  included below
  * ================================== */
 function createHaloGeometry(TimePeriods) {
-    console.log("createHaloGeometry(TimePeriods)");
+    console.log("\tcreateHaloGeometry(TimePeriods)");
 
     for (var i = 0; i < TimePeriods.length; i++) {
 
@@ -31,6 +31,7 @@ function createHaloGeometry(TimePeriods) {
             createSphere(id, colorKey(i),  i);
         }
     }
+    console.log("\tSpheres have been created")
 
     for (i = 0; i < Lines.length; i++) {
 
@@ -41,7 +42,7 @@ function createHaloGeometry(TimePeriods) {
                 createPathLine(segment, colorKey(i), id, i);
         }
     }
-
+    console.log("\tLines have been created")
     // set the visibility of the halo data
     DEFERRED = false;
     showSpinner(false);
@@ -98,7 +99,7 @@ function createSphere(id, color, period) {
             shading: THREE.SmoothShading,
             vertexColors: THREE.VertexColors,
             transparent: true,
-            side: THREE.BackSide,
+            // side: THREE.BackSide,  // Seems to be slowing things down a lot
             opacity: 0.4
         })
     );
@@ -113,7 +114,6 @@ function createSphere(id, color, period) {
     HaloSpheres[id] = mesh;
     sphereGroup.add(mesh);
     //console.log("created Halosphere", halo.id, index, HaloSpheres.length, HaloSpheres[index].length);
-
 }
 
 function createPathLine(points, color, id, period) {

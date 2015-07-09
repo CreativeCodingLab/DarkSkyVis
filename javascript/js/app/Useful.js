@@ -12,7 +12,7 @@ function rgbToHex(R,G,B){
 
 // Displays the loading image
 function showSpinner(value) {
-    console.log("Loading!!", value)
+    console.log("\tLoading Screen!!", value)
     //document.getElementById(id).style.display = value ? 'block' : 'none';
     var loading = $("#loading")[0];
     loading.style.display = value ? 'block' : 'none';
@@ -148,7 +148,6 @@ function tweenToPosition(durationA, durationB, zoom) {
     if (zoom)
         tweenLookAt.chain(tweenPosition);
     tweenLookAt.start();
-
 }
 
 

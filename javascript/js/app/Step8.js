@@ -38,7 +38,7 @@ var hits = [], curTarget, prevTarget;
 
 var pointCloud;
 var haloStats;
-var DEFERRED = true, DEFERRED_COUNT = 0;
+var DEFERRED = true;
 
 // Be sure to match this with the slider's connect!!
 var colorKey = d3.scale.linear()
@@ -129,7 +129,7 @@ function onFrame(time) {
     var sliderVal1 = parseInt(slider.val()[1]);
 
     if ((EPOCH_HEAD !== sliderVal0) || (EPOCH_TAIL !== sliderVal1)) {
-
+        console.log("Slider values have changed!");
         EPOCH_HEAD = sliderVal0;
         EPOCH_TAIL = sliderVal1;
         updateAllTheGeometry();
@@ -148,7 +148,6 @@ function onFrame(time) {
 function render() {
 
     if (!DEFERRED) {
-        DEFERRED_COUNT = 0;
         raycaster.setFromCamera( mouse, camera );
 
         // This loop is to set the captured moused over halos back to their
