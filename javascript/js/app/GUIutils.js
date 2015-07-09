@@ -4,23 +4,32 @@
 
 function GUIcontrols() {
 
+    // Display Halo Properties
     this.showPaths = false;
     this.showHalos = true;
     this.showStats = false;
     this.showHaloMap = true;
-    this.enableSelection = false;
 
+    // Choose Dataset
+    this.dataset = "676638 777K";
+
+    // Reset Position
+    this.goToHead = function () { this.__goToHead() };
+    this.goToCenter = function () { this.__goToCenter() };
+    this.goToTail = function () { this.__goToTail() };
+
+    // Interaction Components
+    this.enableSelection = false;
+    this.animateTime = function () {};
+    this.scale = 0.01;  // Eventually this will apply to scaling the halos
+
+    // Cosmetic manipulations
     this.color0 = rgbToHex(255,0,0);
     this.color1 = rgbToHex(255,0,255);
     this.color2 = rgbToHex(0,0,255);
     this.color3 = rgbToHex(0,255,255);
     this.color4 = rgbToHex(0,255,0);
 
-    this.dataset = "676638 777K";
-    this.goToHead = function () { this.__resetView(0) };
-    this.goToCenter = function () { this.__resetView(1) };
-    this.goToTail = function () { this.__resetView(2) };
-    this.animateTime = function () {};
 }
 
 
@@ -71,57 +80,57 @@ GUIcontrols.prototype.__animateSlider = function(offset) {
 
 }
 
-
-
-GUIcontrols.prototype.__resetView = function(toPosition) {
-
-    console.log("You hit the reset button!!", toPosition);
+GUIcontrols.prototype.__goToHead = function() {
     var halo;
-    if (toPosition === 0) {
-        (function () {
-            for (var i = EPOCH_HEAD; i <= EPOCH_TAIL; i++) {
+    for (var i = EPOCH_HEAD; i <= EPOCH_TAIL; i++) {
 
-                if (halo) break;
-                for (var j = 0; j < EPOCH_PERIODS[i].length; j++) {
+        if (halo) break;
+        for (var j = 0; j < EPOCH_PERIODS[i].length; j++) {
 
-                    var id = EPOCH_PERIODS[i][j];
-                    if (HaloSpheres[id]) {
-                        halo = HaloSpheres[id];
-                        if (halo !== undefined) break;
-                    }
-                }
-            }
-        }());
-    } else if (toPosition === 1) {
-        (function () {
-
-            var i = (EPOCH_HEAD < EPOCH_TAIL) ? (EPOCH_HEAD + parseInt((EPOCH_TAIL - EPOCH_HEAD) / 2)) : 0;
-            for (var j = 0; j < EPOCH_PERIODS[i].length; j++) {
-
-                var id = EPOCH_PERIODS[i][j];
-                if (HaloSpheres[id]) {
-                    halo = HaloSpheres[id];
-                    if (halo !== undefined) break;
-                }
-            }
-        }());
-    } else if (toPosition === 2) {
-        (function () {
-
-            for (var i = EPOCH_TAIL; i >= EPOCH_HEAD; i--) {
-
+            var id = EPOCH_PERIODS[i][j];
+            if (HaloSpheres[id]) {
+                halo = HaloSpheres[id];
                 if (halo !== undefined) break;
-                for (var j = 0; j < EPOCH_PERIODS[i].length; j++) {
-
-                    var id = EPOCH_PERIODS[i][j];
-                    if (HaloSpheres[id]) {
-                        halo = HaloSpheres[id];
-                        if (halo) break;
-                    }
-                }
             }
-        }());
+        }
     }
+    this.__resetView(halo);
+}
+
+GUIcontrols.prototype.__goToCenter = function() {
+    var halo;
+    var i = (EPOCH_HEAD < EPOCH_TAIL) ? (EPOCH_HEAD + parseInt((EPOCH_TAIL - EPOCH_HEAD) / 2)) : 0;
+    for (var j = 0; j < EPOCH_PERIODS[i].length; j++) {
+
+        var id = EPOCH_PERIODS[i][j];
+        if (HaloSpheres[id]) {
+            halo = HaloSpheres[id];
+            if (halo !== undefined) break;
+        }
+    }
+
+    this.__resetView(halo);
+}
+
+GUIcontrols.prototype.__goToTail = function() {
+    var halo;
+    for (var i = EPOCH_TAIL; i >= EPOCH_HEAD; i--) {
+
+        if (halo !== undefined) break;
+        for (var j = 0; j < EPOCH_PERIODS[i].length; j++) {
+
+            var id = EPOCH_PERIODS[i][j];
+            if (HaloSpheres[id]) {
+                halo = HaloSpheres[id];
+                if (halo) break;
+            }
+        }
+    }
+    this.__resetView(halo);
+}
+
+GUIcontrols.prototype.__resetView = function(halo) {
+    console.log("You hit the reset button!!", halo);
 
     if (halo !== undefined) { // This implies we are in the wrong time-frame
         console.log("\tnew halo is", halo)
@@ -133,7 +142,6 @@ GUIcontrols.prototype.__resetView = function(toPosition) {
         curTarget.object.material.opacity = 0.7;
 
         displayHaloStats();
-        // displayHalos();
         tweenToPosition(1500, 500, true);
     } else {
         alert(
@@ -285,7 +293,6 @@ function initGUI() {
 
         haloSelectionBox.open();
     }
-
 
     /*
      *  Color configuration stuff

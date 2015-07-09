@@ -3,7 +3,6 @@
  */
 
 
-
 // ==========================================
 //        onReshape, onMouseMove
 // And associated Event Listeners
@@ -76,11 +75,8 @@ function onMouseClick() {
         prevTarget.object.material.opacity = 0.4;
         curTarget.object.material.opacity = 0.8;
 
-        //tweenToPosition();
         displayHaloStats();
     }
-
-
 }
 
 
