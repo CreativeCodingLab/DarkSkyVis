@@ -9,7 +9,14 @@ function rgbToHex(R,G,B){
 }
 
 
-// kind of a misleading function name
+// wrapper function to update the light position
+function updateLightPosition() {
+    light.position.set(camera.position.x, camera.position.y, camera.position.z);
+}
+
+
+
+// Used to display Halos and lines during initialization
 function displayHalos() {
     if (!DEFERRED) {
         for (var i = 0; i < EPOCH_PERIODS.length; i++) {
@@ -36,6 +43,27 @@ function displayHalos() {
 }
 
 
+function toggleVisibility(HaloObject, isVisible, opacity) {
+
+    for (var i=EPOCH_HEAD; i<EPOCH_TAIL+1; i++) {
+
+        for (var j = 0; j < EPOCH_PERIODS[i].length; j++) {
+
+            var id = EPOCH_PERIODS[i][j];
+            if(HaloObject[id]){
+                HaloObject[id].visible = isVisible;
+                if (opacity){
+                    console.log("toggleVisibility", i, opacity);
+                    HaloObject[id].material.opacity = opacity;
+                }
+            }
+
+        }
+    }
+}
+
+
+// Display currently selected Halo's Attribute information
 function displayHaloStats() {
 
     console.log(haloStats);
@@ -62,26 +90,6 @@ function displayHaloStats() {
         "<b>      Spin:</b> " +  haloData['Spin'] + "</br>"
 
     haloStats.html(result);
-}
-
-
-function toggleVisibility(HaloObject, isVisible, opacity) {
-
-    for (var i=EPOCH_HEAD; i<EPOCH_TAIL+1; i++) {
-
-        for (var j = 0; j < EPOCH_PERIODS[i].length; j++) {
-
-            var id = EPOCH_PERIODS[i][j];
-            if(HaloObject[id]){
-                HaloObject[id].visible = isVisible;
-                if (opacity){
-                    console.log("toggleVisibility", i, opacity);
-                    HaloObject[id].material.opacity = opacity;
-                }
-            }
-
-        }
-    }
 }
 
 
@@ -129,12 +137,14 @@ function tweenToPosition(durationA, durationB, zoom) {
 
 }
 
-function updateLightPosition() {
-    light.position.set(camera.position.x, camera.position.y, camera.position.z);
+
+// Wrapper for pulling the Json
+function getHaloTreeData(url) {
+    showSpinner(true);
+    return get(url).then(JSON.parse);
 }
 
-
-
+// Uses promises to get the halo data.
 function get(url) {
     return new Promise( function(resolve, reject) {
         var req = new XMLHttpRequest();
@@ -156,36 +166,9 @@ function get(url) {
     })
 }
 
-function getHaloTreeData(url) {
-    showSpinner(true);
-    return get(url).then(JSON.parse);
-}
-
-
-
-
-//function onReady(callback) {
-//    var intervalID = window.setInterval(checkReady, 1000);
-//
-//    function checkReady() {
-//        if (document.getElementsByTagName('body')[0] !== undefined) {
-//            window.clearInterval(intervalID);
-//            callback.call(this);
-//        }
-//    }
-//}
-//
-//onReady(function () {
-//    show('page', true);
-//    show('#loading', false);
-//});
-
-function showSpinner(value, message) {
-    message = message || 0;
+function showSpinner(value) {
     console.log("Loading!!", value)
     //document.getElementById(id).style.display = value ? 'block' : 'none';
     var loading = $("#loading")[0];
     loading.style.display = value ? 'block' : 'none';
-    if (message > 30)
-        loading.style.backgroundImage = 'url("http://i.stack.imgur.com/MnyxU.gif")';
 }

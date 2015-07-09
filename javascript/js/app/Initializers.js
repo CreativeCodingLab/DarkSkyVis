@@ -317,81 +317,18 @@ function initHaloTree(DATA, firstTime) {
 
     console.log("\n\ninitHaloTree!!", firstTime, DATA.length);
 
-    function __prepGlobalStructures() {
-
-        console.log("calling __prepGlobalStructures()!");
-        Lines = [];
-        HaloBranch = {};
-        HaloSpheres = {};
-        HaloLines = {};
-        __traversed = {};
-        HaloLUT = {length: 0};  // just to keep track of how many objects we have
-
-
-        EPOCH_PERIODS = [];
-        for (var i = 0; i < NUMTIMEPERIODS; i++) {
-
-            Lines[i] = [];
-            EPOCH_PERIODS[i] = [];
-        }
-    }
-
-    function __resetGlobalStructures() {
-
-        console.log("calling __resetGlobalStructures()!");
-        for (var i = 0; i < EPOCH_PERIODS.length; i++) {
-
-            for (var j = 0; j < EPOCH_PERIODS[i].length; j++) {
-
-                var id = EPOCH_PERIODS[i][j];
-                if (HaloLines[id]) {
-
-                    linesGroup.remove(HaloLines[id]);
-                    scene.remove(HaloLines[id]);
-                    HaloLines[id].material.dispose();
-                    HaloLines[id].geometry.dispose();
-                    delete HaloLines[id]
-                }
-
-                if (HaloSpheres[id]) {
-
-                    sphereGroup.remove(HaloSpheres[id]);
-                    scene.remove(HaloSpheres[id]);
-                    HaloSpheres[id].material.dispose();
-                    HaloSpheres[id].geometry.dispose();
-                    delete HaloSpheres[id];
-                }
-
-                if (HaloLUT[id]) {
-
-                    delete HaloLUT[id];
-                    HaloLUT.length--;
-                }
-            }
-        }
-        __prepGlobalStructures();
-    }
-
     if (firstTime)
         __prepGlobalStructures();
     else
         __resetGlobalStructures();
 
-    // PATH257, HALOTREE, TREE676638
     for (var i = 0; i < DATA.length; i++) {
 
         var halo = DATA[i];
         halo.rs1 = (halo.rvir / halo.rs);  // convenience keys, one divided by
         halo.rs2 = (halo.rvir * halo.rs);  // the other multiplied
-        //halo.x = (halo.x >= 60.0)? 60.0 - halo.x: halo.x;
-        //halo.position[0] = halo.x
         halo.vec3 = THREE.Vector3(halo.x, halo.y, halo.z);  // Convenience, make a THREE.Vector3
         halo.time = parseInt(halo.scale * 100) - 12;
-        //console.log(halo.time, halo.id, halo.desc_id, halo.pid)
-        //console.log("\tHalo.id ", halo.id, "Halo.scale",halo.scale, "Halo.time",halo.time);
-
-        // if (halo.x > 50.0 && halo.time)
-        //     console.log(halo.time, halo.id, halo.desc_id, halo.position);
 
         // add Halos to list by ID
         HaloLUT[halo.id] = halo;

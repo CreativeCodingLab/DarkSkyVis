@@ -6,27 +6,39 @@
 if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 // Three.js components
-var container;
-var scene, renderer;
-var camera, slider, controls;
-var mouse, raycaster, light;
+var container;                        // WebGL container, fps stats
+var scene, renderer;                  // scene, renderer
+var camera, slider, controls;         // camera, slider, camera-controls
+var config, mouse, raycaster, light;  // gui, mouse, raycaster, lights
 
-// Halo Components
-var EPOCH_HEAD, EPOCH_TAIL;
+// Time Components
+var EPOCH_PERIODS, EPOCH_HEAD, EPOCH_TAIL;
 
-var Lines = [];
-var linesGroup, sphereGroup;
-var HaloLines = {}, HaloSpheres = {};
-var HaloBranch = {}, HaloSelect = {};
-var HaloLUT, EPOCH_PERIODS, __traversed={};
-
-var hits = [], curTarget, prevTarget;
-
+// Geometry attributes
 var nDivisions = 10, NUMTIMEPERIODS = 89;
 
-var config, haloStats;
-var pointCloud, DEFERRED = true;
-var DEFERRED_COUNT = 0;
+// Halo Components
+// Lines is used to construct Halo Lines
+var Lines = [];
+
+// linesGroup and sphereGroup contain the
+var linesGroup, sphereGroup;
+
+// HaloLines act as a LUT containing the Line Geometry
+// HaloSpheres acts as a LUT containing the Sphere geometry
+var HaloLines = {}, HaloSpheres = {};
+// HaloBranch is the object acts like HaloSpheres
+// HaloSelect is a global lookup which keeps track of all SELECTED Halos
+var HaloBranch = {}, HaloSelect = {};
+var HaloLUT, __traversed={};            // HaloLUT is a global lookup table to keep track of all loaded halos
+
+// Click objects
+var hits = [], curTarget, prevTarget;
+
+
+var pointCloud;
+var haloStats;
+var DEFERRED = true, DEFERRED_COUNT = 0;
 
 // Be sure to match this with the slider's connect!!
 var colorKey = d3.scale.linear()

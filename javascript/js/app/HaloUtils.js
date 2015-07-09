@@ -281,21 +281,57 @@ function resetHaloBranchs() {
 }
 
 
-function toggleVisibility(HaloObject, isVisible, opacity) {
+function __prepGlobalStructures() {
 
-    for (var i=EPOCH_HEAD; i<EPOCH_TAIL+1; i++) {
+    console.log("calling __prepGlobalStructures()!");
+    Lines = [];
+    HaloBranch = {};
+    HaloSpheres = {};
+    HaloLines = {};
+    __traversed = {};
+    HaloLUT = {length: 0};  // just to keep track of how many objects we have
+
+
+    EPOCH_PERIODS = [];
+    for (var i = 0; i < NUMTIMEPERIODS; i++) {
+
+        Lines[i] = [];
+        EPOCH_PERIODS[i] = [];
+    }
+}
+
+function __resetGlobalStructures() {
+
+    console.log("calling __resetGlobalStructures()!");
+    for (var i = 0; i < EPOCH_PERIODS.length; i++) {
 
         for (var j = 0; j < EPOCH_PERIODS[i].length; j++) {
 
             var id = EPOCH_PERIODS[i][j];
-            if(HaloObject[id]){
-                HaloObject[id].visible = isVisible;
-                if (opacity){
-                    console.log("toggleVisibility", i, opacity);
-                    HaloObject[id].material.opacity = opacity;
-                }
+            if (HaloLines[id]) {
+
+                linesGroup.remove(HaloLines[id]);
+                scene.remove(HaloLines[id]);
+                HaloLines[id].material.dispose();
+                HaloLines[id].geometry.dispose();
+                delete HaloLines[id]
             }
 
+            if (HaloSpheres[id]) {
+
+                sphereGroup.remove(HaloSpheres[id]);
+                scene.remove(HaloSpheres[id]);
+                HaloSpheres[id].material.dispose();
+                HaloSpheres[id].geometry.dispose();
+                delete HaloSpheres[id];
+            }
+
+            if (HaloLUT[id]) {
+
+                delete HaloLUT[id];
+                HaloLUT.length--;
+            }
         }
     }
+    __prepGlobalStructures();
 }

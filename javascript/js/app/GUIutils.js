@@ -24,19 +24,17 @@ function GUIcontrols() {
 }
 
 
-GUIcontrols.prototype.__setColor = function(offset) {
-    var that = this;
+GUIcontrols.prototype.__setColor = function() {
+
     colorKey = d3.scale.linear()
         .domain([0, 18, 36, 53, 71, NUMTIMEPERIODS])
-        .range([that.color0, that.color1, that.color2, that.color3, that.color4]);
+        .range([this.color0, this.color1, this.color2, this.color3, this.color4]);
 
-    console.log("color change!" , this.object);
     for (var i = 0; i < EPOCH_PERIODS.length; i++) {
 
         for (var j = 0; j < EPOCH_PERIODS[i].length; j++) {
 
             var id = EPOCH_PERIODS[i][j];
-            //console.log(i, id)
             // Set Halo Line Visibility
             if (HaloLines[id]){
                 // console.log("\tdisplaying Halo line?", i, id, config.showPaths, EPOCH_HEAD, EPOCH_TAIL)
