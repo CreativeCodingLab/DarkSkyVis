@@ -186,6 +186,8 @@ function initSlider() {
     EPOCH_HEAD = parseInt(slider.val()[0]);
     EPOCH_TAIL = parseInt(slider.val()[1]);
 }
+
+
 function initGUI() {
     console.log("initGUI()");
     var gui = new dat.GUI({ autoPlace: false });
@@ -253,13 +255,12 @@ function initGUI() {
     }
 
 
-
-    var haloFocusBox = guiBox.addFolder("Choose Focus point!");
+    var haloFocusBox = guiBox.addFolder("Reset Position!");
     {
         haloFocusBox.add(config, "goToHead").name("Jump to Head");
         haloFocusBox.add(config, "goToCenter").name("Jump to Center");
         haloFocusBox.add(config, "goToTail").name("Jump to Tail");
-        haloFocusBox.open();
+        //haloFocusBox.open();
     }
 
     var haloSelectionBox = guiBox.addFolder("Interaction Components");
@@ -289,25 +290,157 @@ function initGUI() {
                 config.__animateSlider((EPOCH_TAIL - EPOCH_HEAD));
             })
         }
+
+        haloSelectionBox.open();
     }
-    //var colorBox = guiBox.addFolder("Cosmetic");
-    //{
-    //    colorBox.addColor(config, "color0");
-    //    colorBox.addColor(config, "color1");
-    //    colorBox.addColor(config, "color2");
-    //    colorBox.addColor(config, "color3").onChange(function(){
-    //        console.log("wooo color!", config.color3);
-    //        var foo = $(".noUi-connect");
-    //        console.log("\twooo we got it!!", foo, config.color3);
-    //        foo.css( "background-image", function() {
-    //
-    //            return "-webkit-linear-gradient( "
-    //                + config.color0  + " 0%, "
-    //                + config.color1  +  " 25%, "
-    //                + config.color2  +  " 50%, "
-    //                + config.color3  +  " 75%);!important";
-    //        });
-    //    })
-    //}
+
+
+    var colorBox = guiBox.addFolder("Cosmetic");
+    {
+        console.log("gui cosmetics",config.color0);
+        colorBox.addColor(config, "color0").onChange(function() { config.__setColor() } );
+        colorBox.addColor(config, "color1").onChange(function() { config.__setColor() } );
+        colorBox.addColor(config, "color2").onChange(function() { config.__setColor() } );
+        colorBox.addColor(config, "color3").onChange(function() { config.__setColor() } );
+        colorBox.addColor(config, "color4").onChange(function() { config.__setColor() } );
+
+    }
 }
 
+
+/* ================================== *
+ *          initHaloTree
+ *  Our render function which renders
+ *  the scene and its associated objects
+ * ================================== */
+function initHaloTree(DATA, firstTime) {
+
+    console.log("\n\ninitHaloTree!!", firstTime, DATA.length);
+
+    function __prepGlobalStructures() {
+
+        console.log("calling __prepGlobalStructures()!");
+        Lines = [];
+        HaloBranch = {};
+        HaloSpheres = {};
+        HaloLines = {};
+        __traversed = {};
+        HaloLUT = {length: 0};  // just to keep track of how many objects we have
+
+
+        EPOCH_PERIODS = [];
+        for (var i = 0; i < NUMTIMEPERIODS; i++) {
+
+            Lines[i] = [];
+            EPOCH_PERIODS[i] = [];
+        }
+    }
+
+    function __resetGlobalStructures() {
+
+        console.log("calling __resetGlobalStructures()!");
+        for (var i = 0; i < EPOCH_PERIODS.length; i++) {
+
+            for (var j = 0; j < EPOCH_PERIODS[i].length; j++) {
+
+                var id = EPOCH_PERIODS[i][j];
+                if (HaloLines[id]) {
+
+                    linesGroup.remove(HaloLines[id]);
+                    scene.remove(HaloLines[id]);
+                    HaloLines[id].material.dispose();
+                    HaloLines[id].geometry.dispose();
+                    delete HaloLines[id]
+                }
+
+                if (HaloSpheres[id]) {
+
+                    sphereGroup.remove(HaloSpheres[id]);
+                    scene.remove(HaloSpheres[id]);
+                    HaloSpheres[id].material.dispose();
+                    HaloSpheres[id].geometry.dispose();
+                    delete HaloSpheres[id];
+                }
+
+                if (HaloLUT[id]) {
+
+                    delete HaloLUT[id];
+                    HaloLUT.length--;
+                }
+            }
+        }
+        __prepGlobalStructures();
+    }
+
+    if (firstTime)
+        __prepGlobalStructures();
+    else
+        __resetGlobalStructures();
+
+    // PATH257, HALOTREE, TREE676638
+    for (var i = 0; i < DATA.length; i++) {
+
+        var halo = DATA[i];
+        halo.rs1 = (halo.rvir / halo.rs);  // convenience keys, one divided by
+        halo.rs2 = (halo.rvir * halo.rs);  // the other multiplied
+        //halo.x = (halo.x >= 60.0)? 60.0 - halo.x: halo.x;
+        //halo.position[0] = halo.x
+        halo.vec3 = THREE.Vector3(halo.x, halo.y, halo.z);  // Convenience, make a THREE.Vector3
+        halo.time = parseInt(halo.scale * 100) - 12;
+        //console.log(halo.time, halo.id, halo.desc_id, halo.pid)
+        //console.log("\tHalo.id ", halo.id, "Halo.scale",halo.scale, "Halo.time",halo.time);
+
+        // if (halo.x > 50.0 && halo.time)
+        //     console.log(halo.time, halo.id, halo.desc_id, halo.position);
+
+        // add Halos to list by ID
+        HaloLUT[halo.id] = halo;
+        HaloLUT.length++;
+
+        EPOCH_PERIODS[halo.time].push(halo.id);
+    }
+
+    console.log("\n\tTimePeriods", EPOCH_PERIODS,"\n");
+    console.log("\tHaloLUT", HaloLUT.length,"\n");
+
+    // **** Make some Spline Geometry ***
+    createHaloGeometry(EPOCH_PERIODS);
+}
+
+
+function initHaloMap(DATASET) {
+    console.log("Init The Halo Map");
+    var forestGeometry = new THREE.Geometry();
+
+    for (var i = 0; i < DATASET.length; i++) {
+
+        var _halo = DATASET[i];
+        _halo.time = 1.0;  // We know a priori that this is the last time period
+        console.log(_halo);
+        var particle = new THREE.Vector3();
+        particle.x = _halo.position[0];
+        particle.y = _halo.position[1];
+        particle.z = _halo.position[2];
+
+        particle.vx = _halo.velocity[0];
+        particle.vy = _halo.velocity[1];
+        particle.vz = _halo.velocity[2];
+
+        particle.halo_id = _halo.id;
+        particle.halo_time = _halo.time;
+
+        forestGeometry.vertices.push(particle);
+        //console.log("\tHalo.id ", halo.id, "Halo.scale",halo.scale, "Halo.time",halo.time);
+    }
+    var material = new THREE.PointCloudMaterial( {
+        color: rgbToHex(255,0,0),
+        size: 0.5,
+        blending: THREE.AdditiveBlending,
+        transparent: true
+    });
+
+    pointCloud = new THREE.PointCloud( forestGeometry, material );
+    scene.add(pointCloud);
+    console.log(pointCloud );
+
+}
