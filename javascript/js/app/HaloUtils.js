@@ -75,7 +75,6 @@ function initHaloMap(DATASET) {
     pointCloud = new THREE.PointCloud( forestGeometry, material );
     scene.add(pointCloud);
     console.log(pointCloud );
-
 }
 
 /* ================================== *
@@ -167,7 +166,7 @@ function createSphere(id, color, period) {
     //console.log("createSphere", index, halo.id);
 
     var mesh = new THREE.Mesh(
-        new THREE.SphereGeometry(halo.rs1/100, 15, 15),
+        new THREE.SphereGeometry(halo.rs1 * 0.01, 15, 15),
         new THREE.MeshPhongMaterial({
             color: color,
             specular: rgbToHex(255,255,255),
@@ -181,6 +180,7 @@ function createSphere(id, color, period) {
     );
 
     // Add the halo's id to the mess so we can check it against the Halo ID map/LUT/Hash.
+    mesh.scale.set
     mesh.visible = (period >= EPOCH_HEAD && period <= EPOCH_TAIL)? config.showHalos : false;
     mesh.renderOrder = halo.time;
     mesh.halo_id = id;
@@ -236,7 +236,6 @@ function createPathLine(points, color, id, period) {
 }
 
 
-
 /* ================================== *
  *          updateAllTheGeometry
  *  Redraws the Splines for the paths
@@ -252,15 +251,12 @@ function updateAllTheGeometry() {
     } else {
 
         displayHalos();
-
     }
 }
 
 
-
 // given a clicked Halo id, traverse the tree with the given halo.
 
-//
 function intoTheAbyss(id, period, points) {
 
     var halo = HaloLUT[id];  // use the ID to pull the halo
@@ -368,7 +364,9 @@ function prepGlobalStructures() {
     // just to keep track of how many objects we have
     // Has a length component so we know how many halos there are
     // The min and Max components represent the min/max time in dataset
-    HaloLUT = {length: 0, min: 0, max: 0};
+    //  min is set to maximum time periods, while max is set to zero so we
+    //  can ensure we get an accurate representation of the halos time frame
+    HaloLUT = {length: 0, min: NUMTIMEPERIODS, max: 0};
 
 
     EPOCH_PERIODS = [];

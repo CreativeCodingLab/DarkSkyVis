@@ -55,13 +55,16 @@ function onMouseClick() {
     raycaster.setFromCamera( mouse, camera );
     // calculate objects intersecting the picking ray
     var hit, hits = raycaster.intersectObjects( sphereGroup.children );
+
     for (var i = 0; i < hits.length; i++) {
 
         //hit = raycaster.intersectObjects( sphereGroup.children )[i];
         hit = hits[i];
         console.log(i, "hit?", hit);
         if (hit.object.visible) break;
+
     }
+
     if (hit && (hit.object.material.opacity !== 0.0 && hit.object.visible)) {
 
         console.log("we got something!", hit);

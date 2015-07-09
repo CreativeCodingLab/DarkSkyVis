@@ -21,7 +21,7 @@ function GUIcontrols() {
     // Interaction Components
     this.enableSelection = false;
     this.animateTime = function () {};
-    this.scale = 0.01;  // Eventually this will apply to scaling the halos
+    this.scale = 1.0;  // Eventually this will apply to scaling the halos
 
     // Cosmetic manipulations
     this.color0 = rgbToHex(255,0,0);
@@ -165,7 +165,7 @@ GUIcontrols.prototype.__updateData = function() {
         }).then(function() {
             showSpinner(false);
             // Always hide the spinner
-            that.__resetView(0);
+            that.__goToHead();
         });
 };
 
@@ -232,7 +232,8 @@ function initGUI() {
     var dataSetBox = guiBox.addFolder("Choose a Dataset");
     {
         var data = dataSetBox.add(config, "dataset", [
-            "682265 3.9K", "676879 157K",
+            "682265 3.9K",
+            "31410 32K", "676879 157K",
             "675650 209K", "675608 252K",
             "676638 777K", "679619 2.8M",
             "677545 2.9M", "677521 3.6M",
@@ -261,10 +262,10 @@ function initGUI() {
     /*
      * Interaction Components
      */
-    var haloSelectionBox = guiBox.addFolder("Interaction Components");
+    var haloInteractionBox = guiBox.addFolder("Interaction Components");
     {
         // Turn Halo Selection Mode On/Off
-        var selectionController = haloSelectionBox.add(config, "enableSelection").name("Enable Selection");
+        var selectionController = haloInteractionBox.add(config, "enableSelection").name("Enable Selection");
         {
             selectionController.onFinishChange(function() {
                 resetHaloBranchs();
@@ -282,8 +283,22 @@ function initGUI() {
             })
         }
 
+        var scalingController = haloInteractionBox.add(config, "scale").min(0.01).step(0.01).name("Scale Halo");
+        {
+            scalingController.onFinishChange(function() {
+                var scale = config.scale <= 0.0 ? 0.001 : config.scale;
+                for (var i = 0; i < EPOCH_PERIODS.length; i++) {
+                    for (var j = 0; j < EPOCH_PERIODS[i].length; j++) {
+                        var id = EPOCH_PERIODS[i][j];
+                        if (HaloSpheres[id])
+                            HaloSpheres[id].scale.set(scale, scale, scale)
+                    }
+                }
+            })
+        }
+
         // Animate Time Button
-        var animateTime = haloSelectionBox.add(config, "animateTime").name("Animate Time!");
+        var animateTime = haloInteractionBox.add(config, "animateTime").name("Animate Time!");
         {
             animateTime.onFinishChange(function() {
                 console.log((EPOCH_TAIL - EPOCH_HEAD), EPOCH_TAIL, EPOCH_HEAD)
@@ -291,7 +306,7 @@ function initGUI() {
             })
         }
 
-        haloSelectionBox.open();
+        haloInteractionBox.open();
     }
 
     /*
