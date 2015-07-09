@@ -2,6 +2,81 @@
  * Created by krbalmryde on 7/9/15.
  */
 
+/* ================================== *
+ *          initHaloTree
+ *  Our render function which renders
+ *  the scene and its associated objects
+ * ================================== */
+function initHaloTree(DATA, firstTime) {
+
+    console.log("\n\ninitHaloTree!!", firstTime, DATA.length);
+
+    if (firstTime)
+        prepGlobalStructures();
+    else
+        resetGlobalStructures();
+
+    for (var i = 0; i < DATA.length; i++) {
+
+        var halo = DATA[i];
+        halo.rs1 = (halo.rvir / halo.rs);  // convenience keys, one divided by
+        halo.rs2 = (halo.rvir * halo.rs);  // the other multiplied
+        halo.vec3 = THREE.Vector3(halo.x, halo.y, halo.z);  // Convenience, make a THREE.Vector3
+        halo.time = parseInt(halo.scale * 100) - 12;
+
+        // add Halos to list by ID
+        HaloLUT[halo.id] = halo;
+        HaloLUT.length++;
+        HaloLUT.min = (halo.time < HaloLUT.min) ? halo.time : HaloLUT.min
+        HaloLUT.max = (halo.time > HaloLUT.max) ? halo.time : HaloLUT.max
+
+        EPOCH_PERIODS[halo.time].push(halo.id);
+    }
+
+    // console.log("\n\tTimePeriods", EPOCH_PERIODS,"\n");
+    console.log("\tHaloLUT", HaloLUT.length, HaloLUT.min, HaloLUT.max,"\n");
+
+    // **** Make some Spline Geometry ***
+    createHaloGeometry(EPOCH_PERIODS);
+}
+
+
+function initHaloMap(DATASET) {
+    console.log("Init The Halo Map");
+    var forestGeometry = new THREE.Geometry();
+
+    for (var i = 0; i < DATASET.length; i++) {
+
+        var _halo = DATASET[i];
+        _halo.time = 1.0;  // We know a priori that this is the last time period
+        console.log(_halo);
+        var particle = new THREE.Vector3();
+        particle.x = _halo.position[0];
+        particle.y = _halo.position[1];
+        particle.z = _halo.position[2];
+
+        particle.vx = _halo.velocity[0];
+        particle.vy = _halo.velocity[1];
+        particle.vz = _halo.velocity[2];
+
+        particle.halo_id = _halo.id;
+        particle.halo_time = _halo.time;
+
+        forestGeometry.vertices.push(particle);
+        //console.log("\tHalo.id ", halo.id, "Halo.scale",halo.scale, "Halo.time",halo.time);
+    }
+    var material = new THREE.PointCloudMaterial( {
+        color: rgbToHex(255,0,0),
+        size: 0.5,
+        blending: THREE.AdditiveBlending,
+        transparent: true
+    });
+
+    pointCloud = new THREE.PointCloud( forestGeometry, material );
+    scene.add(pointCloud);
+    console.log(pointCloud );
+
+}
 
 /* ================================== *
  *          createHaloGeometry
@@ -15,9 +90,9 @@
 function createHaloGeometry(TimePeriods) {
     console.log("\tcreateHaloGeometry(TimePeriods)");
 
-    var Lines = []
+    var _lines = []
     for (var i = 0; i < TimePeriods.length; i++) {
-        Lines[i] = []
+        _lines[i] = []
         for (var j = 0; j < TimePeriods[i].length; j++) {
 
 
@@ -26,7 +101,7 @@ function createHaloGeometry(TimePeriods) {
             if (!(id in __traversed)) {
 
                 var points = intoTheVoid(id, [], 0);
-                Lines[i].push( { 'points': points, 'id': id } );
+                _lines[i].push( { 'points': points, 'id': id } );
             }
 
             createSphere(id, colorKey(i),  i);
@@ -34,11 +109,11 @@ function createHaloGeometry(TimePeriods) {
     }
     console.log("\tSpheres have been created")
 
-    for (i = 0; i < Lines.length; i++) {
+    for (i = 0; i < _lines.length; i++) {
 
-        for (j = 0; j < Lines[i].length; j++){
-            var id = Lines[i][j].id;
-            var segment = Lines[i][j].points;
+        for (j = 0; j < _lines[i].length; j++){
+            var id = _lines[i][j].id;
+            var segment = _lines[i][j].points;
             if (segment.length > 1)
                 createPathLine(segment, colorKey(i), id, i);
         }
@@ -286,7 +361,6 @@ function resetHaloBranchs() {
 function prepGlobalStructures() {
 
     console.log("calling prepGlobalStructures()!");
-    // Lines = [];
     HaloBranch = {};
     HaloSpheres = {};
     HaloLines = {};
@@ -300,7 +374,6 @@ function prepGlobalStructures() {
     EPOCH_PERIODS = [];
     for (var i = 0; i < NUMTIMEPERIODS; i++) {
 
-        // Lines[i] = [];
         EPOCH_PERIODS[i] = [];
     }
 }

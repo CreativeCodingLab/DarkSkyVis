@@ -160,3 +160,144 @@ GUIcontrols.prototype.__updateData = function() {
             that.__resetView(0);
         });
 };
+
+
+function initGUI() {
+    console.log("initGUI()");
+    var gui = new dat.GUI({ autoPlace: false });
+    $('.ma-gui').append($(gui.domElement));
+    var guiBox = gui.addFolder("Halos in a Dark Sky");
+    guiBox.open();
+
+    config = new GUIcontrols();
+
+    /*
+     * Halo Display Box
+     */
+    var displayBox = guiBox.addFolder("Display Halo Properties")
+    {
+        //Turn Halo Spheres On/Off
+        var spheresController = displayBox.add(config, "showHalos").name("Halos");
+        {
+            spheresController.onFinishChange(function(){
+                console.log("spheresController.onFinishChange");
+                if (config.enableSelection)
+                    toggleVisibility(HaloSelect,config.showHalos);
+                else
+                    toggleVisibility(HaloSpheres,config.showHalos);
+            });
+        }
+
+        // Turn Halo Lines On/Off
+        var linesController = displayBox.add(config, "showPaths").name("Paths");
+        {
+            linesController.onFinishChange(function(){
+                console.log("linesController.onFinishChange");
+                if (config.enableSelection)
+                    toggleVisibility(HaloBranch,config.showPaths);
+                else
+                    toggleVisibility(HaloLines,config.showPaths);
+            });
+        }
+
+        // Halo Properties display
+        var statsController = displayBox.add(config, "showStats").name("Properties");
+        {
+            statsController.onFinishChange(function() {
+                console.log("statsController.onFinishChange");
+                haloStats
+                    .style("display", function(){
+                        if (config.showStats )
+                            return "block";
+                        else
+                            return "none";
+                    })
+            })
+        }
+        displayBox.open();
+    }
+
+
+    /*
+     * Add or Remove Datasets
+     */
+    var dataSetBox = guiBox.addFolder("Choose a Dataset");
+    {
+        var data = dataSetBox.add(config, "dataset", [
+            "682265 3.9K", "676879 157K",
+            "675650 209K", "675608 252K",
+            "676638 777K", "679619 2.8M",
+            "677545 2.9M", "677521 3.6M",
+            "680462 4.0M", "679582 6.0M",
+        ]);
+        data.name("Tree #");
+        data.onFinishChange(function(value) {
+            config.__updateData();
+        });
+
+        dataSetBox.open();
+    }
+
+
+    /*
+     * Position Configurations
+     */
+    var haloFocusBox = guiBox.addFolder("Reset Position!");
+    {
+        haloFocusBox.add(config, "goToHead").name("Jump to Head");
+        haloFocusBox.add(config, "goToCenter").name("Jump to Center");
+        haloFocusBox.add(config, "goToTail").name("Jump to Tail");
+        //haloFocusBox.open();
+    }
+
+    /*
+     * Interaction Components
+     */
+    var haloSelectionBox = guiBox.addFolder("Interaction Components");
+    {
+        // Turn Halo Selection Mode On/Off
+        var selectionController = haloSelectionBox.add(config, "enableSelection").name("Enable Selection");
+        {
+            selectionController.onFinishChange(function() {
+                resetHaloBranchs();
+                console.log("selectionController.onFinishChange");
+                if (config.enableSelection) {
+
+                    console.log("Selection Mode is active!");
+                    renderer.setClearColor(rgbToHex(150,150,150), 1);
+                } else {
+                    toggleVisibility(HaloLines, config.showPaths);
+                    toggleVisibility(HaloSpheres, config.showHalos);
+                    renderer.setClearColor(rgbToHex(50,50,50), 1);
+                }
+
+            })
+        }
+
+        // Animate Time Button
+        var animateTime = haloSelectionBox.add(config, "animateTime").name("Animate Time!");
+        {
+            animateTime.onFinishChange(function() {
+                console.log((EPOCH_TAIL - EPOCH_HEAD), EPOCH_TAIL, EPOCH_HEAD)
+                config.__animateSlider((EPOCH_TAIL - EPOCH_HEAD));
+            })
+        }
+
+        haloSelectionBox.open();
+    }
+
+
+    /*
+     *  Color configuration stuff
+     */
+    var colorBox = guiBox.addFolder("Cosmetic");
+    {
+        console.log("gui cosmetics",config.color0);
+        colorBox.addColor(config, "color0").onChange(function() { config.__setColor() } );
+        colorBox.addColor(config, "color1").onChange(function() { config.__setColor() } );
+        colorBox.addColor(config, "color2").onChange(function() { config.__setColor() } );
+        colorBox.addColor(config, "color3").onChange(function() { config.__setColor() } );
+        colorBox.addColor(config, "color4").onChange(function() { config.__setColor() } );
+
+    }
+}
