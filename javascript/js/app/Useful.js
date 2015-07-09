@@ -1,4 +1,5 @@
 
+// Useful function to help me and my lack of hex understanding
 function rgbToHex(R,G,B){
     function toHex(c) {
 
@@ -9,14 +10,23 @@ function rgbToHex(R,G,B){
 }
 
 
+// Displays the loading image
+function showSpinner(value) {
+    console.log("Loading!!", value)
+    //document.getElementById(id).style.display = value ? 'block' : 'none';
+    var loading = $("#loading")[0];
+    loading.style.display = value ? 'block' : 'none';
+}
+
+
 // wrapper function to update the light position
 function updateLightPosition() {
     light.position.set(camera.position.x, camera.position.y, camera.position.z);
 }
 
 
-
 // Used to display Halos and lines during initialization
+// Differs from toggleVisibility because it controls color as well
 function displayHalos() {
     if (!DEFERRED) {
         for (var i = 0; i < EPOCH_PERIODS.length; i++) {
@@ -24,14 +34,15 @@ function displayHalos() {
             for (var j = 0; j < EPOCH_PERIODS[i].length; j++) {
 
                 var id = EPOCH_PERIODS[i][j];
-                //console.log(i, id)
                 // Set Halo Line Visibility
-                if (HaloLines[id]){
+                if (HaloLines[id])
                     // console.log("\tdisplaying Halo line?", i, id, config.showPaths, EPOCH_HEAD, EPOCH_TAIL)
                     HaloLines[id].visible = (i >= EPOCH_HEAD && i < EPOCH_TAIL)? config.showPaths : false;
-                }
-                // Set Halo Spheres Visibility
-                HaloSpheres[id].visible = (i >= EPOCH_HEAD && i <= EPOCH_TAIL)? config.showHalos : false;
+
+                if (HaloSpheres[id])
+                    // Set Halo Spheres Visibility
+                    HaloSpheres[id].visible = (i >= EPOCH_HEAD && i <= EPOCH_TAIL)? config.showHalos : false;
+
                 if (curTarget && HaloSpheres[id].position !== curTarget.object.position){
                     console.log("displayHalos adjust colors", colorKey(i));
                     HaloSpheres[id].material.color.set(colorKey(i));
@@ -42,7 +53,7 @@ function displayHalos() {
     }
 }
 
-
+// Controls the visibility of the object in question
 function toggleVisibility(HaloObject, isVisible, opacity) {
 
     for (var i=EPOCH_HEAD; i<EPOCH_TAIL+1; i++) {
@@ -50,8 +61,11 @@ function toggleVisibility(HaloObject, isVisible, opacity) {
         for (var j = 0; j < EPOCH_PERIODS[i].length; j++) {
 
             var id = EPOCH_PERIODS[i][j];
+
             if(HaloObject[id]){
+
                 HaloObject[id].visible = isVisible;
+
                 if (opacity){
                     console.log("toggleVisibility", i, opacity);
                     HaloObject[id].material.opacity = opacity;
@@ -164,11 +178,4 @@ function get(url) {
 
         req.send();
     })
-}
-
-function showSpinner(value) {
-    console.log("Loading!!", value)
-    //document.getElementById(id).style.display = value ? 'block' : 'none';
-    var loading = $("#loading")[0];
-    loading.style.display = value ? 'block' : 'none';
 }

@@ -159,7 +159,7 @@ function render() {
 
                 // Hit object is NOT the currently selected object
                 if (hits[i].object.position !== curTarget.object.position && hits[i].object.visible){
-                    hits[i].object.material.opacity = 0.2;
+                    hits[i].object.material.opacity = 0.4;
                 }
             }
         }
@@ -174,7 +174,7 @@ function render() {
 
                 // Hit object is not our currently selected object
                 if (hits[i].object.position !== curTarget.object.position && hits[i].object.visible){
-                    hits[i].object.material.opacity = 0.4;
+                    hits[i].object.material.opacity = 0.6;
                 }
             }
         }

@@ -79,15 +79,16 @@ GUIcontrols.prototype.__resetView = function(toHead) {
     var halo = null;
     if (toHead === 0) {
         (function () {
-
             for (var i = EPOCH_HEAD; i <= EPOCH_TAIL; i++) {
 
                 if (halo) break;
                 for (var j = 0; j < EPOCH_PERIODS[i].length; j++) {
 
                     var id = EPOCH_PERIODS[i][j];
-                    halo = HaloSpheres[id];
-                    if (halo) break;
+                    if (HaloSpheres[id]) {
+                        halo = HaloSpheres[id];
+                        if (halo) break;
+                    }
                 }
             }
         }());
@@ -98,10 +99,12 @@ GUIcontrols.prototype.__resetView = function(toHead) {
             for (var j = 0; j < EPOCH_PERIODS[i].length; j++) {
 
                 var id = EPOCH_PERIODS[i][j];
-                halo = HaloSpheres[id];
-                if (halo) break;
+                if (HaloSpheres[id]) {
+                    halo = HaloSpheres[id];
+                    if (halo) break;
+                }
             }
-        })();
+        }());
     } else if (toHead === 2) {
         (function () {
 
@@ -111,11 +114,13 @@ GUIcontrols.prototype.__resetView = function(toHead) {
                 for (var j = 0; j < EPOCH_PERIODS[i].length; j++) {
 
                     var id = EPOCH_PERIODS[i][j];
-                    halo = HaloSpheres[id];
-                    if (halo) break;
+                    if (HaloSpheres[id]) {
+                        halo = HaloSpheres[id];
+                        if (halo) break;
+                    }
                 }
             }
-        })();
+        }());
     }
 
     if (curTarget.object)

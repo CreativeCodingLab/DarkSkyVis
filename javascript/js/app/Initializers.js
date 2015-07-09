@@ -318,9 +318,9 @@ function initHaloTree(DATA, firstTime) {
     console.log("\n\ninitHaloTree!!", firstTime, DATA.length);
 
     if (firstTime)
-        __prepGlobalStructures();
+        prepGlobalStructures();
     else
-        __resetGlobalStructures();
+        resetGlobalStructures();
 
     for (var i = 0; i < DATA.length; i++) {
 

@@ -98,6 +98,7 @@ function createSphere(id, color, period) {
             shading: THREE.SmoothShading,
             vertexColors: THREE.VertexColors,
             transparent: true,
+            side: THREE.BackSide,
             opacity: 0.4
         })
     );
@@ -281,9 +282,9 @@ function resetHaloBranchs() {
 }
 
 
-function __prepGlobalStructures() {
+function prepGlobalStructures() {
 
-    console.log("calling __prepGlobalStructures()!");
+    console.log("calling prepGlobalStructures()!");
     Lines = [];
     HaloBranch = {};
     HaloSpheres = {};
@@ -300,9 +301,9 @@ function __prepGlobalStructures() {
     }
 }
 
-function __resetGlobalStructures() {
+function resetGlobalStructures() {
 
-    console.log("calling __resetGlobalStructures()!");
+    console.log("calling resetGlobalStructures()!");
     for (var i = 0; i < EPOCH_PERIODS.length; i++) {
 
         for (var j = 0; j < EPOCH_PERIODS[i].length; j++) {
@@ -333,5 +334,5 @@ function __resetGlobalStructures() {
             }
         }
     }
-    __prepGlobalStructures();
+    prepGlobalStructures();
 }
