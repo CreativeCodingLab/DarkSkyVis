@@ -102,7 +102,7 @@ function displayHaloStats() {
 
 function tweenToPosition(durationA, durationB, zoom) {
 
-    console.log("we are tweenToPosition!");
+    console.log("we are tweenToPosition! Pre");
     TWEEN.removeAll();
 
 
@@ -141,6 +141,7 @@ function tweenToPosition(durationA, durationB, zoom) {
     if (zoom)
         tweenLookAt.chain(tweenPosition);
     tweenLookAt.start();
+    console.log("we are tweenToPosition! Post");
 }
 
 
@@ -166,6 +167,10 @@ function getHaloTreeData(url) {
 
 // Uses promises to get the halo data.
 function get(url) {
+    oboe(url).node("!.*", function(halo) {
+        console.log("oboe ->", halo)
+    })
+
     return new Promise( function(resolve, reject) {
         var req = new XMLHttpRequest();
         req.open('GET', url);

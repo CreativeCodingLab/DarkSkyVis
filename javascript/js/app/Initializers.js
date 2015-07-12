@@ -70,19 +70,20 @@ function initRayCaster() {
     {
         mouse = new THREE.Vector2();
         // **** Have to set this so it doesnt complain! ***
-        var halo;
+        // var halo;
 
-        for (var i = EPOCH_HEAD; i < EPOCH_TAIL; i++) {
+        // for (var i = EPOCH_HEAD; i < EPOCH_TAIL; i++) {
 
-            if (halo) break;
-            for (var j = 0; j < EPOCH_PERIODS[i].length; j++) {
+        //     if (halo) break;
+        //     for (var j = 0; j < EPOCH_PERIODS[i].length; j++) {
 
-                var id = EPOCH_PERIODS[i][j];
-                halo = HaloSpheres[id];
-                if ( halo ) break;
-            }
-        }
-        prevTarget = curTarget = {object: halo};
+        //         var id = EPOCH_PERIODS[i][j];
+        //         halo = HaloSpheres[id];
+        //         if ( halo ) break;
+        //     }
+        // }
+        // console.log("\t", halo)
+        // prevTarget = curTarget = {object: halo};
         curTarget.object.material.opacity = 0.7;
         tweenToPosition(250, 250, false);
     }
@@ -94,7 +95,9 @@ function initCamera() {
     camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 1000 );
     {
         // **** position the camera near the first halo; ***
-        var pos = sphereGroup.children[3].position;
+        // var pos = sphereGroup.children[0].position;
+        var pos = curTarget.object.position;
+        console.log("\t", pos)
         //var pos = pointCloud.position;
         light.position.set(pos.x, pos.y+0.1, pos.z-(pos.z*0.5));
         camera.position.set(pos.x, pos.y+0.1, pos.z-(pos.z*0.5));

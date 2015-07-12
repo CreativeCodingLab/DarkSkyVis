@@ -7,39 +7,69 @@
  *  Our render function which renders
  *  the scene and its associated objects
  * ================================== */
-function initHaloTree(DATA, firstTime) {
+function initHaloTree(url, firstTime) {
 
-    console.log("\n\ninitHaloTree!!", firstTime, DATA.length);
+    showSpinner(true);
+    console.log("\n\ninitHaloTree!!", firstTime, url);
 
     if (firstTime)
         prepGlobalStructures();
     else
         resetGlobalStructures();
 
-    for (var i = 0; i < DATA.length; i++) {
+    var targetSet = false;
+    oboe(url)
+        .node("!.*", function(halo, path) {
+            // console.log("\t",path[0])
+            halo.rs1 = (halo.rvir / halo.rs);  // convenience keys, one divided by
+            halo.rs2 = (halo.rvir * halo.rs);  // the other multiplied
+            halo.vec3 = THREE.Vector3(halo.x, halo.y, halo.z);  // Convenience, make a THREE.Vector3
+            halo.time = parseInt(halo.scale * 100) - 12;
 
-        var halo = DATA[i];
-        halo.rs1 = (halo.rvir / halo.rs);  // convenience keys, one divided by
-        halo.rs2 = (halo.rvir * halo.rs);  // the other multiplied
-        halo.vec3 = THREE.Vector3(halo.x, halo.y, halo.z);  // Convenience, make a THREE.Vector3
-        halo.time = parseInt(halo.scale * 100) - 12;
+            // add Halos to list by ID
+            HaloLUT[halo.id] = halo;
+            HaloLUT.length++;
+            HaloLUT.min = (halo.time < HaloLUT.min) ? halo.time : HaloLUT.min
+            HaloLUT.max = (halo.time > HaloLUT.max) ? halo.time : HaloLUT.max
 
-        // add Halos to list by ID
-        HaloLUT[halo.id] = halo;
-        HaloLUT.length++;
-        HaloLUT.min = (halo.time < HaloLUT.min) ? halo.time : HaloLUT.min
-        HaloLUT.max = (halo.time > HaloLUT.max) ? halo.time : HaloLUT.max
+            EPOCH_PERIODS[halo.time].push(halo.id);
+            createSphere2(halo);
 
-        EPOCH_PERIODS[halo.time].push(halo.id);
-    }
+            if (firstTime) {
+                if (path[0] === 0) {
+                    curTarget = {object: HaloSpheres[halo.id]};
+                    console.log("BOOM! Load shit count ===", path[0], prevTarget, curTarget)
+                    initCamera();
+                    initRayCaster();
+                    initListeners();
+                    DEFERRED = false;
+                    onFrame()
+                }
+            } else {
+                // console.log("\ttargetSet?", targetSet);
+                if(!targetSet) {
+                    if (halo.time >= EPOCH_HEAD && halo.time <= EPOCH_TAIL){
+                        targetSet = true;
+                        prevTarget = null;
+                        curTarget = {object: HaloSpheres[halo.id]};
+                        curTarget.object.material.opacity = 0.7;
+                        DEFERRED = false;
+                        tweenToPosition(250, 250, true);
+                        onFrame()
+                    }
+                }
+            }
 
+            return oboe.drop;
+
+        }).done(function() {
+            createHaloGeometry(EPOCH_PERIODS);
+            console.log("\tHaloLUT", HaloLUT.length, HaloLUT.min, HaloLUT.max,"\n");
+        })
     // console.log("\n\tTimePeriods", EPOCH_PERIODS,"\n");
-    console.log("\tHaloLUT", HaloLUT.length, HaloLUT.min, HaloLUT.max,"\n");
 
     // **** Make some Spline Geometry ***
-    createHaloGeometry(EPOCH_PERIODS);
 }
-
 
 function initHaloMap(DATASET) {
     console.log("Init The Halo Map");
@@ -102,8 +132,6 @@ function createHaloGeometry(TimePeriods) {
                 var points = intoTheVoid(id, [], 0);
                 _lines[i].push( { 'points': points, 'id': id } );
             }
-
-            createSphere(id, colorKey(i),  i);
         }
     }
     console.log("\tSpheres have been created")
@@ -119,7 +147,6 @@ function createHaloGeometry(TimePeriods) {
     }
     console.log("\tLines have been created")
     // set the visibility of the halo data
-    DEFERRED = false;
     showSpinner(false);
 
 }
@@ -191,6 +218,39 @@ function createSphere(id, color, period) {
     sphereGroup.add(mesh);
     //console.log("created Halosphere", halo.id, index, HaloSpheres.length, HaloSpheres[index].length);
 }
+
+
+function createSphere2(halo) {
+    // console.log("createSphere2(",halo,")")
+    var color = colorKey(halo.time)
+    var period = halo.time;
+
+    var mesh = new THREE.Mesh(
+        new THREE.SphereGeometry(halo.rs1 * 0.01, 15, 15),
+        new THREE.MeshPhongMaterial({
+            color: color,
+            specular: rgbToHex(255,255,255),
+            shininess: 10,
+            shading: THREE.SmoothShading,
+            vertexColors: THREE.VertexColors,
+            transparent: true,
+            // side: THREE.BackSide,  // Seems to be slowing things down a lot
+            opacity: 0.4
+        })
+    );
+
+    // Add the halo's id to the mess so we can check it against the Halo ID map/LUT/Hash.
+    mesh.visible = (period >= EPOCH_HEAD && period <= EPOCH_TAIL)? config.showHalos : false;
+    mesh.renderOrder = halo.time;
+    mesh.halo_id = halo.id;
+    mesh.halo_period = halo.time;
+    mesh.position.set( halo.x, halo.y, halo.z);
+    mesh.updateMatrix();
+    HaloSpheres[halo.id] = mesh;
+    sphereGroup.add(mesh);
+    //console.log("created Halosphere", halo.id, index, HaloSpheres.length, HaloSpheres[index].length);
+}
+
 
 function createPathLine(points, color, id, period) {
 

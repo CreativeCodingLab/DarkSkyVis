@@ -28,7 +28,6 @@ function onMouseMove( event ) {
 
 
 function onMouseClick() {
-
     console.log("Single Click!!");
     // update the picking ray with the camera and mouse position
     raycaster.setFromCamera( mouse, camera );
@@ -53,7 +52,7 @@ function onMouseClick() {
             prevTarget = curTarget;
             curTarget = hit;
         }
-
+        console.log("prevTarget, curTarget", prevTarget, curTarget)
         prevTarget.object.material.opacity = 0.4;
         curTarget.object.material.opacity = 0.8;
 

@@ -158,15 +158,16 @@ GUIcontrols.prototype.__updateData = function() {
     DEFERRED = true;
     var URL = "js/assets/tree_" + this.dataset.split(' ')[0] + ".json";
     console.log("\tloading", URL)
-    getHaloTreeData(URL)
-        .then(function(response) {
-            //console.log("Fuck Yeah!", typeof response, response);
-            initHaloTree(response, false);
-        }).then(function() {
-            showSpinner(false);
-            // Always hide the spinner
-            that.__goToHead();
-        });
+    initHaloTree(URL, false);
+    // getHaloTreeData(URL)
+    //     .then(function(response) {
+    //         //console.log("Fuck Yeah!", typeof response, response);
+    //         initHaloTree(response, false);
+    //     }).then(function() {
+    //         showSpinner(false);
+    //         // Always hide the spinner
+    //         that.__goToHead();
+    //     });
 };
 
 

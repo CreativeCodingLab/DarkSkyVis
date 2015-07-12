@@ -182,12 +182,6 @@ function render() {
         updateLightPosition();
         renderer.render( scene, camera );
     }
-    //else {
-    //    DEFERRED_COUNT++;
-    //    console.log("DEFERRED!!", DEFERRED_COUNT);
-    //    if (DEFERRED_COUNT >= 200)
-    //        showSpinner(true, DEFERRED_COUNT);
-    //}
 }
 
 
