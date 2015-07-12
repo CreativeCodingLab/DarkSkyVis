@@ -42,7 +42,7 @@ function initRenderer() {
 
 function initContainer() {
     console.log("initContainer()")
-    container = document.getElementById( 'Sandbox' );
+    container = document.getElementById( 'DarkSky' );
     container.appendChild( renderer.domElement );
 
 }
