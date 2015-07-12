@@ -170,7 +170,7 @@ function createSphere(id, color, period) {
         new THREE.MeshPhongMaterial({
             color: color,
             specular: rgbToHex(255,255,255),
-            shininess: 30,
+            shininess: 10,
             shading: THREE.SmoothShading,
             vertexColors: THREE.VertexColors,
             transparent: true,
@@ -261,7 +261,7 @@ function intoTheAbyss(id, period, points) {
 
     var halo = HaloLUT[id];  // use the ID to pull the halo
     points.push(halo.position);
-    HaloSelect[id] = true;
+    HaloSelect[id] = id;
     HaloSpheres[id].visible = (period >= EPOCH_HEAD && period < EPOCH_TAIL)? config.showHalos : false;
     //points.push([halo.x,halo.y,halo.z,halo.id,halo.desc_id]); // for debugging purposes
 
@@ -340,7 +340,7 @@ function resetHaloBranchs() {
         if (id in HaloBranch){
             console.log("HaloBranch", id)
             linesGroup.remove(HaloBranch[id]);
-            scene.remove(HaloBranch[id]);
+            // scene.remove(HaloBranch[id]);
             HaloBranch[id].material.dispose();
             HaloBranch[id].geometry.dispose();
             delete HaloBranch[id]

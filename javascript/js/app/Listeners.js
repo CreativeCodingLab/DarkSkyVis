@@ -26,27 +26,6 @@ function onMouseMove( event ) {
 
 }
 
-function onMouseDoubleClick() {
-
-    console.log("Double Click!!", curTarget.object.halo_id);
-    // update the picking ray with the camera and mouse position
-
-    if(config.enableSelection) {
-
-        toggleVisibility(HaloLines, false);
-        toggleVisibility(HaloSpheres, false);
-
-        var id = curTarget.object.halo_id;
-        var period = curTarget.object.halo_period;
-        // just need to use the halo-id's to turn the spheres on, no sense in rebuilding existing data.
-        var points = intoTheAbyss(id, period, []);
-        createSpline(points, id, period);
-
-    } else
-        tweenToPosition(1500, 500, false);
-
-}
-
 
 function onMouseClick() {
 
@@ -80,6 +59,28 @@ function onMouseClick() {
 
         displayHaloStats();
     }
+}
+
+
+function onMouseDoubleClick() {
+
+    console.log("Double Click!!", curTarget.object.halo_id);
+    // update the picking ray with the camera and mouse position
+
+    if(config.enableSelection) {
+
+        toggleVisibility(HaloLines, false);
+        toggleVisibility(HaloSpheres, false);
+
+        var id = curTarget.object.halo_id;
+        var period = curTarget.object.halo_period;
+        // just need to use the halo-id's to turn the spheres on, no sense in rebuilding existing data.
+        var points = intoTheAbyss(id, period, []);
+        createSpline(points, id, period);
+
+    } else
+        tweenToPosition(1500, 500, false);
+
 }
 
 

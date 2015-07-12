@@ -10,13 +10,6 @@ function rgbToHex(R,G,B){
 }
 
 
-// Displays the loading image
-function showSpinner(value) {
-    console.log("\tLoading Screen!!", value)
-    //document.getElementById(id).style.display = value ? 'block' : 'none';
-    var loading = $("#loading")[0];
-    loading.style.display = value ? 'block' : 'none';
-}
 
 
 // wrapper function to update the light position
@@ -148,6 +141,20 @@ function tweenToPosition(durationA, durationB, zoom) {
     if (zoom)
         tweenLookAt.chain(tweenPosition);
     tweenLookAt.start();
+}
+
+
+// Displays the loading image
+function showSpinner(value) {
+    console.log("\tLoading Screen!!", value)
+    //document.getElementById(id).style.display = value ? 'block' : 'none';
+    var loading = $("#loading")[0];
+
+    if (value)
+        spinner.spin(loading);
+    else
+        spinner.stop();
+
 }
 
 

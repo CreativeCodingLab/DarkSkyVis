@@ -5,6 +5,8 @@
 
 if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
+var spinner;  // our Loading spinner thing
+
 // Three.js components
 var container;                        // WebGL container, fps stats
 var scene, renderer;                  // scene, renderer
@@ -63,6 +65,8 @@ function Start() {
  * ==========================================
  */
 function onCreate() {
+
+    initSpinner();  // get this up and running first thing
 
     /* -------------------------------*/
     /*      Setting the stage         */

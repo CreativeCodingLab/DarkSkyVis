@@ -40,7 +40,7 @@ strong, b {
  * Shamelessly stolen Spinner code
  * http://www.html5rocks.com/en/tutorials/es6/promises/#toc-lib-compatibility
  ***********************************/
-#loading {
+/*#loading {
     position: absolute;
     top: 0;
     left: 0;
@@ -49,10 +49,11 @@ strong, b {
     height: 100vh;
     background-color: rgba(10,10,10, 0.5);
     background-image: url("assets/loading.jpg");
-    /*background-image: url("http://i.stack.imgur.com/MnyxU.gif");*/
+    background-image: url("http://i.stack.imgur.com/MnyxU.gif");
     background-repeat: no-repeat;
     background-position: center;
 }
+*/
 /**********************************
  * Settings for the Slider values
  ***********************************/

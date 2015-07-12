@@ -399,22 +399,63 @@
 			"file": "javascript/js/app/Step8.js",
 			"settings":
 			{
-				"buffer_size": 31376,
+				"buffer_size": 5287,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"contents": "\n<!DOCTYPE html>\n<html lang=\"en\">\n    <head>\n        <title>three.js webgl - interactive cubes</title>\n        <meta charset=\"utf-8\">\n        <meta name=\"viewport\" content=\"width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0\">\n        <style>\n            body {\n                font-family: Monospace;\n                background-color: #f0f0f0;\n                margin: 0px;\n                overflow: hidden;\n            }\n        </style>\n    </head>\n    <body>\n\n        <script src=\"../build/three.min.js\"></script>\n\n        <script src=\"js/libs/stats.min.js\"></script>\n\n        <script>\n\n            var container, stats;\n            var camera, scene, raycaster, renderer;\n\n            var mouse = new THREE.Vector2(), INTERSECTED;\n            var radius = 100, theta = 0;\n\n            init();\n            animate();\n\n            function init() {\n\n                container = document.createElement( 'div' );\n                document.body.appendChild( container );\n\n                var info = document.createElement( 'div' );\n                info.style.position = 'absolute';\n                info.style.top = '10px';\n                info.style.width = '100%';\n                info.style.textAlign = 'center';\n                info.innerHTML = '<a href=\"http://threejs.org\" target=\"_blank\">three.js</a> webgl - interactive cubes';\n                container.appendChild( info );\n\n                camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, - 500, 1000 );\n\n                scene = new THREE.Scene();\n\n                var light = new THREE.DirectionalLight( 0xffffff, 1 );\n                light.position.set( 1, 1, 1 ).normalize();\n                scene.add( light );\n\n                var geometry = new THREE.BoxGeometry( 20, 20, 20 );\n\n                for ( var i = 0; i < 2000; i ++ ) {\n\n                    var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );\n\n                    object.position.x = Math.random() * 800 - 400;\n                    object.position.y = Math.random() * 800 - 400;\n                    object.position.z = Math.random() * 800 - 400;\n\n                    object.rotation.x = Math.random() * 2 * Math.PI;\n                    object.rotation.y = Math.random() * 2 * Math.PI;\n                    object.rotation.z = Math.random() * 2 * Math.PI;\n\n                    object.scale.x = Math.random() + 0.5;\n                    object.scale.y = Math.random() + 0.5;\n                    object.scale.z = Math.random() + 0.5;\n\n                    scene.add( object );\n\n                }\n\n                raycaster = new THREE.Raycaster();\n\n                renderer = new THREE.WebGLRenderer();\n                renderer.setClearColor( 0xf0f0f0 );\n                renderer.setPixelRatio( window.devicePixelRatio );\n                renderer.setSize( window.innerWidth, window.innerHeight );\n                renderer.sortObjects = false;\n                container.appendChild(renderer.domElement);\n\n                stats = new Stats();\n                stats.domElement.style.position = 'absolute';\n                stats.domElement.style.top = '0px';\n                container.appendChild( stats.domElement );\n\n                document.addEventListener( 'mousemove', onDocumentMouseMove, false );\n\n                //\n\n                window.addEventListener( 'resize', onWindowResize, false );\n\n            }\n\n            function onWindowResize() {\n\n                camera.left = window.innerWidth / - 2;\n                camera.right = window.innerWidth / 2;\n                camera.top = window.innerHeight / 2;\n                camera.bottom = window.innerHeight / - 2;\n\n                camera.updateProjectionMatrix();\n\n                renderer.setSize( window.innerWidth, window.innerHeight );\n\n            }\n\n            function onDocumentMouseMove( event ) {\n\n                event.preventDefault();\n\n                mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;\n                mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;\n\n            }\n\n            //\n\n            function animate() {\n\n                requestAnimationFrame( animate );\n\n                render();\n                stats.update();\n\n            }\n\n            function render() {\n\n                theta += 0.1;\n\n                camera.position.x = radius * Math.sin( THREE.Math.degToRad( theta ) );\n                camera.position.y = radius * Math.sin( THREE.Math.degToRad( theta ) );\n                camera.position.z = radius * Math.cos( THREE.Math.degToRad( theta ) );\n                camera.lookAt( scene.position );\n\n                camera.updateMatrixWorld();\n\n                // find intersections\n\n                raycaster.setFromCamera( mouse, camera );\n\n                var intersects = raycaster.intersectObjects( scene.children );\n\n                if ( intersects.length > 0 ) {\n\n                    if ( INTERSECTED != intersects[ 0 ].object ) {\n\n                        if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );\n\n                        INTERSECTED = intersects[ 0 ].object;\n                        INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();\n                        INTERSECTED.material.emissive.setHex( 0xff0000 );\n\n                    }\n\n                } else {\n\n                    if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );\n\n                    INTERSECTED = null;\n\n                }\n\n                renderer.render( scene, camera );\n\n            }\n\n        </script>\n\n    </body>\n</html>\n",
+			"file": "javascript/js/app/Initializers.js",
 			"settings":
 			{
-				"buffer_size": 5704,
+				"buffer_size": 5057,
 				"line_ending": "Unix"
 			}
 		},
 		{
+			"file": "javascript/js/app/Listeners.js",
 			"settings":
 			{
-				"buffer_size": 0,
+				"buffer_size": 2852,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "javascript/js/app/HaloUtils.js",
+			"settings":
+			{
+				"buffer_size": 12275,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/Users/krbalmryde/node_modules/nifti-js/README.md",
+			"settings":
+			{
+				"buffer_size": 1340,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "javascript/js/app/GUIutils.js",
+			"settings":
+			{
+				"buffer_size": 10434,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "javascript/js/app/Useful.js",
+			"settings":
+			{
+				"buffer_size": 5848,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "data/dev/miniTreeTest.dat",
+			"settings":
+			{
+				"buffer_size": 11155,
 				"line_ending": "Unix"
 			}
 		}
@@ -426,10 +467,18 @@
 	"build_varint": "",
 	"command_palette":
 	{
-		"height": 400.0,
-		"last_filter": "",
+		"height": 203.0,
+		"last_filter": "jsa",
 		"selected_items":
 		[
+			[
+				"jsa",
+				"Set Syntax: JavaScript"
+			],
+			[
+				"py",
+				"Set Syntax: Python"
+			],
 			[
 				"js",
 				"Set Syntax: JavaScript"
@@ -461,10 +510,6 @@
 			[
 				"java",
 				"Set Syntax: JavaScript"
-			],
-			[
-				"py",
-				"Set Syntax: Python"
 			],
 			[
 				"mar",
@@ -823,9 +868,25 @@
 	],
 	"file_history":
 	[
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/.gitignore",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/python/HaloUtils.py",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/data/dev/miniTreeTest.dat",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/js/assets/tree_31410.json",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/js/app/GUIutils.js",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/js/app/Initializers.js",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/js/app/Useful.js",
+		"/Users/krbalmryde/.bash_aliases",
+		"/Users/krbalmryde/.bash_functions",
+		"/Users/krbalmryde/.bash_profile",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/python/HaloUtils.py",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/python/extractHaloTree.py",
+		"/Users/krbalmryde/Library/Enthought/Canopy_64bit/User/lib/python2.7/site-packages/thingking/utils.py",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/js/app/Initialize.js",
+		"/Users/krbalmryde/Library/Enthought/Canopy_64bit/User/lib/python2.7/site-packages/thingking/httpmmap.py",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/data/rockstar/tree/tree_0_0_0.dat",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/data/dev/tree_parse_test.dat",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/python/exractHaloTree.py",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/js/app/Step8.js",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/js/app/examples/three_interactive_cubes.html",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/.gitignore",
 		"/Users/krbalmryde/Dropbox/Class-projects/cs424/HW3/RightHereRightNow.github.io/APP/framework/markers/HaloController.js",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/js/config.js",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/css/style.css",
@@ -845,12 +906,8 @@
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/js/app/examples/HaloWorld.js",
 		"/Users/krbalmryde/Dropbox/Class-projects/cs424/projects/SweetHomeChicago/chicago.js",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/js/app/Step7.js",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/data/dev/miniTreeTest.dat",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/js/app/iterations/Step5.js",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/js/app/examples/three.js webgl - multiple views.html",
-		"/Users/krbalmryde/.bash_profile",
-		"/Users/krbalmryde/.bash_aliases",
-		"/Users/krbalmryde/.bash_functions",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/README.md",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/src/Step6.js",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis-bc/javascript/js/app/iterations/Step6.js",
@@ -860,7 +917,6 @@
 		"/Users/krbalmryde/Dropbox/Class-projects/cs424/projects/SweetHomeChicago/index.html",
 		"/Users/krbalmryde/Dropbox/Class-projects/cs424/HW1/chicago.js",
 		"/Users/krbalmryde/Dropbox/Class-projects/cs424/HW1/step-7.html",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/data/rockstar/tree/tree_0_0_0.dat",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/data/rockstar/tree/locations.dat",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/data/dev/tree679582.js",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/data/dev/tree679582.json",
@@ -939,18 +995,7 @@
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/css/jquery.nouislider.css",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/css/jquery.nouislider.pips.css",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/css/jquery.nouislider.min.css",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyPy/__forlater.py",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/src/Step1.js",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/LTG/processing-poster-client/src/main/resources/closeQT.sh",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/js/dat.gui.min.js",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/js/dat.gui.js",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/js/OrbitControls.js",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/src/Step012.js",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/src/Step0.js",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyPy/vtkDarkSkyParticles.py",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyPy/utils/vtkDarkSkyUtilities.py",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyVis.xcodeproj/project.pbxproj",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/darksky/vtkExtractHaloContents.py"
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyPy/__forlater.py"
 	],
 	"find":
 	{
@@ -961,6 +1006,10 @@
 		"height": 95.0,
 		"where_history":
 		[
+			"*.js",
+			"",
+			".",
+			"",
 			"chicago_health.json",
 			""
 		]
@@ -970,6 +1019,59 @@
 		"case_sensitive": true,
 		"find_history":
 		[
+			"HaloSelect",
+			"resetHaloBranchs",
+			"config.scale",
+			"haloSelectionBox",
+			"__updateData",
+			"tweenToPosition",
+			"intoTheAbyss",
+			"GUIcontrols.prototype.__goTo",
+			"goTo",
+			"jumpTo",
+			"min",
+			"HaloLUT",
+			" Lines",
+			"\\sLines",
+			"Display ",
+			"/*",
+			"Turn Halo",
+			"guiBox",
+			"haloStats",
+			"if (halo)",
+			"updateAllTheGeometry",
+			"displayHalos()",
+			"displayHalos();",
+			"toHead",
+			"HaloSpheres[id]",
+			"__",
+			"initHaloTree",
+			"showSpinner",
+			"\\sLines",
+			"Lines",
+			"lines",
+			"Lines",
+			"handleColorChange",
+			".json",
+			"\"scale\": \"0.12\"",
+			"\"scale\"",
+			"httpfile",
+			"675556",
+			"#tree ",
+			"halo",
+			"os.path",
+			"#tree",
+			"haloJSON",
+			"jsonFN",
+			"tree",
+			"tk",
+			"#tree",
+			"105205",
+			"Lines",
+			"Lights",
+			"light.position.set(camera.position.x, camera.position.y, camera.position.z);",
+			"controls.update();",
+			"tweenToPosition",
 			"mvir",
 			"rvir",
 			"light",
@@ -1044,60 +1146,7 @@
 			"add_chunk",
 			"add_particles",
 			"add_chunk",
-			"toggleVisibility",
-			".opacity = ",
-			".opacity = 0.8;",
-			"\"<b>\"+ ",
-			"(",
-			" ",
-			"50",
-			");\n",
-			"50",
-			"toggleVisibility",
-			"__resetHaloBranch",
-			"HaloBranch",
-			"toggleVisibility",
-			"config",
-			"updateAllTheGeometry",
-			"HaloLines",
-			"HaloBranch",
-			"colorKey",
-			"i",
-			"id",
-			"lineMesh",
-			"HaloBranch",
-			"color",
-			"createPathLine",
-			"displayHaloData",
-			"start",
-			"var",
-			"displayHaloData",
-			"i][k",
-			"i",
-			"lineMesh",
-			"createPathLine",
-			"createSphere",
-			"Traversed",
-			"Halos",
-			"[i][k]",
-			"HaloLines[i][j]",
-			"HaloLines",
-			"\\sHalo[s]",
-			"halo",
-			"Halo",
-			"halo",
-			"Halo",
-			"halo",
-			"Halo",
-			"halo",
-			"Halo",
-			"log",
-			"M500",
-			"M500c",
-			".opacity",
-			".js",
-			"lib",
-			"js/"
+			"toggleVisibility"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -1161,7 +1210,7 @@
 	"groups":
 	[
 		{
-			"selected": 0,
+			"selected": 4,
 			"sheets":
 			[
 				{
@@ -1170,15 +1219,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 31376,
+						"buffer_size": 5287,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2020,
-								2020
+								427,
+								427
 							]
 						],
 						"settings":
@@ -1188,66 +1237,218 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 2947.0,
+						"translation.y": 1180.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 0,
+					"stack_index": 6,
 					"type": "text"
 				},
 				{
 					"buffer": 1,
+					"file": "javascript/js/app/Initializers.js",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 5704,
+						"buffer_size": 5057,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								444,
-								444
+								5057,
+								5057
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/HTML/HTML.tmLanguage",
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 2669.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 7,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "javascript/js/app/Listeners.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2852,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								686,
+								686
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1004.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 2,
 					"type": "text"
 				},
 				{
-					"buffer": 2,
+					"buffer": 3,
+					"file": "javascript/js/app/HaloUtils.js",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 0,
+						"buffer_size": 12275,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								8077,
+								8077
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/Text/Plain text.tmLanguage"
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 3692.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "/Users/krbalmryde/node_modules/nifti-js/README.md",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1340,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1340,
+								1340
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Markdown/Markdown.tmLanguage"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "javascript/js/app/GUIutils.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 10434,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								9270,
+								9270
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 2300.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "javascript/js/app/Useful.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 5848,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								870,
+								1872
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 214.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "data/dev/miniTreeTest.dat",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 11155,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1140,
+								1145
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage",
+							"tab_size": 3,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
 					"type": "text"
 				}
 			]
@@ -1255,7 +1456,7 @@
 	],
 	"incremental_find":
 	{
-		"height": 26.0
+		"height": 38.0
 	},
 	"input":
 	{
@@ -1305,6 +1506,22 @@
 		"last_filter": "",
 		"selected_items":
 		[
+			[
+				"ini",
+				"javascript/js/app/Initialize.js"
+			],
+			[
+				"tree_",
+				"data/rockstar/tree/tree_0_0_0.dat"
+			],
+			[
+				"step8",
+				"javascript/js/app/Step8.js"
+			],
+			[
+				"use",
+				"javascript/js/app/Useful.js"
+			],
 			[
 				"sty",
 				"javascript/css/style.css"
@@ -1488,10 +1705,6 @@
 			[
 				"read",
 				"README.md"
-			],
-			[
-				"use",
-				"darksky/utils/vtkDarkSkyUtilities.py"
 			],
 			[
 				"utili",
@@ -1804,18 +2017,6 @@
 			[
 				"progr",
 				"src/Program.cpp"
-			],
-			[
-				"mri",
-				"Utilities/.Utilities.backup/MRI.py"
-			],
-			[
-				"java",
-				"Scripts/Java/JavaBatRecursion/JavaBat_Recursion.java"
-			],
-			[
-				"ass2",
-				"CLASS/cs372/ass2.hs"
 			]
 		],
 		"width": 0.0
@@ -1849,7 +2050,7 @@
 	"show_minimap": false,
 	"show_open_files": true,
 	"show_tabs": true,
-	"side_bar_visible": false,
+	"side_bar_visible": true,
 	"side_bar_width": 219.0,
 	"status_bar_visible": true,
 	"template_settings":
