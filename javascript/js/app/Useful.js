@@ -26,25 +26,36 @@ function displayHalos() {
         var i;
         if (config.showHalos)
             sphereGroup.children.forEach(function(mesh) {
-                i = mesh.halo_period;
-                mesh.visible = (i >= EPOCH_HEAD && i <= EPOCH_TAIL)? config.showHalos : false;
+                i = +mesh.halo_period;
+                mesh.visible = (i >= EPOCH_HEAD && i <= EPOCH_TAIL)? true : false;
                 if (curTarget && mesh.position !== curTarget.object.position){
                     mesh.material.color.set(colorKey(i));
                     mesh.material.opacity = 0.4;
                 }
-
             });
 
         if (config.showPaths)
             linesGroup.children.forEach(function(lineMesh) {
                 i = lineMesh.halo_period;
-                lineMesh.visible = (i >= EPOCH_HEAD && i < EPOCH_TAIL)? config.showPaths : false;
+                lineMesh.visible = (i >= EPOCH_HEAD && i < EPOCH_TAIL)? true : false;
             });
     }
 }
 
 // Controls the visibility of the object in question
-function toggleVisibility(HaloObject, isVisible, opacity) {
+function toggleVisibility(haloObjectGroup, isVisible, opacity) {
+    if (isVisible)
+        haloObjectGroup.children.forEach(function(objMesh) {
+            i = +objMesh.halo_period;
+            objMesh.visible = (i >= EPOCH_HEAD && i < EPOCH_TAIL)? true : false;
+            if (opacity){
+                console.log("toggleVisibility", i, opacity);
+                objMesh.material.opacity = opacity;
+
+            }
+
+        });
+
 
     for (var i=EPOCH_HEAD; i<EPOCH_TAIL+1; i++) {
 

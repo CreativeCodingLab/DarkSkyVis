@@ -540,6 +540,7 @@ function onMouseMove( event ) {
 
 }
 
+
 function onMouseDblClick() {
 
     console.log("Double Click!!", curTarget.object.halo_id);
@@ -567,6 +568,7 @@ function onMouseDblClick() {
 
 }
 
+
 function __resetHaloBranch() {
 
     for (var id in HaloSelect) {
@@ -589,7 +591,6 @@ function __resetHaloBranch() {
 
 // given a clicked Halo id, traverse the tree with the given halo.
 
-//
 function intoTheAbyss(id, period, points) {
 
     var halo = HaloLUT[id];  // use the ID to pull the halo
@@ -618,6 +619,7 @@ function intoTheAbyss(id, period, points) {
     }
 
 }
+
 
 function traceBackPath(id, period, points) {
 
@@ -721,7 +723,6 @@ function onKeyPress( event ) {
 }
 
 
-
 function tweenToPosition(durationA, durationB) {
 
     console.log("we are tweenToPosition!");
@@ -767,6 +768,7 @@ function tweenToPosition(durationA, durationB) {
 
 }
 
+
 /* ================================== *
  *          onFrame
  *  Our Main rendering loop with
@@ -788,6 +790,7 @@ function onFrame() {
     render();
 
 }
+
 
 /* ================================== *
  *          render
@@ -1022,6 +1025,7 @@ function intoTheVoid(id, points, steps) {
 
 }
 
+
 function createSphere(id, color, index) {
 
     var halo = HaloLUT[id];
@@ -1095,6 +1099,7 @@ function createPathLine(points, color, id, period) {
 
 }
 
+
 // kind of a misleading function name
 function displayHaloData() {
 
@@ -1135,7 +1140,7 @@ function updateAllTheGeometry() {
         toggleVisibility(HaloSelect,config.showHalos, 0.05);
     } else{
         displayHaloData();
-    };
+    }
 
 
 }

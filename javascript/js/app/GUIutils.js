@@ -40,19 +40,19 @@ GUIcontrols.prototype.__setColor = function() {
     colorKey = d3.scale.linear()
         .domain([0, 18, 36, 53, 71, NUMTIMEPERIODS])
         .range([this.color0, this.color1, this.color2, this.color3, this.color4]);
+    for (var id in HaloLUT) {
 
-    for (var i = 0; i < EPOCH_PERIODS.length; i++) {
+        var i = +HaloLUT[id].time;
 
-        for (var j = 0; j < EPOCH_PERIODS[i].length; j++) {
+        // Set Halo Line Visibility
+        if (linesGroup.getObjectByName(id)){
+            // console.log("\tdisplaying Halo line?", i, id, config.showPaths, EPOCH_HEAD, EPOCH_TAIL)
+            linesGroup.getObjectByName(id).visible = (i >= EPOCH_HEAD && i < EPOCH_TAIL)? config.showPaths : false;
+            linesGroup.getObjectByName(id).material.color.set(colorKey(i));
+        }
 
-            var id = EPOCH_PERIODS[i][j];
-            // Set Halo Line Visibility
-            if (HaloLines[id]){
-                // console.log("\tdisplaying Halo line?", i, id, config.showPaths, EPOCH_HEAD, EPOCH_TAIL)
-                HaloLines[id].visible = (i >= EPOCH_HEAD && i < EPOCH_TAIL)? config.showPaths : false;
-                HaloLines[id].material.color.set(colorKey(i));
-            }
-            // Set Halo Spheres Visibility
+        // Set Halo Spheres Visibility
+        if(sphereGroup.getObjectByName(id)) {
             sphereGroup.getObjectByName(id).visible = (i >= EPOCH_HEAD && i <= EPOCH_TAIL)? config.showHalos : false;
             sphereGroup.getObjectByName(id).material.color.set(colorKey(i));
         }
@@ -80,7 +80,7 @@ GUIcontrols.prototype.__animateSlider = function(offset) {
     tweenToTail.chain(tweenToHead);
     tweenToTail.start();
 
-}
+};
 
 GUIcontrols.prototype.__goToHead = function() {
     var halo;
@@ -97,7 +97,7 @@ GUIcontrols.prototype.__goToHead = function() {
         }
     }
     this.__resetView(halo);
-}
+};
 
 GUIcontrols.prototype.__goToCenter = function() {
     var halo;
@@ -112,7 +112,7 @@ GUIcontrols.prototype.__goToCenter = function() {
     }
 
     this.__resetView(halo);
-}
+};
 
 GUIcontrols.prototype.__goToTail = function() {
     var halo;
@@ -129,7 +129,7 @@ GUIcontrols.prototype.__goToTail = function() {
         }
     }
     this.__resetView(halo);
-}
+};
 
 GUIcontrols.prototype.__resetView = function(halo) {
     console.log("You hit the reset button!!", halo);
@@ -266,7 +266,7 @@ function initGUI() {
             "680462 4.0M", "679582 6.0M",
         ]);
         data.name("Tree #");
-        data.onFinishChange(function(value) {
+        data.onFinishChange(function() {
             config.__updateData();
         });
 
@@ -347,4 +347,4 @@ function initGUI() {
         colorBox.addColor(config, "color4").onChange(function() { config.__setColor() } );
 
     }
-}
+};

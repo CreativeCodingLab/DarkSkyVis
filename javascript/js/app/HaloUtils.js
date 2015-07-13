@@ -117,7 +117,7 @@ function createSphereGeometry(halo) {
  * ================================== */
 function createHaloLineGeometry() {
     console.log("\tcreateHaloLineGeometry(TimePeriods)",HaloLUT);
-    var i, _lines = {length:0}
+    var _lines = {length:0}
 
     for (var id in HaloLUT) {
         console.log("\t", typeof id, id, (id !== "length" && id !== "max" && id !== "min") )
@@ -141,44 +141,35 @@ function createHaloLineGeometry() {
     for (var id in _lines) {
         if  (id !== "length" && id !== "max" && id !== "min") {
             for (var j=0; j < _lines[id].length; j++) {
-                var i = HaloLUT[+id].time
+                var i = +HaloLUT[+id].time
                 var segment = _lines[id][j].points;
                 if (segment.length > 1)
                     createPathLine(segment, colorKey(i), id, i);
             }
         }
     }
+    linesGroup.visible = false;
     console.log("\tLines have been created")
     // set the visibility of the halo data
 }
 
 // Helper function
 function intoTheVoid(id, points, steps) {
-    console.log('\tintoTheVoid',id);
+    //console.log('\tintoTheVoid',id);
     var maxSteps = 1;
     var halo = HaloLUT[id];  // use the ID to pull the halo
     points.push(halo.position);
-    //points.push([halo.x,halo.y,halo.z,halo.id,halo.desc_id]); // for debugging purposes
 
-    //if (halo.desc_id in HaloLUT && halo.time < EPOCH_TAIL) {
 
     if (halo.desc_id in HaloLUT && steps < maxSteps) {
 
         var next = HaloLUT[halo.desc_id];
 
         if (halo.desc_id in __traversed) {
-
-            //if (halo.time === next.time){
-            //    console.log('\t',halo.time, next.time, halo.id, next.id, halo.position, next.position);
-            //    return [];
-            //}
-            //console.log("\t\tAdding", halo.id, "to points", halo.time, next.position);
             points.push(next.position);
-            //points.push([next.x,next.y,next.z,next.id,next.desc_id]); // for debugging purposes
             return points;
         } else {
             __traversed[halo.id] = true;
-            //console.log("\t\tAdding", halo.id, "to __traversed", halo.time);
             return intoTheVoid(next.id, points, steps+1);
         }
     } else {
@@ -190,7 +181,7 @@ function intoTheVoid(id, points, steps) {
 
 
 function createPathLine(points, color, id, period) {
-    console.log("createPathLine(points, color, id, period)", points, id, period)
+    //console.log("createPathLine(points, id, period)", points, typeof id, typeof period)
     // if points is defined at all...
     if (points && points.length > 1) {
 
@@ -209,7 +200,7 @@ function createPathLine(points, color, id, period) {
             xyz = spline.getPoint(index);
 
             splineGeometry.vertices[i] = new THREE.Vector3( xyz.x, xyz.y, xyz.z );
-            console.log(splineGeometry.vertices)
+            //console.log(splineGeometry.vertices)
             colors[ i ] = new THREE.Color(color);
         }
 
@@ -225,13 +216,13 @@ function createPathLine(points, color, id, period) {
         });
 
         var mesh = new THREE.Line(splineGeometry, material);
-
-        mesh.visible = (period >= EPOCH_HEAD && period < EPOCH_TAIL)? config.showPaths : false;
+        mesh.visible = (+period >= EPOCH_HEAD && +period < EPOCH_TAIL)? true : false;
         mesh.name = +id;
         mesh.halo_id = +id;
-        mesh.halo_period = period;
+        mesh.halo_period = +period;
         linesGroup.add(mesh);
-        console.log(mesh);
+        //console.log(mesh);
+
     }
 
 }
