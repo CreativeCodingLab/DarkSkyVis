@@ -1,3 +1,4 @@
+"use strict";
 
 // Useful function to help me and my lack of hex understanding
 function rgbToHex(R,G,B){
@@ -23,67 +24,22 @@ function updateLightPosition() {
 function displayHalos() {
     if (!DEFERRED) {
         var i;
-        sphereGroup.children.forEach(function(mesh) {
-            i = mesh.halo_period;
-            mesh.visible = (i >= EPOCH_HEAD && i <= EPOCH_TAIL)? config.showHalos : false;
-            if (curTarget && mesh.position !== curTarget.object.position){
-                mesh.material.color.set(colorKey(i));
-                mesh.material.opacity = 0.4;
-            }
+        if (config.showHalos)
+            sphereGroup.children.forEach(function(mesh) {
+                i = mesh.halo_period;
+                mesh.visible = (i >= EPOCH_HEAD && i <= EPOCH_TAIL)? config.showHalos : false;
+                if (curTarget && mesh.position !== curTarget.object.position){
+                    mesh.material.color.set(colorKey(i));
+                    mesh.material.opacity = 0.4;
+                }
 
-        });
+            });
 
-        linesGroup.children.forEach(function(lineMesh) {
-            lineMesh.visible = (i >= EPOCH_HEAD && i < EPOCH_TAIL)? config.showPaths : false;
-        });
-
-
-        //for(id in HaloLUT) {
-        //
-        //    if (id !== "length" || id !== "min" || id !== "max"){
-        //
-        //        var i = HaloLUT[id].time;
-        //        // console.log("HaloLUT foreach", i, id)
-        //        if (HaloLines[id])
-        //            // console.log("\tdisplaying Halo line?", i, id, config.showPaths, EPOCH_HEAD, EPOCH_TAIL)
-        //            HaloLines[id].visible = (i >= EPOCH_HEAD && i < EPOCH_TAIL)? config.showPaths : false;
-        //
-        //        if (sphereGroup.getObjectByName(id)){
-        //            // Set Halo Spheres Visibility
-        //            sphereGroup.getObjectByName(id).visible = (i >= EPOCH_HEAD && i <= EPOCH_TAIL)? config.showHalos : false;
-        //
-        //            if (curTarget && sphereGroup.getObjectByName(id).position !== curTarget.object.position){
-        //                console.log("displayHalos adjust colors", colorKey(i));
-        //                sphereGroup.getObjectByName(id).material.color.set(colorKey(i));
-        //                sphereGroup.getObjectByName(id).material.opacity = 0.4;
-        //            }
-        //        }
-        //
-        //    }
-        //}
-
-
-        // for (var i = 0; i < EPOCH_PERIODS.length; i++) {
-
-        //     for (var j = 0; j < EPOCH_PERIODS[i].length; j++) {
-
-        //         var id = EPOCH_PERIODS[i][j];
-        //         // Set Halo Line Visibility
-        //         if (HaloLines[id])
-        //             // console.log("\tdisplaying Halo line?", i, id, config.showPaths, EPOCH_HEAD, EPOCH_TAIL)
-        //             HaloLines[id].visible = (i >= EPOCH_HEAD && i < EPOCH_TAIL)? config.showPaths : false;
-
-        //         if (sphereGroup.getObjectByName(id))
-        //             // Set Halo Spheres Visibility
-        //             sphereGroup.getObjectByName(id).visible = (i >= EPOCH_HEAD && i <= EPOCH_TAIL)? config.showHalos : false;
-
-        //         if (curTarget && sphereGroup.getObjectByName(id).position !== curTarget.object.position){
-        //             console.log("displayHalos adjust colors", colorKey(i));
-        //             sphereGroup.getObjectByName(id).material.color.set(colorKey(i));
-        //             sphereGroup.getObjectByName(id).material.opacity = 0.4;
-        //         }
-        //     }
-        // }
+        if (config.showPaths)
+            linesGroup.children.forEach(function(lineMesh) {
+                i = lineMesh.halo_period;
+                lineMesh.visible = (i >= EPOCH_HEAD && i < EPOCH_TAIL)? config.showPaths : false;
+            });
     }
 }
 

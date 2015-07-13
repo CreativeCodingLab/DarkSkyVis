@@ -2,6 +2,7 @@
  * Created by krbalmryde on 7/7/15.
  */
 
+"use strict";
 
 // *****************************
 //      Order does matter
@@ -253,7 +254,7 @@ function initSceneActors(url) {
         .done(function() {
             console.log("\tDone")
             showSpinner(false);
-            createHaloLineGeometry(EPOCH_PERIODS);
+            createHaloLineGeometry();
             console.log("\tHaloLUT", HaloLUT.length, HaloLUT.min, HaloLUT.max,"\n");
             return oboe.drop;
         });

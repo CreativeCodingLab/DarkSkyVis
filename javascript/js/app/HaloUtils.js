@@ -2,6 +2,7 @@
  * Created by krbalmryde on 7/9/15.
  */
 
+"use strict";
 /* ================================== *
  *          initHaloTree
  *  Our render function which renders
@@ -114,39 +115,46 @@ function createSphereGeometry(halo) {
  *  NB: A number of helper functions
  *  included below
  * ================================== */
-function createHaloLineGeometry(TimePeriods) {
-    console.log("\tcreateHaloLineGeometry(TimePeriods)");
-    var i, _lines = []
+function createHaloLineGeometry() {
+    console.log("\tcreateHaloLineGeometry(TimePeriods)",HaloLUT);
+    var i, _lines = {length:0}
 
     for (var id in HaloLUT) {
+        console.log("\t", typeof id, id, (id !== "length" && id !== "max" && id !== "min") )
+        if  (id !== "length" && id !== "max" && id !== "min") {
 
-        i = HaloLUT[id].time;
-        if (!_lines[i])
-            _lines[i] = [];
+            if (!_lines[id]) {
+                _lines[id] = [];
+            }
+            _lines.length++;
+            console.log(id,  _lines.length, _lines[id].length)
 
-        if (!(id in __traversed)) {
+            //console.log("\t",typeof id, id, +id, i, _lines[i]);
+            if (!(+id in __traversed)) {
 
-            var points = intoTheVoid(id, [], 0);
-            _lines[i].push( { 'points': points, 'id': id } );
+                var points = intoTheVoid(+id, [], 0);
+                _lines[id].push({'points': points, 'id': id});
+            }
         }
     }
-
-    for (i = 0; i < _lines.length; i++) {
-        for (var j = 0; j < _lines[i].length; j++){
-            var id = _lines[i][j].id;
-            var segment = _lines[i][j].points;
-            if (segment.length > 1)
-                createPathLine(segment, colorKey(i), id, i);
+    console.log("lets make some segments!");
+    for (var id in _lines) {
+        if  (id !== "length" && id !== "max" && id !== "min") {
+            for (var j=0; j < _lines[id].length; j++) {
+                var i = HaloLUT[+id].time
+                var segment = _lines[id][j].points;
+                if (segment.length > 1)
+                    createPathLine(segment, colorKey(i), id, i);
+            }
         }
     }
     console.log("\tLines have been created")
     // set the visibility of the halo data
-
 }
 
 // Helper function
 function intoTheVoid(id, points, steps) {
-
+    console.log('\tintoTheVoid',id);
     var maxSteps = 1;
     var halo = HaloLUT[id];  // use the ID to pull the halo
     points.push(halo.position);
@@ -182,7 +190,7 @@ function intoTheVoid(id, points, steps) {
 
 
 function createPathLine(points, color, id, period) {
-
+    console.log("createPathLine(points, color, id, period)", points, id, period)
     // if points is defined at all...
     if (points && points.length > 1) {
 
@@ -199,29 +207,31 @@ function createPathLine(points, color, id, period) {
 
             index = i/numPoints;
             xyz = spline.getPoint(index);
+
             splineGeometry.vertices[i] = new THREE.Vector3( xyz.x, xyz.y, xyz.z );
+            console.log(splineGeometry.vertices)
             colors[ i ] = new THREE.Color(color);
         }
 
         splineGeometry.colors = colors;
-        splineGeometry.computeBoundingSphere();
+        splineGeometry.computeLineDistances();
 
-        var mesh = new THREE.Line(
-            splineGeometry,
-            new THREE.LineBasicMaterial({
-                color: rgbToHex(255, 255, 255),
-                linewidth: 0.5,
-                vertexColors: THREE.VertexColors,
-                transparent: true,
-                opacity: 0.5
-            })
-        );
+        var material = new THREE.LineBasicMaterial({
+            color: rgbToHex(255, 255, 255),
+            linewidth: 0.5,
+            vertexColors: THREE.VertexColors,
+            transparent: true,
+            opacity: 0.5
+        });
+
+        var mesh = new THREE.Line(splineGeometry, material);
+
         mesh.visible = (period >= EPOCH_HEAD && period < EPOCH_TAIL)? config.showPaths : false;
-        mash.name = id;
-        mesh.halo_id = id;
+        mesh.name = +id;
+        mesh.halo_id = +id;
         mesh.halo_period = period;
         linesGroup.add(mesh);
-        console.log(linesGroup);
+        console.log(mesh);
     }
 
 }
@@ -356,7 +366,6 @@ function prepGlobalStructures() {
     //  can ensure we get an accurate representation of the halos time frame
     HaloLUT = {length: 0, min: NUMTIMEPERIODS, max: 0};
 
-
     EPOCH_PERIODS = [];
     for (var i = 0; i < NUMTIMEPERIODS; i++) {
 
@@ -370,26 +379,30 @@ function resetGlobalStructures() {
     for (id in HaloLUT) {
      //console.log("\t",typeof id, id);
         if (linesGroup.getObjectByName(+id)) {
-            linesGroup.remove(linesGroup.getObjectByName(+id));
-            linesGroup.getObjectByName(+id).geometry.dispose();
-            linesGroup.getObjectByName(+id).material.dispose();
+            var line = linesGroup.getObjectByName(+id)
+
+            linesGroup.remove(line);
+
+            line.getObjectByName(+id).geometry.dispose();
+            line.getObjectByName(+id).material.dispose();
         }
 
         if (sphereGroup.getObjectByName(+id)) {
-            console.log("\tsphere",typeof id, id);
+            //console.log("\tsphere",typeof id, id);
             var mesh = sphereGroup.getObjectByName(+id);
+
             sphereGroup.remove(mesh);
             mesh.geometry.dispose();
             mesh.material.dispose();
             //delete sphereGroup.getObjectByName(id);
         }
-        if  (id !== "length" || id !== "max" || id !== "min"){
+        if  (id !== "length" && id !== "max" && id !== "min"){
             delete HaloLUT[id];
             HaloLUT.length--;
         }
     }
     //sphereGroup.dispose();
     //linesGroup.dispose();
-    console.log("\t",sphereGroup, linesGroup, scene, HaloLUT);
+    console.log("\t",sphereGroup.children, linesGroup.children, scene, HaloLUT);
     prepGlobalStructures();
 }

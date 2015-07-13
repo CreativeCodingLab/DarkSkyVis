@@ -2,6 +2,8 @@
  * Created by krbalmryde on 7/9/15.
  */
 
+"use strict";
+
 function GUIcontrols() {
 
     // Display Halo Properties
@@ -180,13 +182,13 @@ GUIcontrols.prototype.__updateData = function() {
                     tweenToPosition(1500, 500, false);
                 }
             }
-            console.log("Oboe->>", path[0], halo.time, halo.id, targetSet)
+            //console.log("Oboe->>", path[0], halo.time, halo.id, targetSet)
             return oboe.drop;
         })
         .done(function() {
             showSpinner(false);
-            createHaloLineGeometry(EPOCH_PERIODS);
-            tweenToPosition(1500, 500, true);
+            createHaloLineGeometry();
+            that.__goToHead();
             console.log("\tHaloLUT", HaloLUT.length, HaloLUT.min, HaloLUT.max,"\n");
             return oboe.drop;
         });
