@@ -11,7 +11,7 @@ function GUIcontrols() {
     this.showHaloMap = true;
 
     // Choose Dataset
-    this.dataset = "676638 777K";
+    this.dataset = "679582 777K";
 
     // Reset Position
     this.goToHead = function () { this.__goToHead() };
@@ -51,8 +51,8 @@ GUIcontrols.prototype.__setColor = function() {
                 HaloLines[id].material.color.set(colorKey(i));
             }
             // Set Halo Spheres Visibility
-            HaloSpheres[id].visible = (i >= EPOCH_HEAD && i <= EPOCH_TAIL)? config.showHalos : false;
-            HaloSpheres[id].material.color.set(colorKey(i));
+            sphereGroup.getObjectByName(id).visible = (i >= EPOCH_HEAD && i <= EPOCH_TAIL)? config.showHalos : false;
+            sphereGroup.getObjectByName(id).material.color.set(colorKey(i));
         }
     }
 };
@@ -88,8 +88,8 @@ GUIcontrols.prototype.__goToHead = function() {
         for (var j = 0; j < EPOCH_PERIODS[i].length; j++) {
 
             var id = EPOCH_PERIODS[i][j];
-            if (HaloSpheres[id]) {
-                halo = HaloSpheres[id];
+            if (sphereGroup.getObjectByName(id)) {
+                halo = sphereGroup.getObjectByName(id);
                 if (halo !== undefined) break;
             }
         }
@@ -103,8 +103,8 @@ GUIcontrols.prototype.__goToCenter = function() {
     for (var j = 0; j < EPOCH_PERIODS[i].length; j++) {
 
         var id = EPOCH_PERIODS[i][j];
-        if (HaloSpheres[id]) {
-            halo = HaloSpheres[id];
+        if (sphereGroup.getObjectByName(id)) {
+            halo = sphereGroup.getObjectByName(id);
             if (halo !== undefined) break;
         }
     }
@@ -120,8 +120,8 @@ GUIcontrols.prototype.__goToTail = function() {
         for (var j = 0; j < EPOCH_PERIODS[i].length; j++) {
 
             var id = EPOCH_PERIODS[i][j];
-            if (HaloSpheres[id]) {
-                halo = HaloSpheres[id];
+            if (sphereGroup.getObjectByName(id)) {
+                halo = sphereGroup.getObjectByName(id);
                 if (halo) break;
             }
         }
@@ -155,19 +155,42 @@ GUIcontrols.prototype.__resetView = function(halo) {
 
 GUIcontrols.prototype.__updateData = function() {
     var that = this;
-    DEFERRED = true;
     var URL = "js/assets/tree_" + this.dataset.split(' ')[0] + ".json";
-    console.log("\tloading", URL)
-    initHaloTree(URL, false);
-    // getHaloTreeData(URL)
-    //     .then(function(response) {
-    //         //console.log("Fuck Yeah!", typeof response, response);
-    //         initHaloTree(response, false);
-    //     }).then(function() {
-    //         showSpinner(false);
-    //         // Always hide the spinner
-    //         that.__goToHead();
-    //     });
+    console.log("\nUpdating!", URL)
+
+    showSpinner(true);
+
+    oboe(URL)
+        .node("!.*", function(halo, path) {
+
+            if (path[0]==0) {
+                resetGlobalStructures();
+                initHaloTree(halo, true);
+                console.log("\tGetting Ready to reset shit!",halo.time)
+
+            } else {
+                initHaloTree(halo, false);
+
+                if(!targetSet && (halo.time >= EPOCH_HEAD && halo.time <= EPOCH_TAIL)) {
+                    console.log("\tTarget is in Range!")
+                    targetSet = true;
+                    prevTarget = null;
+                    curTarget = {object: sphereGroup.getObjectByName(halo.id)};
+                    curTarget.object.material.opacity = 0.7;
+                    DEFERRED = false;
+                    tweenToPosition(250, 250, true);
+                    onFrame()
+                }
+            }
+            console.log("Oboe->>", path, halo.time, halo.id, targetSet)
+            return oboe.drop;
+        })
+        .done(function() {
+            showSpinner(false);
+            createHaloLineGeometry(EPOCH_PERIODS);
+            console.log("\tHaloLUT", HaloLUT.length, HaloLUT.min, HaloLUT.max,"\n");
+            return oboe.drop;
+        });
 };
 
 
@@ -193,7 +216,8 @@ function initGUI() {
                 if (config.enableSelection)
                     toggleVisibility(HaloSelect,config.showHalos);
                 else
-                    toggleVisibility(HaloSpheres,config.showHalos);
+                    sphereGroup.visible = config.showHalos;
+                    // toggleVisibility(sphereGroup.getObjectByName,config.showHalos);
             });
         }
 
@@ -205,7 +229,7 @@ function initGUI() {
                 if (config.enableSelection)
                     toggleVisibility(HaloBranch,config.showPaths);
                 else
-                    toggleVisibility(HaloLines,config.showPaths);
+                    linesGroup.visible = config.showPaths;
             });
         }
 
@@ -277,7 +301,7 @@ function initGUI() {
                     renderer.setClearColor(rgbToHex(150,150,150), 1);
                 } else {
                     toggleVisibility(HaloLines, config.showPaths);
-                    toggleVisibility(HaloSpheres, config.showHalos);
+                    toggleVisibility(sphereGroup, config.showHalos);
                     renderer.setClearColor(rgbToHex(50,50,50), 1);
                 }
 
@@ -291,8 +315,8 @@ function initGUI() {
                 for (var i = 0; i < EPOCH_PERIODS.length; i++) {
                     for (var j = 0; j < EPOCH_PERIODS[i].length; j++) {
                         var id = EPOCH_PERIODS[i][j];
-                        if (HaloSpheres[id])
-                            HaloSpheres[id].scale.set(scale, scale, scale)
+                        if (sphereGroup.getObjectByName(id))
+                            sphereGroup.getObjectByName(id).scale.set(scale, scale, scale)
                     }
                 }
             })
@@ -315,7 +339,6 @@ function initGUI() {
      */
     var colorBox = guiBox.addFolder("Cosmetic");
     {
-        console.log("gui cosmetics",config.color0);
         colorBox.addColor(config, "color0").onChange(function() { config.__setColor() } );
         colorBox.addColor(config, "color1").onChange(function() { config.__setColor() } );
         colorBox.addColor(config, "color2").onChange(function() { config.__setColor() } );

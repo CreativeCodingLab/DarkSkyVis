@@ -22,9 +22,6 @@ var nDivisions = 10, NUMTIMEPERIODS = 89;
 // Halo Components
 // linesGroup and sphereGroup contain the
 var linesGroup, sphereGroup;
-// HaloLines act as a LUT containing the Line Geometry
-// HaloSpheres acts as a LUT containing the Sphere geometry
-var HaloLines = {}, HaloSpheres = {};
 // HaloBranch is the object acts like HaloSpheres
 // HaloSelect is a global lookup which keeps track of all SELECTED Halos
 var HaloBranch = {}, HaloSelect = {};
@@ -95,20 +92,8 @@ function onCreate() {
     /*    Organizing our Actors       */
     /* -------------------------------*/
 
-    // **** Lights! ***
-    initLights();
-
-    // Load Data for Halo  // TREE679582  TREE676638
-    initHaloTree("js/assets/tree_676638.json", true);
-
-    // // **** Camera! ***
-    // initCamera();
-
-    // // **** Setup our Raycasting stuff ***
-    // initRayCaster();
-
     // **** Action! Listeners *** //
-    // initListeners();
+    initSceneActors("js/assets/tree_679582.json");
 }
 
 /* ================================== *

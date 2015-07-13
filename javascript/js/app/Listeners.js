@@ -68,8 +68,8 @@ function onMouseDoubleClick() {
 
     if(config.enableSelection) {
 
-        toggleVisibility(HaloLines, false);
-        toggleVisibility(HaloSpheres, false);
+        toggleVisibility(linesGroup, false);
+        toggleVisibility(sphereGroup, false);
 
         var id = curTarget.object.halo_id;
         var period = curTarget.object.halo_period;

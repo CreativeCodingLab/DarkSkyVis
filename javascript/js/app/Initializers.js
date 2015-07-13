@@ -8,7 +8,7 @@
 // *****************************
 
 function initScene() {
-    console.log("initScene()")
+    console.log("initScene()");
     scene = new THREE.Scene();
 
     // **** Adding our Group object ***
@@ -27,7 +27,7 @@ function initScene() {
 
 
 function initRenderer() {
-    console.log("initRenderer()")
+    console.log("initRenderer()");
     renderer = new THREE.WebGLRenderer( { antialias: true } );
     {
         renderer.setPixelRatio( window.devicePixelRatio );
@@ -69,21 +69,6 @@ function initRayCaster() {
     raycaster = new THREE.Raycaster();
     {
         mouse = new THREE.Vector2();
-        // **** Have to set this so it doesnt complain! ***
-        // var halo;
-
-        // for (var i = EPOCH_HEAD; i < EPOCH_TAIL; i++) {
-
-        //     if (halo) break;
-        //     for (var j = 0; j < EPOCH_PERIODS[i].length; j++) {
-
-        //         var id = EPOCH_PERIODS[i][j];
-        //         halo = HaloSpheres[id];
-        //         if ( halo ) break;
-        //     }
-        // }
-        // console.log("\t", halo)
-        // prevTarget = curTarget = {object: halo};
         curTarget.object.material.opacity = 0.7;
         tweenToPosition(250, 250, false);
     }
@@ -91,7 +76,7 @@ function initRayCaster() {
 }
 
 function initCamera() {
-    console.log("initCamera()")
+    console.log("initCamera()",curTarget);
     camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 1000 );
     {
         // **** position the camera near the first halo; ***
@@ -214,8 +199,62 @@ function initSpinner() {
         shadow: false, // Whether to render a shadow
         hwaccel: true, // Whether to use hardware acceleration
         position: 'absolute' // Element positioning
-    }
+    };
     var target = document.getElementById('loading')
     spinner = new Spinner(opts).spin(target);
     console.log("Initializing the spinner!", target, spinner)
+}
+
+
+function initSceneActors(url) {
+
+    console.log("initSceneActors!!", url);
+
+    showSpinner(true);
+    var targetSet = false;
+
+    // Prepare our Global halo objects
+    prepGlobalStructures();
+
+    oboe(url)
+        .node("!.*", function(halo, path) {
+            if (path[0]==0) {
+                // Load Data for Halo
+                initHaloTree(halo, true);
+
+                  // **** Lights! ***
+                initLights();
+
+                // **** Camera! ***
+                initCamera();
+
+                // **** Setup our Raycasting stuff ***
+                initRayCaster();
+
+                // **** Action! Listeners *** //
+                initListeners();
+            } else {
+
+                initHaloTree(halo, false);
+
+                if(!targetSet && (halo.time >= EPOCH_HEAD && halo.time <= EPOCH_TAIL)) {
+                    console.log("Ha got you fucker!", halo.time);
+                    targetSet = true;
+                    prevTarget = null;
+                    curTarget = {object: sphereGroup.getObjectByName(halo.id)};
+                    curTarget.object.material.opacity = 0.7;
+                    DEFERRED = false;
+                    tweenToPosition(250, 250, true);
+                }
+            }
+            return oboe.drop;
+
+        })
+        .done(function() {
+            console.log("\tDone")
+            showSpinner(false);
+            createHaloLineGeometry(EPOCH_PERIODS);
+            console.log("\tHaloLUT", HaloLUT.length, HaloLUT.min, HaloLUT.max,"\n");
+            return oboe.drop;
+        });
 }

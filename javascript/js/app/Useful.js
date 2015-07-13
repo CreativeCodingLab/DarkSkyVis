@@ -22,27 +22,68 @@ function updateLightPosition() {
 // Differs from toggleVisibility because it controls color as well
 function displayHalos() {
     if (!DEFERRED) {
-        for (var i = 0; i < EPOCH_PERIODS.length; i++) {
-
-            for (var j = 0; j < EPOCH_PERIODS[i].length; j++) {
-
-                var id = EPOCH_PERIODS[i][j];
-                // Set Halo Line Visibility
-                if (HaloLines[id])
-                    // console.log("\tdisplaying Halo line?", i, id, config.showPaths, EPOCH_HEAD, EPOCH_TAIL)
-                    HaloLines[id].visible = (i >= EPOCH_HEAD && i < EPOCH_TAIL)? config.showPaths : false;
-
-                if (HaloSpheres[id])
-                    // Set Halo Spheres Visibility
-                    HaloSpheres[id].visible = (i >= EPOCH_HEAD && i <= EPOCH_TAIL)? config.showHalos : false;
-
-                if (curTarget && HaloSpheres[id].position !== curTarget.object.position){
-                    console.log("displayHalos adjust colors", colorKey(i));
-                    HaloSpheres[id].material.color.set(colorKey(i));
-                    HaloSpheres[id].material.opacity = 0.4;
-                }
+        var i;
+        sphereGroup.children.forEach(function(mesh) {
+            i = mesh.halo_period;
+            mesh.visible = (i >= EPOCH_HEAD && i <= EPOCH_TAIL)? config.showHalos : false;
+            if (curTarget && mesh.position !== curTarget.object.position){
+                mesh.material.color.set(colorKey(i));
+                mesh.material.opacity = 0.4;
             }
-        }
+
+        });
+
+        linesGroup.children.forEach(function(lineMesh) {
+            lineMesh.visible = (i >= EPOCH_HEAD && i < EPOCH_TAIL)? config.showPaths : false;
+        });
+
+
+        //for(id in HaloLUT) {
+        //
+        //    if (id !== "length" || id !== "min" || id !== "max"){
+        //
+        //        var i = HaloLUT[id].time;
+        //        // console.log("HaloLUT foreach", i, id)
+        //        if (HaloLines[id])
+        //            // console.log("\tdisplaying Halo line?", i, id, config.showPaths, EPOCH_HEAD, EPOCH_TAIL)
+        //            HaloLines[id].visible = (i >= EPOCH_HEAD && i < EPOCH_TAIL)? config.showPaths : false;
+        //
+        //        if (sphereGroup.getObjectByName(id)){
+        //            // Set Halo Spheres Visibility
+        //            sphereGroup.getObjectByName(id).visible = (i >= EPOCH_HEAD && i <= EPOCH_TAIL)? config.showHalos : false;
+        //
+        //            if (curTarget && sphereGroup.getObjectByName(id).position !== curTarget.object.position){
+        //                console.log("displayHalos adjust colors", colorKey(i));
+        //                sphereGroup.getObjectByName(id).material.color.set(colorKey(i));
+        //                sphereGroup.getObjectByName(id).material.opacity = 0.4;
+        //            }
+        //        }
+        //
+        //    }
+        //}
+
+
+        // for (var i = 0; i < EPOCH_PERIODS.length; i++) {
+
+        //     for (var j = 0; j < EPOCH_PERIODS[i].length; j++) {
+
+        //         var id = EPOCH_PERIODS[i][j];
+        //         // Set Halo Line Visibility
+        //         if (HaloLines[id])
+        //             // console.log("\tdisplaying Halo line?", i, id, config.showPaths, EPOCH_HEAD, EPOCH_TAIL)
+        //             HaloLines[id].visible = (i >= EPOCH_HEAD && i < EPOCH_TAIL)? config.showPaths : false;
+
+        //         if (sphereGroup.getObjectByName(id))
+        //             // Set Halo Spheres Visibility
+        //             sphereGroup.getObjectByName(id).visible = (i >= EPOCH_HEAD && i <= EPOCH_TAIL)? config.showHalos : false;
+
+        //         if (curTarget && sphereGroup.getObjectByName(id).position !== curTarget.object.position){
+        //             console.log("displayHalos adjust colors", colorKey(i));
+        //             sphereGroup.getObjectByName(id).material.color.set(colorKey(i));
+        //             sphereGroup.getObjectByName(id).material.opacity = 0.4;
+        //         }
+        //     }
+        // }
     }
 }
 
@@ -55,13 +96,14 @@ function toggleVisibility(HaloObject, isVisible, opacity) {
 
             var id = EPOCH_PERIODS[i][j];
 
-            if(HaloObject[id]){
+            if(HaloObject.getObjectByName(id)){
 
-                HaloObject[id].visible = isVisible;
+                HaloObject.getObjectByName(id).visible = isVisible;
 
                 if (opacity){
                     console.log("toggleVisibility", i, opacity);
-                    HaloObject[id].material.opacity = opacity;
+                    HaloObject.getObjectByName(id).material.opacity = opacity;
+
                 }
             }
 
@@ -73,8 +115,8 @@ function toggleVisibility(HaloObject, isVisible, opacity) {
 // Display currently selected Halo's Attribute information
 function displayHaloStats() {
 
-    console.log(haloStats);
     var haloData = HaloLUT[curTarget.object.halo_id];
+    console.log(haloStats, haloData,curTarget);
 
     var result = "<b> time:</b> " + haloData['time'] + "</br>" +
         "<b>        id:</b> " + haloData['id'] + "</br>" +
@@ -156,37 +198,4 @@ function showSpinner(value) {
     else
         spinner.stop();
 
-}
-
-
-// Wrapper for pulling the Json
-function getHaloTreeData(url) {
-    showSpinner(true);
-    return get(url).then(JSON.parse);
-}
-
-// Uses promises to get the halo data.
-function get(url) {
-    oboe(url).node("!.*", function(halo) {
-        console.log("oboe ->", halo)
-    })
-
-    return new Promise( function(resolve, reject) {
-        var req = new XMLHttpRequest();
-        req.open('GET', url);
-        req.onload = function() {
-            if (req.status === 200) {
-                resolve(req.response);
-
-            } else {
-                reject(Error(req.statusText));
-            }
-        };
-
-        req.onerror = function() {
-            reject(Error("Network Error"));
-        };
-
-        req.send();
-    })
 }
