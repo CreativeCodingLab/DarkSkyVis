@@ -11,7 +11,7 @@ function GUIcontrols() {
     this.showHaloMap = true;
 
     // Choose Dataset
-    this.dataset = "679582 777K";
+    this.dataset = "676638 777K";
 
     // Reset Position
     this.goToHead = function () { this.__goToHead() };
@@ -154,17 +154,16 @@ GUIcontrols.prototype.__resetView = function(halo) {
 
 
 GUIcontrols.prototype.__updateData = function() {
+    showSpinner(true);
     var that = this;
     var URL = "js/assets/tree_" + this.dataset.split(' ')[0] + ".json";
     console.log("\nUpdating!", URL)
-
-    showSpinner(true);
-
+    var targetSet = false;
+    resetGlobalStructures();
     oboe(URL)
         .node("!.*", function(halo, path) {
 
             if (path[0]==0) {
-                resetGlobalStructures();
                 initHaloTree(halo, true);
                 console.log("\tGetting Ready to reset shit!",halo.time)
 
@@ -178,16 +177,16 @@ GUIcontrols.prototype.__updateData = function() {
                     curTarget = {object: sphereGroup.getObjectByName(halo.id)};
                     curTarget.object.material.opacity = 0.7;
                     DEFERRED = false;
-                    tweenToPosition(250, 250, true);
-                    onFrame()
+                    tweenToPosition(1500, 500, false);
                 }
             }
-            console.log("Oboe->>", path, halo.time, halo.id, targetSet)
+            console.log("Oboe->>", path[0], halo.time, halo.id, targetSet)
             return oboe.drop;
         })
         .done(function() {
             showSpinner(false);
             createHaloLineGeometry(EPOCH_PERIODS);
+            tweenToPosition(1500, 500, true);
             console.log("\tHaloLUT", HaloLUT.length, HaloLUT.min, HaloLUT.max,"\n");
             return oboe.drop;
         });

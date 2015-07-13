@@ -93,7 +93,7 @@ function onCreate() {
     /* -------------------------------*/
 
     // **** Action! Listeners *** //
-    initSceneActors("js/assets/tree_679582.json");
+    initSceneActors("js/assets/tree_676638.json");
 }
 
 /* ================================== *
@@ -123,7 +123,7 @@ function onFrame(time) {
  *  Our render function which renders
  *  the scene and its associated objects
  * ================================== */
-function render() {
+function render() { 
 
     if (!DEFERRED) {
         raycaster.setFromCamera( mouse, camera );

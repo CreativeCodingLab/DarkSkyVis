@@ -17,7 +17,7 @@ function initHaloTree(halo, firstTime) {
     // add Halos to list by ID
     HaloLUT[halo.id] = halo;
 
-    console.log("\tinitHaloTree",halo.id, halo.time, firstTime);
+    //console.log("\tinitHaloTree",typeof halo.id, halo.id, halo.time, firstTime);
 
     HaloLUT.length++;
     HaloLUT.min = (halo.time < HaloLUT.min) ? halo.time : HaloLUT.min
@@ -29,7 +29,7 @@ function initHaloTree(halo, firstTime) {
     if (firstTime)
         curTarget = {object: sphereGroup.getObjectByName(halo.id)}; // Trick camera
 
-    console.log("\tinitHaloTree",halo.id, halo.time, firstTime);
+    //console.log("\tinitHaloTree",halo.id, halo.time, firstTime);
 }
 
 
@@ -366,32 +366,30 @@ function prepGlobalStructures() {
 
 function resetGlobalStructures() {
     console.log("calling resetGlobalStructures()!");
-    for (var id in HaloLUT) {
+    var id;
+    for (id in HaloLUT) {
+     //console.log("\t",typeof id, id);
+        if (linesGroup.getObjectByName(+id)) {
+            linesGroup.remove(linesGroup.getObjectByName(+id));
+            linesGroup.getObjectByName(+id).geometry.dispose();
+            linesGroup.getObjectByName(+id).material.dispose();
+        }
+
+        if (sphereGroup.getObjectByName(+id)) {
+            console.log("\tsphere",typeof id, id);
+            var mesh = sphereGroup.getObjectByName(+id);
+            sphereGroup.remove(mesh);
+            mesh.geometry.dispose();
+            mesh.material.dispose();
+            //delete sphereGroup.getObjectByName(id);
+        }
         if  (id !== "length" || id !== "max" || id !== "min"){
-            var s = sphereGroup.getObjectByName(id),
-                l = linesGroup.getObjectByName(id)
-            console.log("\t",id, s, l)
-
-            if (linesGroup.getObjectByName(id)) {
-                linesGroup.getObjectByName(id).geometry.dispose();
-                linesGroup.getObjectByName(id).material.dispose();
-                linesGroup.remove(linesGroup.getObjectByName(id));
-            }
-
-            if (sphereGroup.getObjectByName(id)) {
-                sphereGroup.remove(sphereGroup.getObjectByName(id));
-
-                sphereGroup.getObjectByName(id).geometry.dispose();
-                sphereGroup.getObjectByName(id).material.dispose();
-                //delete sphereGroup.getObjectByName(id);
-            }
             delete HaloLUT[id];
-
             HaloLUT.length--;
         }
     }
     //sphereGroup.dispose();
     //linesGroup.dispose();
-    console.log("\t",sphereGroup, linesGroup, scene, HaloLUT)
+    console.log("\t",sphereGroup, linesGroup, scene, HaloLUT);
     prepGlobalStructures();
 }
