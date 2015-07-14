@@ -26,7 +26,7 @@ function displayHalos() {
         var i;
         if (config.showHalos)
             sphereGroup.children.forEach(function(mesh) {
-                i = +mesh.halo_period;
+                i = +mesh.period;
                 mesh.visible = (i >= EPOCH_HEAD && i <= EPOCH_TAIL)? true : false;
                 if (curTarget && mesh.position !== curTarget.object.position){
                     mesh.material.color.set(colorKey(i));
@@ -36,7 +36,7 @@ function displayHalos() {
 
         if (config.showPaths)
             linesGroup.children.forEach(function(lineMesh) {
-                i = lineMesh.halo_period;
+                i = lineMesh.period;
                 lineMesh.visible = (i >= EPOCH_HEAD && i < EPOCH_TAIL)? true : false;
             });
     }
@@ -46,7 +46,7 @@ function displayHalos() {
 function toggleVisibility(haloObjectGroup, isVisible, opacity) {
     if (isVisible)
         haloObjectGroup.children.forEach(function(objMesh) {
-            i = +objMesh.halo_period;
+            i = +objMesh.period;
             objMesh.visible = (i >= EPOCH_HEAD && i < EPOCH_TAIL)? true : false;
             if (opacity){
                 console.log("toggleVisibility", i, opacity);
@@ -82,7 +82,7 @@ function toggleVisibility(haloObjectGroup, isVisible, opacity) {
 // Display currently selected Halo's Attribute information
 function displayHaloStats() {
 
-    var haloData = HaloLUT[curTarget.object.halo_id];
+    var haloData = HaloLUT[curTarget.object.name];
     console.log(haloStats, haloData,curTarget);
 
     var result = "<b> time:</b> " + haloData['time'] + "</br>" +

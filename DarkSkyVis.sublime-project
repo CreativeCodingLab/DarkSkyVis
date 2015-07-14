@@ -20,19 +20,17 @@
 				".idea"
 			],
 			"follow_symlinks": true,
-			"path": "javascript"
+			"path": "python"
 		},
 		{
 			"folder_exclude_patterns":
 			[
-				".idea"
+				".idea",
+				"js/app/examples",
+				"js/app/iterations"
 			],
 			"follow_symlinks": true,
-			"path": "python"
-		},
-		{
-			"follow_symlinks": true,
-			"path": "data"
+			"path": "javascript"
 		}
 	],
 	"settings":

@@ -16,21 +16,27 @@ function GUIcontrols() {
     this.dataset = "676638 777K";
 
     // Reset Position
-    this.goToHead = function () { this.__goToHead() };
-    this.goToCenter = function () { this.__goToCenter() };
-    this.goToTail = function () { this.__goToTail() };
+    this.goToHead = function() {
+        this.__goToHead()
+    };
+    this.goToCenter = function() {
+        this.__goToCenter()
+    };
+    this.goToTail = function() {
+        this.__goToTail()
+    };
 
     // Interaction Components
     this.enableSelection = false;
-    this.animateTime = function () {};
-    this.scale = 1.0;  // Eventually this will apply to scaling the halos
+    this.animateTime = function() {};
+    this.scale = 1.0; // Eventually this will apply to scaling the halos
 
     // Cosmetic manipulations
-    this.color0 = rgbToHex(255,0,0);
-    this.color1 = rgbToHex(255,0,255);
-    this.color2 = rgbToHex(0,0,255);
-    this.color3 = rgbToHex(0,255,255);
-    this.color4 = rgbToHex(0,255,0);
+    this.color0 = rgbToHex(255, 0, 0);
+    this.color1 = rgbToHex(255, 0, 255);
+    this.color2 = rgbToHex(0, 0, 255);
+    this.color3 = rgbToHex(0, 255, 255);
+    this.color4 = rgbToHex(0, 255, 0);
 
 }
 
@@ -45,15 +51,15 @@ GUIcontrols.prototype.__setColor = function() {
         var i = +HaloLUT[id].time;
 
         // Set Halo Line Visibility
-        if (linesGroup.getObjectByName(id)){
+        if (linesGroup.getObjectByName(id)) {
             // console.log("\tdisplaying Halo line?", i, id, config.showPaths, EPOCH_HEAD, EPOCH_TAIL)
-            linesGroup.getObjectByName(id).visible = (i >= EPOCH_HEAD && i < EPOCH_TAIL)? config.showPaths : false;
+            linesGroup.getObjectByName(id).visible = (i >= EPOCH_HEAD && i < EPOCH_TAIL) ? config.showPaths : false;
             linesGroup.getObjectByName(id).material.color.set(colorKey(i));
         }
 
         // Set Halo Spheres Visibility
-        if(sphereGroup.getObjectByName(id)) {
-            sphereGroup.getObjectByName(id).visible = (i >= EPOCH_HEAD && i <= EPOCH_TAIL)? config.showHalos : false;
+        if (sphereGroup.getObjectByName(id)) {
+            sphereGroup.getObjectByName(id).visible = (i >= EPOCH_HEAD && i <= EPOCH_TAIL) ? config.showHalos : false;
             sphereGroup.getObjectByName(id).material.color.set(colorKey(i));
         }
     }
@@ -64,15 +70,27 @@ GUIcontrols.prototype.__animateSlider = function(offset) {
     var step = slider.noUiSlider('step');
     console.log("animate", step, slider.val());
     // Frist we position the camera so it is looking at our Halo of interest
-    var tweenToTail = new TWEEN.Tween({x: EPOCH_HEAD, y: EPOCH_TAIL})
-        .to({x: 88 - offset, y: 88}, 3500)
+    var tweenToTail = new TWEEN.Tween({
+            x: EPOCH_HEAD,
+            y: EPOCH_TAIL
+        })
+        .to({
+            x: 88 - offset,
+            y: 88
+        }, 3500)
         .onUpdate(function() {
             slider.val([this.x, this.y]);
         });
 
     // Then we zoom in
-    var tweenToHead = new TWEEN.Tween({x: 88 - offset, y: 88})
-        .to({x: 0, y: offset}, 3500)
+    var tweenToHead = new TWEEN.Tween({
+            x: 88 - offset,
+            y: 88
+        })
+        .to({
+            x: 0,
+            y: offset
+        }, 3500)
         .onUpdate(function() {
             slider.val([this.x, this.y]);
         });
@@ -139,7 +157,9 @@ GUIcontrols.prototype.__resetView = function(halo) {
         if (curTarget.object)
             curTarget.object = halo;
         else
-            prevTarget = curTarget = {object: halo};
+            prevTarget = curTarget = {
+                object: halo
+            };
         console.log("\tprevTarget, curTarget", prevTarget, curTarget);
         curTarget.object.material.opacity = 0.7;
 
@@ -147,10 +167,10 @@ GUIcontrols.prototype.__resetView = function(halo) {
         tweenToPosition(1500, 500, true);
     } else {
         alert(
-              "No Halos found in Selected Range!\n" +
-              "Please Adjust Range and press\n" +
-              "'Reset Position' -> 'Jump to Head'"
-              )
+            "No Halos found in Selected Range!\n" +
+            "Please Adjust Range and press\n" +
+            "'Reset Position' -> 'Jump to Head'"
+        )
     }
 };
 
@@ -160,44 +180,15 @@ GUIcontrols.prototype.__updateData = function() {
     var that = this;
     var URL = "js/assets/tree_" + this.dataset.split(' ')[0] + ".json";
     console.log("\nUpdating!", URL)
-    var targetSet = false;
-    resetGlobalStructures();
-    oboe(URL)
-        .node("!.*", function(halo, path) {
-
-            if (path[0]==0) {
-                initHaloTree(halo, true);
-                console.log("\tGetting Ready to reset shit!",halo.time)
-
-            } else {
-                initHaloTree(halo, false);
-
-                if(!targetSet && (halo.time >= EPOCH_HEAD && halo.time <= EPOCH_TAIL)) {
-                    console.log("\tTarget is in Range!")
-                    targetSet = true;
-                    prevTarget = null;
-                    curTarget = {object: sphereGroup.getObjectByName(halo.id)};
-                    curTarget.object.material.opacity = 0.7;
-                    DEFERRED = false;
-                    tweenToPosition(1500, 500, false);
-                }
-            }
-            //console.log("Oboe->>", path[0], halo.time, halo.id, targetSet)
-            return oboe.drop;
-        })
-        .done(function() {
-            showSpinner(false);
-            createHaloLineGeometry();
-            that.__goToHead();
-            console.log("\tHaloLUT", HaloLUT.length, HaloLUT.min, HaloLUT.max,"\n");
-            return oboe.drop;
-        });
+    initHaloTree(URL, false);
 };
 
 
 function initGUI() {
     console.log("initGUI()");
-    var gui = new dat.GUI({ autoPlace: false });
+    var gui = new dat.GUI({
+        autoPlace: false
+    });
     $('.ma-gui').append($(gui.domElement));
     var guiBox = gui.addFolder("Halos in a Dark Sky");
     guiBox.open();
@@ -207,28 +198,28 @@ function initGUI() {
     /*
      * Halo Display Box
      */
-    var displayBox = guiBox.addFolder("Display Halo Properties")
+    var displayBox = guiBox.addFolder("Display Halo Properties"); 
     {
         //Turn Halo Spheres On/Off
         var spheresController = displayBox.add(config, "showHalos").name("Halos");
         {
-            spheresController.onFinishChange(function(){
+            spheresController.onFinishChange(function() {
                 console.log("spheresController.onFinishChange");
                 if (config.enableSelection)
-                    toggleVisibility(HaloSelect,config.showHalos);
+                    toggleVisibility(HaloSelect, config.showHalos);
                 else
                     sphereGroup.visible = config.showHalos;
-                    // toggleVisibility(sphereGroup.getObjectByName,config.showHalos);
+                // toggleVisibility(sphereGroup.getObjectByName,config.showHalos);
             });
         }
 
         // Turn Halo Lines On/Off
         var linesController = displayBox.add(config, "showPaths").name("Paths");
         {
-            linesController.onFinishChange(function(){
+            linesController.onFinishChange(function() {
                 console.log("linesController.onFinishChange");
                 if (config.enableSelection)
-                    toggleVisibility(HaloBranch,config.showPaths);
+                    toggleVisibility(HaloBranch, config.showPaths);
                 else
                     linesGroup.visible = config.showPaths;
             });
@@ -240,8 +231,8 @@ function initGUI() {
             statsController.onFinishChange(function() {
                 console.log("statsController.onFinishChange");
                 haloStats
-                    .style("display", function(){
-                        if (config.showStats )
+                    .style("display", function() {
+                        if (config.showStats)
                             return "block";
                         else
                             return "none";
@@ -294,16 +285,16 @@ function initGUI() {
         var selectionController = haloInteractionBox.add(config, "enableSelection").name("Enable Selection");
         {
             selectionController.onFinishChange(function() {
-                resetHaloBranchs();
-                console.log("selectionController.onFinishChange");
+//                resetHaloBranchs();
+//                console.log("selectionController.onFinishChange");
                 if (config.enableSelection) {
 
                     console.log("Selection Mode is active!");
-                    renderer.setClearColor(rgbToHex(150,150,150), 1);
+                    renderer.setClearColor(rgbToHex(150, 150, 150), 1);
                 } else {
-                    toggleVisibility(HaloLines, config.showPaths);
-                    toggleVisibility(sphereGroup, config.showHalos);
-                    renderer.setClearColor(rgbToHex(50,50,50), 1);
+//                    toggleVisibility(linesGroup, config.showPaths);
+//                    toggleVisibility(sphereGroup, config.showHalos);
+                    renderer.setClearColor(rgbToHex(50, 50, 50), 1);
                 }
 
             })
@@ -312,15 +303,13 @@ function initGUI() {
         var scalingController = haloInteractionBox.add(config, "scale").min(0.01).step(0.01).name("Scale Halo");
         {
             scalingController.onFinishChange(function() {
+                console.log("trying out scaling");
                 var scale = config.scale <= 0.0 ? 0.001 : config.scale;
-                for (var i = 0; i < EPOCH_PERIODS.length; i++) {
-                    for (var j = 0; j < EPOCH_PERIODS[i].length; j++) {
-                        var id = EPOCH_PERIODS[i][j];
-                        if (sphereGroup.getObjectByName(id))
-                            sphereGroup.getObjectByName(id).scale.set(scale, scale, scale)
-                    }
-                }
-            })
+                sphereGroup.children.forEach(function(mesh) {
+                    var _s = scale * mesh.rs1;
+                    mesh.scale.set(_s, _s, _s);
+                });
+            });
         }
 
         // Animate Time Button
@@ -340,11 +329,21 @@ function initGUI() {
      */
     var colorBox = guiBox.addFolder("Cosmetic");
     {
-        colorBox.addColor(config, "color0").onChange(function() { config.__setColor() } );
-        colorBox.addColor(config, "color1").onChange(function() { config.__setColor() } );
-        colorBox.addColor(config, "color2").onChange(function() { config.__setColor() } );
-        colorBox.addColor(config, "color3").onChange(function() { config.__setColor() } );
-        colorBox.addColor(config, "color4").onChange(function() { config.__setColor() } );
+        colorBox.addColor(config, "color0").onChange(function() {
+            config.__setColor()
+        });
+        colorBox.addColor(config, "color1").onChange(function() {
+            config.__setColor()
+        });
+        colorBox.addColor(config, "color2").onChange(function() {
+            config.__setColor()
+        });
+        colorBox.addColor(config, "color3").onChange(function() {
+            config.__setColor()
+        });
+        colorBox.addColor(config, "color4").onChange(function() {
+            config.__setColor()
+        });
 
     }
 };
