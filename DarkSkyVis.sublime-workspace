@@ -4,6 +4,10 @@
 		"selected_items":
 		[
 			[
+				"init",
+				"initHaloTree"
+			],
+			[
 				"noI",
 				"noUiSlider"
 			],
@@ -70,10 +74,6 @@
 			[
 				"initS",
 				"initStreamlines	function"
-			],
-			[
-				"init",
-				"initHedgeHog"
 			],
 			[
 				"sdfP",
@@ -396,26 +396,10 @@
 	"buffers":
 	[
 		{
-			"file": "javascript/js/app/Step8.js",
+			"file": "javascript/js/app/Step9.js",
 			"settings":
 			{
-				"buffer_size": 5287,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "javascript/js/app/Initializers.js",
-			"settings":
-			{
-				"buffer_size": 5057,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "javascript/js/app/Listeners.js",
-			"settings":
-			{
-				"buffer_size": 2852,
+				"buffer_size": 4508,
 				"line_ending": "Unix"
 			}
 		},
@@ -423,15 +407,7 @@
 			"file": "javascript/js/app/HaloUtils.js",
 			"settings":
 			{
-				"buffer_size": 12275,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "/Users/krbalmryde/node_modules/nifti-js/README.md",
-			"settings":
-			{
-				"buffer_size": 1340,
+				"buffer_size": 14197,
 				"line_ending": "Unix"
 			}
 		},
@@ -439,7 +415,7 @@
 			"file": "javascript/js/app/GUIutils.js",
 			"settings":
 			{
-				"buffer_size": 10434,
+				"buffer_size": 10494,
 				"line_ending": "Unix"
 			}
 		},
@@ -447,15 +423,7 @@
 			"file": "javascript/js/app/Useful.js",
 			"settings":
 			{
-				"buffer_size": 5848,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "data/dev/miniTreeTest.dat",
-			"settings":
-			{
-				"buffer_size": 11155,
+				"buffer_size": 5408,
 				"line_ending": "Unix"
 			}
 		}
@@ -467,10 +435,26 @@
 	"build_varint": "",
 	"command_palette":
 	{
-		"height": 203.0,
-		"last_filter": "jsa",
+		"height": 271.0,
+		"last_filter": "htm",
 		"selected_items":
 		[
+			[
+				"htm",
+				"Set Syntax: HTML"
+			],
+			[
+				"for",
+				"Format: Javascript"
+			],
+			[
+				"java",
+				"Set Syntax: JavaScript"
+			],
+			[
+				"ja",
+				"Set Syntax: JavaScript"
+			],
 			[
 				"jsa",
 				"Set Syntax: JavaScript"
@@ -488,10 +472,6 @@
 				"Package Control: Install Package"
 			],
 			[
-				"ja",
-				"Set Syntax: JavaScript"
-			],
-			[
 				"color",
 				"Colorsublime: Install Theme"
 			],
@@ -505,10 +485,6 @@
 			],
 			[
 				"jac",
-				"Set Syntax: JavaScript"
-			],
-			[
-				"java",
 				"Set Syntax: JavaScript"
 			],
 			[
@@ -530,10 +506,6 @@
 			[
 				"css",
 				"Set Syntax: CSS"
-			],
-			[
-				"for",
-				"Format: Javascript"
 			],
 			[
 				"pyt",
@@ -646,10 +618,6 @@
 			[
 				"c",
 				"Set Syntax: C++"
-			],
-			[
-				"htm",
-				"Set Syntax: HTML"
 			],
 			[
 				"F",
@@ -844,7 +812,7 @@
 				"Package Control: Install Package"
 			]
 		],
-		"width": 457.0
+		"width": 475.0
 	},
 	"console":
 	{
@@ -868,15 +836,32 @@
 	],
 	"file_history":
 	[
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/data/dev/miniTreeTest.dat",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/js/assets/tree_31410.json",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/js/app/GUIutils.js",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/js/app/Initializers.js",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/js/app/Useful.js",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/.gitignore",
+		"/Users/krbalmryde/.bash_profile",
 		"/Users/krbalmryde/.bash_aliases",
 		"/Users/krbalmryde/.bash_functions",
-		"/Users/krbalmryde/.bash_profile",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/js/app/Initializers.js",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/js/server/web_server.js",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyVis.sublime-project",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/python/HaloUtils.py",
+		"/Users/krbalmryde/Dropbox/Class-projects/cs524/Journal/NiftiViewer/niftiviewer.bmml",
+		"/Volumes/Homer/Projects/DarkSky/data/dev/tree_parse_test.dat",
+		"/Users/krbalmryde/Desktop/WebGL Export.html",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/data/README.txt",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/test_priviledged_app/README.md",
+		"/Users/krbalmryde/Dropbox/Code-Projects/misc/JavaScript/WebGLBook/README.md",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/js/app/HaloUtils.js",
+		"/Users/krbalmryde/Dropbox/Code-Projects/Unity/RollABall/Deployed/WebGL_MiniGame/Development/WebGL_MiniGame.js",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/css/style.css",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/js/app/iterations/Step8.js",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/js/app/GUIutils.js",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/js/app/Listeners.js",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/js/app/Useful.js",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/index.html",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/data/dev/miniTreeTest.dat",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/js/app/Step8.js",
+		"/Users/krbalmryde/node_modules/nifti-js/README.md",
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/js/assets/tree_31410.json",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/python/extractHaloTree.py",
 		"/Users/krbalmryde/Library/Enthought/Canopy_64bit/User/lib/python2.7/site-packages/thingking/utils.py",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/js/app/Initialize.js",
@@ -884,21 +869,16 @@
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/data/rockstar/tree/tree_0_0_0.dat",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/data/dev/tree_parse_test.dat",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/python/exractHaloTree.py",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/js/app/Step8.js",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/js/app/examples/three_interactive_cubes.html",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/.gitignore",
 		"/Users/krbalmryde/Dropbox/Class-projects/cs424/HW3/RightHereRightNow.github.io/APP/framework/markers/HaloController.js",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/js/config.js",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/css/style.css",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/js/app/Scene.js",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/index.html",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/js/app/Slider.js",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/js/app/Camera.js",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/js/app/Controls.js",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/js/app/Epoch.js",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/js/app/Renderer.js",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/js/app/Container.js",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyVis.sublime-project",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/javascript/index_require.html",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/data/dev/tree679582.dat",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/python/hlist_1.0.json",
@@ -983,19 +963,7 @@
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyPy/Halo_257.0_t20.json",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyPy/Halo_257.0_t14.json",
 		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyPy/Halo_257.0_t12.json",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyPy/Halo_257.0_t13.json",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyPy/offsets_times.py",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyPy/correct_function.txt",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyPy/conversion.txt",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/js/Utils.js",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/src/example_drawCalls.js",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/src/Step3a.js",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/index.html",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/css/style.css",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/css/jquery.nouislider.css",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/css/jquery.nouislider.pips.css",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyJs/css/jquery.nouislider.min.css",
-		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyPy/__forlater.py"
+		"/Users/krbalmryde/Dropbox/Code-Projects/EVL/DarkSkyVis/DarkSkyPy/Halo_257.0_t13.json"
 	],
 	"find":
 	{
@@ -1019,6 +987,38 @@
 		"case_sensitive": true,
 		"find_history":
 		[
+			"; {",
+			"createPathLine",
+			"lineMeshProp",
+			"lineMeshPop",
+			"lineMeshProp.spline",
+			"period",
+			"halo.desc_id",
+			"__traversed",
+			"createHaloLineGeometry",
+			"lineMeshProp.splineGeometry",
+			"meshComponents",
+			"splineGeometry",
+			"spline.",
+			"createSphereGeometry",
+			"!==",
+			"__resetView",
+			"__goToHead",
+			"initCamera",
+			"halo.time",
+			"createSphere",
+			"resetGlobalStructures",
+			"createHaloSphereGeometry",
+			"createSphere",
+			"createHalo",
+			"create",
+			"createHaloGeometry",
+			"renderer",
+			"period",
+			"prevTarget",
+			"createHaloGeometry",
+			"createSphere2",
+			"true",
 			"HaloSelect",
 			"resetHaloBranchs",
 			"config.scale",
@@ -1114,39 +1114,7 @@
 			"this.",
 			"TimePeriods",
 			"'#",
-			"jquery.",
-			"onReshape",
-			".js",
-			"<script type='text/javascript' src=\"js/lib/",
-			"function ",
-			"init",
-			"initScene",
-			"y",
-			"x",
-			"scene",
-			"__updateData",
-			"curTarget",
-			"HaloLUT",
-			"linesGroup",
-			"__traversed",
-			"this.",
-			"HaloSpheres",
-			"HaloLines",
-			"__resetHaloBranch",
-			"intoTheAbyss",
-			"onMouseDblClick",
-			"add_chunk",
-			"address",
-			"add_chunk",
-			"xmlhttp",
-			"sphereGroup",
-			"\n}",
-			") {\n",
-			"0",
-			"add_chunk",
-			"add_particles",
-			"add_chunk",
-			"toggleVisibility"
+			"jquery."
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -1210,24 +1178,24 @@
 	"groups":
 	[
 		{
-			"selected": 4,
+			"selected": 0,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "javascript/js/app/Step8.js",
+					"file": "javascript/js/app/Step9.js",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 5287,
+						"buffer_size": 4508,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								427,
-								427
+								1508,
+								1508
 							]
 						],
 						"settings":
@@ -1235,124 +1203,6 @@
 							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 1180.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 6,
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "javascript/js/app/Initializers.js",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 5057,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								5057,
-								5057
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 2669.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 7,
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "javascript/js/app/Listeners.js",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 2852,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								686,
-								686
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 1004.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 2,
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"file": "javascript/js/app/HaloUtils.js",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 12275,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								8077,
-								8077
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 3692.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 1,
-					"type": "text"
-				},
-				{
-					"buffer": 4,
-					"file": "/Users/krbalmryde/node_modules/nifti-js/README.md",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1340,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1340,
-								1340
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Markdown/Markdown.tmLanguage"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
@@ -1362,20 +1212,50 @@
 					"type": "text"
 				},
 				{
-					"buffer": 5,
+					"buffer": 1,
+					"file": "javascript/js/app/HaloUtils.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 14197,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								5460,
+								5460
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 3090.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
 					"file": "javascript/js/app/GUIutils.js",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 10434,
+						"buffer_size": 10494,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								9270,
-								9270
+								9152,
+								9152
 							]
 						],
 						"settings":
@@ -1385,27 +1265,27 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 2300.0,
+						"translation.y": 4811.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 4,
+					"stack_index": 1,
 					"type": "text"
 				},
 				{
-					"buffer": 6,
+					"buffer": 3,
 					"file": "javascript/js/app/Useful.js",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 5848,
+						"buffer_size": 5408,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								870,
-								1872
+								0,
+								0
 							]
 						],
 						"settings":
@@ -1415,37 +1295,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 214.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 5,
-					"type": "text"
-				},
-				{
-					"buffer": 7,
-					"file": "data/dev/miniTreeTest.dat",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 11155,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1140,
-								1145
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Text/Plain text.tmLanguage",
-							"tab_size": 3,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 194.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 3,
@@ -1508,15 +1358,43 @@
 		[
 			[
 				"ini",
-				"javascript/js/app/Initialize.js"
+				"javascript/js/app/Initializers.js"
+			],
+			[
+				"halojs",
+				"javascript/js/app/HaloUtils.js"
+			],
+			[
+				"ha",
+				"python/HaloUtils.py"
+			],
+			[
+				"step8",
+				"javascript/js/app/iterations/Step8.js"
+			],
+			[
+				"gui",
+				"javascript/js/app/GUIutils.js"
+			],
+			[
+				"li",
+				"javascript/js/app/Listeners.js"
+			],
+			[
+				"ste9",
+				"javascript/js/app/Step9.js"
+			],
+			[
+				"st",
+				"javascript/css/style.css"
+			],
+			[
+				"html",
+				"javascript/index.html"
 			],
 			[
 				"tree_",
 				"data/rockstar/tree/tree_0_0_0.dat"
-			],
-			[
-				"step8",
-				"javascript/js/app/Step8.js"
 			],
 			[
 				"use",
@@ -1599,10 +1477,6 @@
 				"javascript/index.html"
 			],
 			[
-				"ha",
-				"python/HaloUtils.py"
-			],
-			[
 				"mi",
 				"data/dev/miniTreeTest.dat"
 			],
@@ -1657,10 +1531,6 @@
 			[
 				"step4",
 				"DarkSkyJs/src/Step4.js"
-			],
-			[
-				"st",
-				"DarkSkyJs/src/Step5.js"
 			],
 			[
 				"utils.js",
@@ -1997,26 +1867,6 @@
 			[
 				"pr",
 				"src/Program.cpp"
-			],
-			[
-				"be",
-				"src/Behavior.cpp"
-			],
-			[
-				"co",
-				"osx/CocoaGL.mm"
-			],
-			[
-				"ma",
-				"niftiViewer/niftiViewer/Main.mm"
-			],
-			[
-				"prog",
-				"src/Program.cpp"
-			],
-			[
-				"progr",
-				"src/Program.cpp"
 			]
 		],
 		"width": 0.0
@@ -2029,7 +1879,7 @@
 		[
 			[
 				"",
-				"~/Dropbox/Code-Projects/KrbAlmryde.github.io/KrbAlmryde.sublime-project"
+				"~/Dropbox/Code-Projects/EVL/LTG/ltg.sublime-workspace"
 			]
 		],
 		"width": 380.0
@@ -2050,7 +1900,7 @@
 	"show_minimap": false,
 	"show_open_files": true,
 	"show_tabs": true,
-	"side_bar_visible": true,
+	"side_bar_visible": false,
 	"side_bar_width": 219.0,
 	"status_bar_visible": true,
 	"template_settings":
