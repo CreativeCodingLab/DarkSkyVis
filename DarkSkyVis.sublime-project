@@ -26,7 +26,7 @@
 			"folder_exclude_patterns":
 			[
 				".idea",
-				"js/app/examples",
+				// "js/app/examples",
 				"js/app/iterations"
 			],
 			"follow_symlinks": true,

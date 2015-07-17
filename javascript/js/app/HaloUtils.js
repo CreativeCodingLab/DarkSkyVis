@@ -20,8 +20,13 @@ function initHaloTree(url, firstTime) {
     var sphereMaterial;
     var _materialsByPeriod = {}
 
-    if (firstTime) {
+    var map = THREE.ImageUtils.loadTexture( "js/assets/sprites/ball.png" );
 
+    // var material = new THREE.SpriteMaterial( { map: map, color: 0xffffff, fog: true } );
+    // var sprite = new THREE.Sprite( material );
+
+
+    if (firstTime) {
         // Prepare our Global halo objects
         prepGlobalStructures();
 
@@ -31,7 +36,6 @@ function initHaloTree(url, firstTime) {
         resetGlobalStructures();
 
     }
-
 
     showSpinner(true);
 
@@ -52,16 +56,19 @@ function initHaloTree(url, firstTime) {
                 sphereMaterial = _materialsByPeriod[halo.time];
 
             else
-                _materialsByPeriod[halo.time] = new THREE.MeshPhongMaterial({
+                _materialsByPeriod[halo.time] = new THREE.SpriteMaterial({
+                    map: map,
                     color: colorKey(halo.time),
-                    specular: colorKey(halo.time),
-                    shininess: 40,
-                    shading: THREE.SmoothShading,
-                    vertexColors: THREE.VertexColors,
+                    blending: THREE.AdditiveBlending,
+                    // specular: colorKey(halo.time),
+                    // shininess: 40,
+                    // shading: THREE.SmoothShading,
+                    // vertexColors: THREE.VertexColors,
                     transparent: true,
                     // side: THREE.BackSide,  // Seems to be slowing things down a lot
                     opacity: 0.4
                 });
+
 
 
             //console.log("\tinitHaloTree",typeof halo.id, halo.id, halo.time, firstTime);
@@ -161,7 +168,8 @@ function createSphereGeometry(halo, sphereGeometry, sphereMaterial) {
     //    var color = colorKey(period)
 
     EPOCH_PERIODS[period].push(halo.id);
-    var mesh = new THREE.Mesh(sphereGeometry, sphereMaterial);
+    var mesh = new THREE.Sprite( sphereMaterial );
+    // var mesh = new THREE.Mesh(sphereGeometry, sphereMaterial);
 
     // Add the halo's id to the mess so we can check it against the Halo ID map/LUT/Hash.
     mesh.visible = (period >= EPOCH_HEAD && period <= EPOCH_TAIL) ? config.showHalos : false;
@@ -173,7 +181,7 @@ function createSphereGeometry(halo, sphereGeometry, sphereMaterial) {
     mesh.scale.set(halo.rs1, halo.rs1, halo.rs1);
     mesh.updateMatrix();
     sphereGroup.add(mesh);
-}   
+}
 
 
 
@@ -201,7 +209,7 @@ function createHaloLineGeometry() {
     // We can use the sphereGroup to drive the line creation
     sphereGroup.children.forEach(function(mesh) {
         console.log("mesh", mesh.name);
-        if (mesh) {            
+        if (mesh) {
             id = +mesh.name,
             period = +mesh.period;
 
@@ -254,7 +262,6 @@ function intoTheVoid(id, points, steps) {
         //console.log("\t\thalo->id:",halo.id, "!= desc_id:", halo.desc_id);
         return points;
     }
-
 }
 
 

@@ -21,8 +21,9 @@ var nDivisions = 10,
     NUMTIMEPERIODS = 89;
 
 // Halo Components
-// linesGroup and sphereGroup contain the
-var linesGroup, sphereGroup;
+// linesGroup and sphereGroup contain the lines and spheres of the halos
+var linesGroup, sphereGroup, traceGroup;
+
 // HaloBranch is the object acts like HaloSpheres
 // HaloSelect is a global lookup which keeps track of all SELECTED Halos
 var HaloBranch = {},
@@ -38,6 +39,7 @@ var hits = [],
 var pointCloud;
 var haloStats;
 var DEFERRED = true;
+
 
 // Be sure to match this with the slider's connect!!
 var colorKey = d3.scale.linear()

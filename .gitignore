@@ -25,7 +25,7 @@ data/*
 docs/*
 images/*
 scivis/*
-manuscript
+manuscript/*
 docs/papers/*
 docs/presentations
 docs/examples/*
