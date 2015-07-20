@@ -165,11 +165,12 @@ GUIcontrols.prototype.__goToTail = function() {
 GUIcontrols.prototype.__resetView = function(halo) {
     console.log("You hit the reset button!!", halo);
 
-    if (this.showHaloMap) {
+    // if (this.showHaloMap) {
 
-        tweenToPosition
+    //     tweenToPosition
 
-    } else if (halo !== undefined) { // This implies we are in the wrong time-frame
+    // } else
+    if (halo !== undefined) { // This implies we are in the wrong time-frame
         console.log("\tnew halo is", halo)
         if (curTarget.object)
             curTarget.object = halo;
@@ -198,7 +199,7 @@ GUIcontrols.prototype.__updateData = function() {
     var URL = "js/assets/trees/tree_" + this.dataset.split(' ')[0] + ".json";
     console.log("\nUpdating!", URL)
     initHaloTree(URL, false);
-    tweenToPosition(4500, 4500, true);
+    tweenToPosition(1500, 1500, true);
 };
 
 

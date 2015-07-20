@@ -33,7 +33,7 @@ function initRenderer() {
     {
         renderer.setPixelRatio(window.devicePixelRatio);
         renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setClearColor(rgbToHex(10, 10, 10), 1);
+        renderer.setClearColor(rgbToHex(255, 255, 255), 1);
         renderer.gammaInput = true;
         renderer.gammaOutput = true;
     }
@@ -90,7 +90,7 @@ function initCamera() {
         // console.log("\t", pos)
             // var pos = pointCloud.position;
         // light.position.set(pos.x, pos.y + 0.1, pos.z - (pos.z * 0.5));
-        camera.position.set(-1, -1, -1);
+        // camera.position.set(-1, -1, -1);
         controls = new THREE.TrackballControls(camera, renderer.domElement); {
             controls.rotateSpeed = 4.0;
             controls.zoomSpeed = 1.5;
@@ -106,8 +106,8 @@ function initCamera() {
             controls.enabled = true;
         }
         // camera.lookAt(pos);
-        controls.target.set(-1, -1, -1);
-        controls.update();
+        // controls.target.set(-1, -1, -1);
+        // controls.update();
         // updateLightPosition();
     }
 
@@ -189,7 +189,7 @@ function initSpinner() {
         radius: 84, // The radius of the inner circle
         scale: 1, // Scales overall size of the spinner
         corners: 1, // Corner roundness (0..1)
-        color: rgbToHex(255, 255, 255), // #rgb or #rrggbb or array of colors
+        color: rgbToHex(0, 0, 0), // #rgb or #rrggbb or array of colors
         opacity: 0, // Opacity of the lines
         rotate: 90, // The rotation offset
         direction: 1, // 1: clockwise, -1: counterclockwise
