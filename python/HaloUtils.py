@@ -287,31 +287,50 @@ def main_tree679582():
     with open("../data/dev/tree679582.json", 'w') as haloJSON:
         haloJSON.write( json.dumps( HaloObjs ) )
 
+def foobar():
+    treeDict = dict()
+    pattern = "../javascript/js/assets/trees/tree_*.json"
+    for fn in glob(pattern):
+        treeFN = op.split(fn)[1]
+        haloID = treeFN[5:].split('.')[0]
+        with open(fn) as fp:
+            treeDict[haloID] = json.load(fp)
+    jsonFinal = "tree_0_0_0.json"
+    with open(jsonFinal, 'w') as jfp:
+        jfp.write( json.dumps( treeDict ) )
+
 
 def main():
-    RAW = "http://darksky.slac.stanford.edu/scivis2015/data/ds14_scivis_0128"
-    HALO = op.join(RAW, "rockstar", "hlists", "hlist_1.00000.list")
-        # PARTICLE = op.join(RAW, "ds14_scivis_0128_e4_dt04_" + time + "00")
-    print HALO
-    halos = list()
-    for halo in tk.loadtxt(HALO):
-        _halo = addHalo(halo)
-        entry = {
-            'id': _halo['id'],
-            'position':_halo['position'],
-            'velocity':_halo['velocity'],
-            'rvir': _halo["rvir"],
-            'mvir': _halo["mvir"],
-            'rs': _halo["rs"]
-        }
+    foobar()
+    # RAW = "http://darksky.slac.stanford.edu/scivis2015/data/ds14_scivis_0128"
+    # HALO = op.join(RAW, "rockstar", "hlists", "hlist_1.00000.list")
+    #     # PARTICLE = op.join(RAW, "ds14_scivis_0128_e4_dt04_" + time + "00")
+    # print HALO
+    # halos = list()
+    # for halo in tk.loadtxt(HALO):
+    #     _halo = addHalo(halo)
+    #     entry = {
+    #         'id': _halo['id'],
+    #         'position':_halo['position'],
+    #         'velocity':_halo['velocity'],
+    #         'rvir': _halo["rvir"],
+    #         'mvir': _halo["mvir"],
+    #         'rs': _halo["rs"]
+    #     }
 
-        halos.append(entry)
+    #     halos.append(entry)
 
-    # halos = [addHalo(halo) for halo in tk.loadtxt(HALO)]
-    jsonFN = "../javascript/js/assets/hlist_1.0.json"
-    with open(jsonFN, 'w') as haloJSON:
-        print jsonFN, len(halos)
-        haloJSON.write( json.dumps( halos ) )
+    # # halos = [addHalo(halo) for halo in tk.loadtxt(HALO)]
+    # jsonFN = "../javascript/js/assets/hlist_1.0.json"
+    # with open(jsonFN, 'w') as haloJSON:
+    #     print jsonFN, len(halos)
+    #     haloJSON.write( json.dumps( halos ) )
+
+
+
+
+
+
 
 if __name__ == '__main__':
     main()

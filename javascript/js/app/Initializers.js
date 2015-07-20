@@ -29,7 +29,7 @@ function initScene() {
 
 function initRenderer() {
     console.log("initRenderer()");
-    renderer = new THREE.WebGLRenderer({ antialias: true }); 
+    renderer = new THREE.WebGLRenderer({ antialias: true });
     {
         renderer.setPixelRatio(window.devicePixelRatio);
         renderer.setSize(window.innerWidth, window.innerHeight);
@@ -70,24 +70,27 @@ function initLights() {
 
 function initRayCaster() {
     console.log("initRayCaster()")
-    raycaster = new THREE.Raycaster(); {
+    raycaster = new THREE.Raycaster();
+    {
+        raycaster.params.PointCloud.threshold = 0.1;
         mouse = new THREE.Vector2();
-        curTarget.object.material.opacity = 0.7;
-        tweenToPosition(250, 250, false);
+        // curTarget.object.material.opacity = 0.7;
+        // tweenToPosition(250, 250, false);
     }
 
 }
 
 function initCamera() {
     console.log("initCamera()", curTarget);
-    camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000); {
+    camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+    {
         // **** position the camera near the first halo; ***
         // var pos = sphereGroup.children[0].position;
-        var pos = curTarget.object.position;
-        console.log("\t", pos)
-            //var pos = pointCloud.position;
-        light.position.set(pos.x, pos.y + 0.1, pos.z - (pos.z * 0.5));
-        camera.position.set(pos.x, pos.y + 0.1, pos.z - (pos.z * 0.5));
+        // var pos = curTarget.object.position;
+        // console.log("\t", pos)
+            // var pos = pointCloud.position;
+        // light.position.set(pos.x, pos.y + 0.1, pos.z - (pos.z * 0.5));
+        camera.position.set(-1, -1, -1);
         controls = new THREE.TrackballControls(camera, renderer.domElement); {
             controls.rotateSpeed = 4.0;
             controls.zoomSpeed = 1.5;
@@ -102,10 +105,10 @@ function initCamera() {
             controls.keys = [65, 83, 68];
             controls.enabled = true;
         }
-        camera.lookAt(pos);
-        controls.target.set(pos.x, pos.y, pos.z);
+        // camera.lookAt(pos);
+        controls.target.set(-1, -1, -1);
         controls.update();
-        updateLightPosition();
+        // updateLightPosition();
     }
 
 }
@@ -203,5 +206,6 @@ function initSpinner() {
     };
     var target = document.getElementById('loading')
     spinner = new Spinner(opts).spin(target);
+    spinner.stop();
     console.log("Initializing the spinner!", target, spinner)
 }

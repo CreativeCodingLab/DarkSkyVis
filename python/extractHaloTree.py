@@ -1,16 +1,12 @@
 import sys
 import json
+import requests
 import numpy as np
 import sdfpy as sdf
 import os.path as op
 from glob import glob
 import thingking as tk
 import StringIO as sio
-
-RAW = "http://darksky.slac.stanford.edu/scivis2015/data/ds14_scivis_0128/rockstar/trees"
-TREE = op.join(RAW, "tree_0_0_0.dat")
-
-
 
 def l2a(l):
     return np.array(l)
@@ -21,6 +17,7 @@ def addHalo(data):
     Create a dictionary object with the halo attributes, for easy json parsing
     later
     """
+    # print type(data)
     return {
         "scale": str(data[0] + 0.000000000000000001), #Scale: Scale factor of halo.,
         "id": int(data[1]), #ID: ID of halo (unique across entire simulation).,
@@ -108,7 +105,31 @@ def addHalo(data):
         "trackedVel": list(np.empty(0))
     }
 
-def extractTreeFromForest(fileName, target):
+def extractTarget(fp, target):
+    while(True):
+        try:
+            line = fp.next()
+        except StopIteration, e:
+            return
+        if line.startswith("#tree"):
+            treeID = int(line.split()[1])
+            print "treeID is" , treeID
+            if treeID == target:
+                print "they match"
+                buf = ""
+                line = fp.next()
+                while(not line.startswith("#")):
+                    # print "so far so good"
+                    buf += line + "\n"
+                    # In case we reach the end of the file object
+                    try:
+                        line = fp.next()
+                    except StopIteration, e:
+                        return buf
+                return buf
+
+
+def extractTreeFromForest(URL, target, stream=True):
     """
     Given a Forest dataset, ie tree_0_0_0.dat
     and a target, ie 681184
@@ -118,61 +139,74 @@ def extractTreeFromForest(fileName, target):
     and later np.loadtxt (which tk.loadtxt calls under the hood)
     and parse as a json file.
     """
-    print fileName, target
-    with open(fileName) as fp:
-        while(True):
-            try:
-                line = fp.next()
-            except StopIteration, e:
-                return
-            if line.startswith("#tree"):
-                treeID = int(line.split()[1])
-                print "treeID is" , treeID
-                if treeID == target:
-                    print "they match"
-                    buf = ""
-                    line = fp.next()
-                    while(not line.startswith("#")):
-                        print "so far so good"
-                        buf += line
-                        # In case we reach the end of the file object
-                        try:
-                            line = fp.next()
-                        except StopIteration, e:
-                            return buf
-                    return buf
-
-def main():
-    # 677521
-    # for the time being, assume we are using tree_parse_test.dat
-    if len(sys.argv) > 1:
-        target = int(sys.argv[1])
+    if (stream):
+        print URL, target, r
+        r = requests.get(URL, stream=stream)
+        # with open(fileName) as fp:
+        fp = r.iter_lines()
+        return extractTarget(fp, target)
     else:
-        raise Exception
-    buff = extractTreeFromForest(TREE, target)
-    treeFP = sio.StringIO(buff)  # np.loadtxt treats StringIO objects as File objects
+        with open(URL) as fp:
+            return extractTarget(fp, target)
 
+
+def treeNameGenerator(url, stream=False):
+    fp = None
+
+    if stream:
+        r = requests.get(url, stream=stream)
+        fp = r.iter_lines()
+    else:
+        fp = open(url)
+
+    while(True):
+        try:
+            line = fp.next()
+        except StopIteration, e:
+            fp.close()
+            return
+        if line.startswith("#tree"):
+            yield line.split()[1]
+
+
+def writeTreeToJson(fp, target):
     halos = list()
-    for h in np.loadtxt(treeFP):
-        # _halo = addHalo(h)
-        # # Just take what we need from the halos and leave the rest for now
-        # entry = {
-        #     'id': _halo['id'],
-        #     'position':_halo['position'],
-        #     'velocity':_halo['velocity'],
-        #     'rvir': _halo["rvir"],
-        #     'mvir': _halo["mvir"],
-        #     'rs': _halo["rs"]
-        # }
-        # halos.append(entry)
+    for h in np.loadtxt(fp):
         halos.append(addHalo(h))
 
-    # halos = [addHalo(halo) for halo in tk.loadtxt(HALO)]
     varName = "_".join( ["tree", str(target)] )
     outFN = op.join("../javascript/js/assets", varName + ".json")
     with open(outFN, 'w') as haloFP:
         print outFN, len(halos)
         haloFP.write( json.dumps( halos ) )
+
+
+
+def main():
+    # RAW = "http://darksky.slac.stanford.edu/scivis2015/data/ds14_scivis_0128/rockstar/trees"
+    stream = False
+    RAW = "../data"
+    Forest = op.join(RAW, "tree_0_0_0.dat")
+
+    if "http" in Forest:
+        stream = True
+
+    # 677521
+    # for the time being, assume we are using tree_parse_test.dat
+    if len(sys.argv) > 1:
+        target = int(sys.argv[1])
+        buff = extractTreeFromForest(Forest, target, stream)
+        treeFP = sio.StringIO(buff)  # np.loadtxt treats StringIO objects as File objects
+        print treeFP
+        writeTreeToJson(treeFP, target)
+    else:
+        for tree in treeNameGenerator(Forest):
+            buff = extractTreeFromForest(Forest, int(tree), stream)
+            treeFP = sio.StringIO(buff)  # np.loadtxt treats StringIO objects as File objects
+            print treeFP
+            writeTreeToJson(treeFP, int(tree))
+
+        # with open(fileName) as fp:
 
 
 if __name__ == '__main__':

@@ -13,7 +13,8 @@ function GUIcontrols() {
     this.showHaloMap = true;
 
     // Choose Dataset
-    this.dataset = "676638 777K";
+    this.dataset = "None";
+    prepGlobalStructures()
 
     // Reset Position
     this.goToHead = function() {
@@ -28,8 +29,11 @@ function GUIcontrols() {
 
     // Interaction Components
     this.enableSelection = false;
-    this.animateTime = function() {};
     this.scale = 1.0; // Eventually this will apply to scaling the halos
+
+    this.animateTime = function() {};
+    this.isPlaying = false;
+
 
     // Cosmetic manipulations
     this.color0 = rgbToHex(255, 0, 0);
@@ -67,36 +71,45 @@ GUIcontrols.prototype.__setColor = function() {
 
 
 GUIcontrols.prototype.__animateSlider = function(offset) {
-    var step = slider.noUiSlider('step');
-    console.log("animate", step, slider.val());
-    // Frist we position the camera so it is looking at our Halo of interest
-    var tweenToTail = new TWEEN.Tween({
-            x: EPOCH_HEAD,
-            y: EPOCH_TAIL
-        })
-        .to({
-            x: 88 - offset,
-            y: 88
-        }, 3500)
-        .onUpdate(function() {
-            slider.val([this.x, this.y]);
-        });
+    if (this.isPlaying){
+        TWEEN.removeAll();
+        this.isPlaying = false;
+    } else {
+        this.isPlaying = true;
+        var step = slider.noUiSlider('step');
+        console.log("animate", step, slider.val());
+        // Frist we position the camera so it is looking at our Halo of interest
+        var _dur = 3500;
+        var TweenDur = _dur - (EPOCH_TAIL/NUMTIMEPERIODS * _dur)
+        var tweenToTail = new TWEEN.Tween({
+                x: EPOCH_HEAD,
+                y: EPOCH_TAIL
+            })
+            .to({
+                x: 88 - offset,
+                y: 88
+            }, TweenDur)
+            .onUpdate(function() {
+                slider.val([this.x, this.y]);
+            });
 
-    // Then we zoom in
-    var tweenToHead = new TWEEN.Tween({
-            x: 88 - offset,
-            y: 88
-        })
-        .to({
-            x: 0,
-            y: offset
-        }, 3500)
-        .onUpdate(function() {
-            slider.val([this.x, this.y]);
-        });
+        // Then we zoom in
+        var tweenToHead = new TWEEN.Tween({
+                x: 88 - offset,
+                y: 88
+            })
+            .to({
+                x: 0,
+                y: offset
+            }, TweenDur)
+            .onUpdate(function() {
+                slider.val([this.x, this.y]);
+            });
 
-    tweenToTail.chain(tweenToHead);
-    tweenToTail.start();
+        tweenToTail.chain(tweenToHead);
+        tweenToTail.start();
+    }
+    console.log("this.isPlaying", this.isPlaying);
 
 };
 
@@ -152,7 +165,11 @@ GUIcontrols.prototype.__goToTail = function() {
 GUIcontrols.prototype.__resetView = function(halo) {
     console.log("You hit the reset button!!", halo);
 
-    if (halo !== undefined) { // This implies we are in the wrong time-frame
+    if (this.showHaloMap) {
+
+        tweenToPosition
+
+    } else if (halo !== undefined) { // This implies we are in the wrong time-frame
         console.log("\tnew halo is", halo)
         if (curTarget.object)
             curTarget.object = halo;
@@ -178,9 +195,10 @@ GUIcontrols.prototype.__resetView = function(halo) {
 GUIcontrols.prototype.__updateData = function() {
     showSpinner(true);
     var that = this;
-    var URL = "js/assets/tree_" + this.dataset.split(' ')[0] + ".json";
+    var URL = "js/assets/trees/tree_" + this.dataset.split(' ')[0] + ".json";
     console.log("\nUpdating!", URL)
     initHaloTree(URL, false);
+    tweenToPosition(4500, 4500, true);
 };
 
 
@@ -198,7 +216,7 @@ function initGUI() {
     /*
      * Halo Display Box
      */
-    var displayBox = guiBox.addFolder("Display Halo Properties"); 
+    var displayBox = guiBox.addFolder("Display Halo Properties");
     {
         //Turn Halo Spheres On/Off
         var spheresController = displayBox.add(config, "showHalos").name("Halos");
@@ -225,20 +243,28 @@ function initGUI() {
             });
         }
 
-        // Halo Properties display
-        var statsController = displayBox.add(config, "showStats").name("Properties");
+        var cloudController = displayBox.add(config, "showHaloMap").name("Cluster");
         {
-            statsController.onFinishChange(function() {
-                console.log("statsController.onFinishChange");
-                haloStats
-                    .style("display", function() {
-                        if (config.showStats)
-                            return "block";
-                        else
-                            return "none";
-                    })
+            cloudController.onFinishChange(function() {
+                console.log("cloudController.onFinishChange");
+                pointCloud.visible = config.showHaloMap;
             })
         }
+
+        // // Halo Properties display
+        // var statsController = displayBox.add(config, "showStats").name("Properties");
+        // {
+        //     statsController.onFinishChange(function() {
+        //         console.log("statsController.onFinishChange");
+        //         haloStats
+        //             .style("display", function() {
+        //                 if (config.showStats)
+        //                     return "block";
+        //                 else
+        //                     return "none";
+        //             })
+        //     })
+        // }
         displayBox.open();
     }
 
@@ -249,12 +275,20 @@ function initGUI() {
     var dataSetBox = guiBox.addFolder("Choose a Dataset");
     {
         var data = dataSetBox.add(config, "dataset", [
-            "682265 3.9K",
-            "31410 32K", "676879 157K",
-            "675650 209K", "675608 252K",
-            "676638 777K", "679619 2.8M",
-            "677545 2.9M", "677521 3.6M",
-            "680462 4.0M", "679582 6.0M",
+            "None",
+            "676638 777K", "681442 867K",
+            "678449 911K", "676674 925K",
+            "674518 945K", "675540 1.1M",
+            "680478 1.2M", "677567 1.3M",
+            "677601 1.3M", "680500 1.4M",
+            "680488 1.4M", "676657 1.5M",
+            "676579 1.5M", "675530 1.7M",
+            "679604 1.7M", "679642 1.9M",
+            "674567 2.4M", "676540 2.4M",
+            "679619 2.8M", "674539 2.9M",
+            "681422 2.9M", "677545 2.9M",
+            "677521 3.6M", "680462 4.0M",
+            "679582 6.0M"
         ]);
         data.name("Tree #");
         data.onFinishChange(function() {
@@ -324,26 +358,26 @@ function initGUI() {
         haloInteractionBox.open();
     }
 
-    /*
-     *  Color configuration stuff
-     */
-    var colorBox = guiBox.addFolder("Cosmetic");
-    {
-        colorBox.addColor(config, "color0").onChange(function() {
-            config.__setColor()
-        });
-        colorBox.addColor(config, "color1").onChange(function() {
-            config.__setColor()
-        });
-        colorBox.addColor(config, "color2").onChange(function() {
-            config.__setColor()
-        });
-        colorBox.addColor(config, "color3").onChange(function() {
-            config.__setColor()
-        });
-        colorBox.addColor(config, "color4").onChange(function() {
-            config.__setColor()
-        });
+    // /*
+    //  *  Color configuration stuff
+    //  */
+    // var colorBox = guiBox.addFolder("Cosmetic");
+    // {
+    //     colorBox.addColor(config, "color0").onChange(function() {
+    //         config.__setColor()
+    //     });
+    //     colorBox.addColor(config, "color1").onChange(function() {
+    //         config.__setColor()
+    //     });
+    //     colorBox.addColor(config, "color2").onChange(function() {
+    //         config.__setColor()
+    //     });
+    //     colorBox.addColor(config, "color3").onChange(function() {
+    //         config.__setColor()
+    //     });
+    //     colorBox.addColor(config, "color4").onChange(function() {
+    //         config.__setColor()
+    //     });
 
-    }
+    // }
 };

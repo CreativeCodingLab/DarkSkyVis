@@ -119,7 +119,7 @@ strong, b {
     top: 10px;
 }
 
-.noUi-connect {
+/*.noUi-connect {
     background: linear-gradient(
             #FF0000 0%,
             #FF00FF 20%,
@@ -127,4 +127,4 @@ strong, b {
             #00FFFF 60%,
             #00FF00  80%
     );
-}
+}*/

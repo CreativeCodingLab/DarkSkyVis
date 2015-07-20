@@ -30,8 +30,10 @@ docs/papers/*
 docs/presentations
 docs/examples/*
 python/images/*
+javascript/js/assets/*.dat
 javascript/js/assets/*.js
 javascript/js/assets/*.json
+javascript/js/assets/trees/*.json
 javascript/js/app/examples/*
 
 ds14_scivis_0128_e4_dt04_0.*

@@ -15,12 +15,24 @@ function initHaloTree(url, firstTime) {
 
     // create halo Sphere components ahead of time to save memory;
     var targetSet = false;
+    var map = THREE.ImageUtils.loadTexture( "js/assets/sprites/circle2.png" );
+
     var sphereGeometry = new THREE.SphereGeometry(1, 32, 32);
 
-    var sphereMaterial;
     var _materialsByPeriod = {}
+    var sphereMaterial = new THREE.SpriteMaterial({
+                    map: map,
+                    color: rgbToHex(255, 255, 255),
+                    // blending: THREE.AdditiveBlending,
+                    // specular: colorKey(halo.time),
+                    // shininess: 40,
+                    // shading: THREE.SmoothShading,
+                    // vertexColors: THREE.VertexColors,
+                    transparent: true,
+                    // side: THREE.BackSide,  // Seems to be slowing things down a lot
+                    opacity: 0.4
+                });
 
-    var map = THREE.ImageUtils.loadTexture( "js/assets/sprites/ball.png" );
 
     // var material = new THREE.SpriteMaterial( { map: map, color: 0xffffff, fog: true } );
     // var sprite = new THREE.Sprite( material );
@@ -51,27 +63,26 @@ function initHaloTree(url, firstTime) {
             HaloLUT[+halo.id] = halo;
 
 
-            if (_materialsByPeriod.hasOwnProperty(halo.time))
+            // if (_materialsByPeriod.hasOwnProperty(halo.time))
 
-                sphereMaterial = _materialsByPeriod[halo.time];
+            //     sphereMaterial = _materialsByPeriod[halo.time];
 
-            else
-                _materialsByPeriod[halo.time] = new THREE.SpriteMaterial({
-                    map: map,
-                    color: colorKey(halo.time),
-                    blending: THREE.AdditiveBlending,
-                    // specular: colorKey(halo.time),
-                    // shininess: 40,
-                    // shading: THREE.SmoothShading,
-                    // vertexColors: THREE.VertexColors,
-                    transparent: true,
-                    // side: THREE.BackSide,  // Seems to be slowing things down a lot
-                    opacity: 0.4
-                });
+            // else {
 
+            //     _materialsByPeriod[halo.time] = new THREE.SpriteMaterial({
+            //         map: map,
+            //         color: rgbToHex(155, 155, 155),
+            //         // blending: THREE.AdditiveBlending,
+            //         // specular: colorKey(halo.time),
+            //         // shininess: 40,
+            //         // shading: THREE.SmoothShading,
+            //         // vertexColors: THREE.VertexColors,
+            //         transparent: true,
+            //         // side: THREE.BackSide,  // Seems to be slowing things down a lot
+            //         opacity: 0.4
+            //     });
+            // }
 
-
-            //console.log("\tinitHaloTree",typeof halo.id, halo.id, halo.time, firstTime);
 
             HaloLUT.length++;
             HaloLUT.min = (halo.time < HaloLUT.min) ? halo.time : HaloLUT.min
@@ -90,75 +101,75 @@ function initHaloTree(url, firstTime) {
                 };
                 curTarget.object.material.opacity = 0.7;
                 DEFERRED = false;
-                tweenToPosition(250, 250, true);
+                // tweenToPosition(250, 250, true);
             }
-
-
-            if (path[0] == 0 && firstTime) {
-
-                // Load Data for Halo
-                curTarget = {
-                    object: sphereGroup.getObjectByName(+halo.id)
-                }; // Trick camera
-
-                // **** Lights! ***
-                initLights();
-
-                // **** Camera! ***
-                initCamera();
-
-                // **** Setup our Raycasting stuff ***
-                initRayCaster();
-
-                // **** Action! Listeners *** //
-                initListeners();
-            }
-
             return oboe.drop;
 
         })
         .done(function() {
             console.log("\tDone")
             showSpinner(false);
+            console.log("sphereGroup.children", sphereGroup.children.length)
             createHaloLineGeometry();
             return oboe.drop;
         });
 }
 
-function initHaloMap(DATASET) {
-    console.log("Init The Halo Map");
+function initHaloMap(url) {
+    console.log("Init The Halo Map", url);
     var forestGeometry = new THREE.Geometry();
+    var colors = [];
 
-    for (var i = 0; i < DATASET.length; i++) {
+    showSpinner(true);
 
-        var _halo = DATASET[i];
-        _halo.time = 1.0; // We know a priori that this is the last time period
-        console.log(_halo);
-        var particle = new THREE.Vector3();
-        particle.x = _halo.position[0];
-        particle.y = _halo.position[1];
-        particle.z = _halo.position[2];
+    oboe(url)
+        .node("!.*", function(halo, path) {
+            // console.log(path, halo);
+            halo.time = 1.0; // We know a priori that this is the last time period
+            var particle = new THREE.Vector3();
+            particle.x = halo.position[0];
+            particle.y = halo.position[1];
+            particle.z = halo.position[2];
 
-        particle.vx = _halo.velocity[0];
-        particle.vy = _halo.velocity[1];
-        particle.vz = _halo.velocity[2];
+            particle.vx = halo.velocity[0];
+            particle.vy = halo.velocity[1];
+            particle.vz = halo.velocity[2];
 
-        particle.halo_id = _halo.id;
-        particle.halo_time = _halo.time;
+            particle.name = halo.id;
+            particle.period = halo.time;
 
-        forestGeometry.vertices.push(particle);
-        //console.log("\tHalo.id ", halo.id, "Halo.scale",halo.scale, "Halo.time",halo.time);
-    }
-    var material = new THREE.PointCloudMaterial({
-        color: rgbToHex(255, 0, 0),
-        size: 0.5,
-        blending: THREE.AdditiveBlending,
-        transparent: true
-    });
+            forestGeometry.vertices.push(particle);
+            colors.push(new THREE.Color(1, 0, 0))
+            return oboe.drop
+        })
+        .done(function() {
+            console.log("finished uploading")
+            var material = new THREE.PointCloudMaterial({
+                // color: rgbToHex(255, 0, 0),
+                size: 0.5,
+                vertexColors: THREE.VertexColors,
+                // map: THREE.ImageUtils.loadTexture( "js/assets/sprites/circle2.png" ),
+                // blending: THREE.AdditiveBlending,
+                transparent: true,
+                opacity: 0.6
+            });
+            forestGeometry.colors = colors;
+            pointCloud = new THREE.PointCloud(forestGeometry, material);
+            pointCloud.updateMatrix();
+            scene.add(pointCloud);
+            console.log(pointCloud);
+            curTarget = {object: pointCloud}
+            showSpinner(false);
 
-    pointCloud = new THREE.PointCloud(forestGeometry, material);
-    scene.add(pointCloud);
-    console.log(pointCloud);
+            curTarget = {
+                object: pointCloud
+            };
+            curTarget.object.material.opacity = 0.7;
+            console.log("currTarget",curTarget);
+            tweenToPosition(4500, 4250, true);
+            DEFERRED = false;
+            console.log("DEFERRED", DEFERRED);
+        })
 }
 
 
@@ -195,7 +206,7 @@ function createSphereGeometry(halo, sphereGeometry, sphereMaterial) {
  *  included below
  * ================================== */
 function createHaloLineGeometry() {
-    console.log("\tcreateHaloLineGeometry()");
+    // console.log("\tcreateHaloLineGeometry()");
     var periodTracker = {};
     var material = new THREE.LineBasicMaterial({
         color: rgbToHex(255, 255, 255),
@@ -205,32 +216,35 @@ function createHaloLineGeometry() {
         opacity: 0.5
     })
 
-    var id, period;
+    var id, period, count = 0;
     // We can use the sphereGroup to drive the line creation
     sphereGroup.children.forEach(function(mesh) {
-        console.log("mesh", mesh.name);
+        console.log("mesh", count, mesh.name);
+        count++;
         if (mesh) {
             id = +mesh.name,
             period = +mesh.period;
 
-            console.log("mesh", mesh.name, id, mesh.period, period);
+            // console.log("mesh", mesh.name, id, mesh.period, period);
 
             if (!periodTracker.hasOwnProperty(period))
-                periodTracker[period] = new THREE.LineBasicMaterial({
-                    color: rgbToHex(255, 255, 255),
-                    linewidth: 0.5,
-                    vertexColors: THREE.VertexColors,
-                    transparent: true,
-                    opacity: 0.5
-                })
+                periodTracker[period] = material.clone();
+                // new THREE.LineBasicMaterial({
+                //     color: rgbToHex(255, 255, 255),
+                //     linewidth: 0.5,
+                //     vertexColors: THREE.VertexColors,
+                //     transparent: true,
+                //     opacity: 0.5
+                // })
                 // console.log("period", periodTracker, __traversed);
             material = periodTracker[period];
             if (!__traversed.hasOwnProperty(id)) {
                 var points = intoTheVoid(+id, [], 0);
-                console.log("\tnot been traversed", id, points.length, material)
+                // console.log("\tnot been traversed", id, points.length, material)
 
-                var mesh = createPathLine(points, id, period, material);
-                linesGroup.add(mesh);
+                var lineMesh = createPathLine(points, id, period, material);
+                if (lineMesh)
+                    linesGroup.add(lineMesh);
             }
         }
     });
@@ -240,7 +254,7 @@ function createHaloLineGeometry() {
 
 // Helper function
 function intoTheVoid(id, points, steps) {
-    console.log('\tintoTheVoid', typeof id, steps);
+    // console.log('\tintoTheVoid', typeof id, steps);
     var maxSteps = 1;
     var halo = HaloLUT[id]; // use the ID to pull the halo
     var desc_id = +halo.desc_id;
@@ -266,7 +280,7 @@ function intoTheVoid(id, points, steps) {
 
 
 function createPathLine(points, id, period, material) {
-    console.log("createPathLine(points, id, period, ", points, typeof id, typeof period, material);
+    // console.log("createPathLine(points, id, period, ", points, typeof id, typeof period, material);
     // if points is defined at all...
     var color = colorKey(period);
     if (points && points.length > 1) {
@@ -288,7 +302,7 @@ function createPathLine(points, id, period, material) {
             colors[i] = new THREE.Color(color);
         }
 
-        console.log(geometry);
+        // console.log(geometry);
         geometry.colors = colors;
         geometry.computeLineDistances();
 

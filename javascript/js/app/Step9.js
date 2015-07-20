@@ -40,7 +40,6 @@ var pointCloud;
 var haloStats;
 var DEFERRED = true;
 
-
 // Be sure to match this with the slider's connect!!
 var colorKey = d3.scale.linear()
     .domain([0, 18, 36, 53, 71, NUMTIMEPERIODS])
@@ -97,7 +96,29 @@ function onCreate() {
     /* -------------------------------*/
 
     // **** Stream in our data! Build Add scene components *** //
-    initHaloTree("js/assets/tree_676638.json", true);
+
+    // **** Camera! ***
+    initCamera();
+
+    // **** Setup our Raycasting stuff ***
+    initRayCaster();
+
+    // **** Action! Listeners *** //
+    initListeners();
+
+    // initHaloTree("js/assets/tree_676638.json", true);
+    initHaloMap("js/assets/hlist_1.0.json");
+
+    // showSpinner(true)
+    // oboe("js/assets/tree_0_0_0.json")
+    //     .node("!.*", function(halo, path) {
+    //         console.log(halo, path)
+    //         return oboe.drop
+
+    //     }).done(function(){
+    //         console.log("done")
+    //     })
+
 }
 
 /* ================================== *
@@ -160,7 +181,7 @@ function render() {
             }
         }
         controls.update();
-        updateLightPosition();
+        // updateLightPosition();
         renderer.render(scene, camera);
     }
 }

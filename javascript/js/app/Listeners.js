@@ -32,7 +32,8 @@ function onMouseClick() {
     // update the picking ray with the camera and mouse position
     raycaster.setFromCamera( mouse, camera );
     // calculate objects intersecting the picking ray
-    var hit, hits = raycaster.intersectObjects( sphereGroup.children );
+    var hit,
+        hits = raycaster.intersectObjects( sphereGroup.children );
 
     for (var i = 0; i < hits.length; i++) {
 
@@ -63,7 +64,7 @@ function onMouseClick() {
 
 function onMouseDoubleClick() {
 
-    console.log("Double Click!!", curTarget.object.halo_id);
+    console.log("Double Click!!", curTarget.object.name);
     // update the picking ray with the camera and mouse position
 
     if(config.enableSelection) {
@@ -71,14 +72,34 @@ function onMouseDoubleClick() {
         toggleVisibility(linesGroup, false);
         toggleVisibility(sphereGroup, false);
 
-        var id = curTarget.object.halo_id;
-        var period = curTarget.object.halo_period;
+        var id = curTarget.object.name;
+        var period = curTarget.object.period;
         // just need to use the halo-id's to turn the spheres on, no sense in rebuilding existing data.
         var points = intoTheAbyss(id, period, []);
         createSpline(points, id, period);
 
-    } else
-        tweenToPosition(1500, 500, false);
+    }
+    else if (config.showHaloMap) {
+        raycaster.setFromCamera(mouse, camera);
+        var hit = raycaster.intersectObject(pointCloud)[0];
+        if (hit) {
+            var index = hit.index;
+            var haloID = hit.object.geometry.vertices[index].name
+            config.dataset = haloID.toString() + " Picked";
+            config.__updateData();
+            pointCloud.geometry.colors[index].setRGB(1, 1, 0);
+            pointCloud.geometry.colorsNeedUpdate = true;
+            curTarget = hit;
+            tweenToPosition(4500, 4500, true);
+            // if (prevHit){
+            //     var pIndex = prevHit.index
+            //     prevHit.object.geometry.colors[pIndex].setRGB(1, 0, 0);
+            //     prevHit.object.geometry.colorsNeedUpdate = true;
+            // }
+        }
+    }
+    // else
+    //     tweenToPosition(1500, 1500, false);
 
 }
 

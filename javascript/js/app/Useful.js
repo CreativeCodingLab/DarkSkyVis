@@ -29,7 +29,7 @@ function displayHalos() {
                 i = +mesh.period;
                 mesh.visible = (i >= EPOCH_HEAD && i <= EPOCH_TAIL)? true : false;
                 if (curTarget && mesh.position !== curTarget.object.position){
-                    mesh.material.color.set(colorKey(i));
+                    // mesh.material.color.set(colorKey(i));
                     mesh.material.opacity = 0.4;
                 }
             });
@@ -111,7 +111,7 @@ function displayHaloStats() {
 
 function tweenToPosition(durationA, durationB, zoom) {
 
-    console.log("we are tweenToPosition! Pre");
+    console.log("we are tweenToPosition!",durationA, durationB, zoom);
     TWEEN.removeAll();
 
 
