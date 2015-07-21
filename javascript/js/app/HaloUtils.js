@@ -264,7 +264,7 @@ function createHaloLineGeometry() {
         linewidth: 0.5,
         vertexColors: THREE.VertexColors,
         transparent: true,
-        opacity: 0.5
+        opacity: 0.2
     })
 
     var id, period, count = 0;

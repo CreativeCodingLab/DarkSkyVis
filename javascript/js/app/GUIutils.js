@@ -34,6 +34,7 @@ function GUIcontrols() {
     this.animateTime = function() {};
     this.isPlaying = false;
 
+    this.screenshot = function() {};
 
     // Cosmetic manipulations
     this.color0 = rgbToHex(255, 0, 0);
@@ -369,7 +370,17 @@ function initGUI() {
         }
 
         haloInteractionBox.open();
+
+
+        var screenCapture = haloInteractionBox.add(config, "screenshot").name("Take Picture");
+        {
+            screenCapture.onFinishChange(function() {
+                window.open( renderer.domElement.toDataURL("image/png"), "Final");
+                return false;
+            });
+        }
     }
+
 
 
     //     var haloFilterBox = guiBox.addFolder("Filter Halos by Properties");

@@ -29,6 +29,10 @@ function initScene() {
 
 function initRenderer() {
     console.log("initRenderer()");
+    // preserveDrawingBuffer allows us to take a screenshot!
+    // There is a performance implication to this however, so dont use it if not needed
+    // http://stackoverflow.com/questions/15558418/how-do-you-save-an-image-from-a-three-js-canvas
+    // renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
     renderer = new THREE.WebGLRenderer({ antialias: true });
     {
         renderer.setPixelRatio(window.devicePixelRatio);
