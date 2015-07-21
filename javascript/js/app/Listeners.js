@@ -83,22 +83,20 @@ function onMouseDoubleClick() {
         raycaster.setFromCamera(mouse, camera);
         var hit = raycaster.intersectObjects(pointCloud.children)[0];
         if (hit) {
-            var index = hit.index;
-            var haloID = hit.object.geometry.vertices[index].name
+            var haloID = hit.object.name
             config.dataset = haloID.toString() + " Picked";
             config.__updateData();
-            pointCloud.geometry.colors[index].setRGB(1, 1, 0);
-            pointCloud.geometry.colorsNeedUpdate = true;
+            hit.object.material.color.setRGB(1, 1, 0);
             curTarget = hit;
             // if (prevHit){
             //     var pIndex = prevHit.index
             //     prevHit.object.geometry.colors[pIndex].setRGB(1, 0, 0);
             //     prevHit.object.geometry.colorsNeedUpdate = true;
             // }
+            tweenToPosition(4500, 3250, true);
         }
     }
     // else
-    //     tweenToPosition(1500, 1500, false);
 
 }
 

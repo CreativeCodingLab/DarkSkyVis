@@ -105,13 +105,13 @@ function initHaloMap(url) {
     var forestGeometry = new THREE.Geometry();
     var colors = [];
     prepGlobalStructures();
-    showSpinner(true);
-
+    var targetSet = false;
     pointCloud = new THREE.Object3D();
 
 
-    var circle = createCircleGeometry();
-    var map = THREE.ImageUtils.loadTexture( "js/assets/sprites/spot.png" );
+    showSpinner(true);
+
+    var map = THREE.ImageUtils.loadTexture( "js/assets/sprites/nova.png" );
         map.minFilter = THREE.NearestFilter;
 
     oboe(url)
@@ -152,54 +152,28 @@ function initHaloMap(url) {
 
             var rs1 = (halo.rvir / halo.rs) * 0.01
             var mesh = new THREE.Sprite(material)
-            // mesh.geometry.fromGeometry(circle);
-            // {
-            //     mesh.geometry.verticesNeedUpdate = true;
-            //     mesh.geometry.elementsNeedUpdate = true;
-            //     mesh.geometry.uvsNeedUpdate = true;
-            //     mesh.geometry.normalsNeedUpdate = true;
-            //     mesh.geometry.tangentsNeedUpdate = true;
-            //     mesh.geometry.colorsNeedUpdate = true;
 
-            // }
             mesh.name = halo.id;
-            // mesh.period = +halo.time;
-            // mesh.rs1 = +halo.rs1;
             mesh.position.set(pos[0], pos[1], pos[2]);
             mesh.scale.set(rs1, rs1, rs1);
             mesh.updateMatrix();
             pointCloud.add(mesh);
 
+            if (!targetSet) {
+                curTarget = {
+                    object: mesh
+                }
+                targetSet = true;
+
+            };
+
             return oboe.drop
         })
         .done(function() {
             console.log("finished uploading")
-        /*
-            var map = THREE.ImageUtils.loadTexture( "js/assets/sprites/particle.png" );
-                map.minFilter = THREE.NearestFilter;
-            var material = new THREE.PointCloudMaterial({
-                size: 1.0,
-                vertexColors: THREE.VertexColors,
-                map: map,
-                transparent: true,
-                opacity: 0.6
-            });
-            forestGeometry.colors = colors;
-            pointCloud = new THREE.PointCloud(forestGeometry, material);
-            pointCloud.renderOrder = 1;
-            pointCloud.updateMatrix();
-            scene.add(pointCloud);
-            console.log(pointCloud);
-            curTarget = {object: pointCloud}
-        */
             showSpinner(false);
             scene.add(pointCloud);
-            // curTarget = {
-            //     object: pointCloud
-            // };
-            // curTarget.object.material.opacity = 0.7;
-            // console.log("currTarget",curTarget);
-            // tweenToPosition(4500, 4250, true);
+            tweenToPosition(2500, 1250, true);
             DEFERRED = false;
             console.log("DEFERRED", DEFERRED);
         })
@@ -255,7 +229,7 @@ function createCircleGeometry() {
 
 
 function createSphereGeometry(halo, sphereGeometry, sphereMaterial) {
-    console.log("createSphereGeometry(",halo,")")
+    // console.log("createSphereGeometry(",halo,")")
     var period = +halo.time;
     //    var color = colorKey(period)
 
@@ -300,7 +274,7 @@ function createHaloLineGeometry() {
     var id, period, count = 0;
     // We can use the sphereGroup to drive the line creation
     sphereGroup.children.forEach(function(mesh) {
-        console.log("mesh", count, mesh.name);
+        // console.log("mesh", count, mesh.name);
         count++;
         if (mesh) {
             id = +mesh.name,

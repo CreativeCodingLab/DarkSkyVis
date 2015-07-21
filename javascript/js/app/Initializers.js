@@ -189,7 +189,7 @@ function initSpinner() {
         radius: 84, // The radius of the inner circle
         scale: 1, // Scales overall size of the spinner
         corners: 1, // Corner roundness (0..1)
-        color: rgbToHex(0, 0, 0), // #rgb or #rrggbb or array of colors
+        color: rgbToHex(255, 255, 255), // #rgb or #rrggbb or array of colors
         opacity: 0, // Opacity of the lines
         rotate: 90, // The rotation offset
         direction: 1, // 1: clockwise, -1: counterclockwise
