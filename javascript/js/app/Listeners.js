@@ -27,8 +27,8 @@ function onMouseMove( event ) {
 }
 
 
-function onMouseClick() {
-    console.log("Single Click!!");
+function onMouseClick(event) {
+    console.log("Single Click!!", event.shiftKey);
     // update the picking ray with the camera and mouse position
     raycaster.setFromCamera( mouse, camera );
     // calculate objects intersecting the picking ray
@@ -59,6 +59,7 @@ function onMouseClick() {
 
         displayHaloStats();
     }
+
 }
 
 
@@ -66,6 +67,7 @@ function onMouseDoubleClick() {
 
     console.log("Double Click!!", curTarget.object.name);
     // update the picking ray with the camera and mouse position
+    HaloSelect = (HaloSelect) ? HaloSelect : [];
 
     if(config.enableSelection) {
 
@@ -80,12 +82,26 @@ function onMouseDoubleClick() {
 
     }
     else if (config.showHaloMap) {
+
         raycaster.setFromCamera(mouse, camera);
         var hit = raycaster.intersectObjects(pointCloud.children)[0];
+
         if (hit) {
+
             var haloID = hit.object.name
             config.dataset = haloID.toString() + " Picked";
-            config.__updateData();
+
+            if (event.shiftKey) {
+                console.log("DOUBLT RAINBOW!", haloID, HaloSelect)
+                HaloSelect.push(haloID);
+
+            } else if (HaloSelect.length >= 0) {
+
+                config.__updateData();
+                HaloSelect = null;
+
+            }
+
             hit.object.material.color.setRGB(1, 1, 0);
             curTarget = hit;
             // if (prevHit){
@@ -94,7 +110,11 @@ function onMouseDoubleClick() {
             //     prevHit.object.geometry.colorsNeedUpdate = true;
             // }
             tweenToPosition(4500, 3250, true);
+
+
         }
+
+
     }
     else
         tweenToPosition(1500, 1500, true);
@@ -110,13 +130,13 @@ function onKeyPress( event ) {
         case 49:
             camera.position.set(camera.position.x, camera.position.y, camera.position.z-0.3);
             controls.update();
-            updateLightPosition();
+            // updateLightPosition();
             console.log(camera, light)
             break;
         case 50:
             camera.position.set(camera.position.x, camera.position.y, camera.position.z+0.3);
             controls.update();
-            updateLightPosition();
+            // updateLightPosition();
             console.log(camera, light);
             break;
     }

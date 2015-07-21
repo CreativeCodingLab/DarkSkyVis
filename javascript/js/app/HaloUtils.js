@@ -15,42 +15,29 @@ function initHaloTree(url, firstTime) {
 
     // create halo Sphere components ahead of time to save memory;
     var targetSet = false;
-    var map = THREE.ImageUtils.loadTexture( "js/assets/sprites/nova.png" );
+    var map = THREE.ImageUtils.loadTexture( "js/assets/sprites/nova.png" );  // http://www.goktepeliler.com/vt22/images/414mavi_klar_11_.png
     var map2 = THREE.ImageUtils.loadTexture( "js/assets/sprites/triangle.png" );
     map.minFilter = THREE.NearestFilter;
     map2.minFilter = THREE.NearestFilter;
-    var sphereGeometry = new THREE.SphereGeometry(1, 32, 32);
 
-    var _materialsByPeriod = {}
-    var sphereMaterial = new THREE.SpriteMaterial();
-
-
-    // var material = new THREE.SpriteMaterial( { map: map, color: 0xffffff, fog: true } );
-    // var sprite = new THREE.Sprite( material );
-
-
-    if (firstTime) {
-        // Prepare our Global halo objects
-        prepGlobalStructures();
-
-    } else {
-
-        // reset our Halo container objects
-        resetGlobalStructures();
-
-    }
+    var sphereMaterial;
 
     showSpinner(true);
+
+    if (firstTime)
+        // Prepare our Global halo objects
+        resetGlobalStructures();
+
 
     oboe(url)
         .node("!.*", function(halo, path) {
 
-            halo.rs1 = (halo.rvir / halo.rs) * 0.05; // convenience keys, one divided by
-            halo.rs2 = (halo.rvir * halo.rs); // the other multiplied
+            halo.rs1 = (halo.rvir / halo.rs) * 0.01; // convenience keys, one divided by
             halo.time = parseInt(halo.scale * 100) - 12;  // 12 is the offset
 
             // add Halos to list by ID
             HaloLUT[+halo.id] = halo;
+            EPOCH_PERIODS[+halo.time].push(halo.id);
 
             // console.log(halo.id)
 
@@ -60,23 +47,30 @@ function initHaloTree(url, firstTime) {
             // for (var ax=0; ax<3; ax++){
             //     vr += halo.velocity[ax]*halo.position[ax];
             // }
-
             // vr /= (rmag*vmag);
-            sphereMaterial = new THREE.SpriteMaterial({
+
+            var sphereMaterial = new THREE.SpriteMaterial({
                 map: map, //(halo.num_prog > 1)? map2: map,
-                // color: new THREE.Color( 0.5 + 0.5*vr , 0.5, 0.5 - 0.5*vr ),
-                color: colorKey(halo.time),
+                color: colorKey(halo.time), // color: new THREE.Color( 0.5 + 0.5*vr , 0.5, 0.5 - 0.5*vr ),
                 transparent: true,
                 opacity: (halo.num_prog > 1) ? 0.9 : 0.4
             });
-            // console.log( halo.scale + halo.scale*vr , halo.scale, halo.scale - halo.scale*vr );
+
+
+            // Add the halo's id to the mess so we can check it against the Halo ID map/LUT/Hash.
+            var mesh = new THREE.Sprite( sphereMaterial );
+            mesh.name = halo.id;
+            mesh.period = +halo.time;
+            mesh.rs1 = +halo.rs1;
+            mesh.position.set(halo.x, halo.y, halo.z);
+            mesh.scale.set(halo.rs1, halo.rs1, halo.rs1);
+            mesh.visible = (+halo.time >= EPOCH_HEAD && +halo.time <= EPOCH_TAIL) ? config.showHalos : false;
+            mesh.updateMatrix();
+            sphereGroup.add(mesh);
 
             HaloLUT.length++;
             HaloLUT.min = (halo.time < HaloLUT.min) ? halo.time : HaloLUT.min
             HaloLUT.max = (halo.time > HaloLUT.max) ? halo.time : HaloLUT.max
-            // **** Make some Spline Geometry ***
-            createSphereGeometry(halo, sphereGeometry, sphereMaterial);
-
 
             if (!targetSet && (halo.time >= EPOCH_HEAD && halo.time <= EPOCH_TAIL)) {
                 console.log("Ha got you fucker!", halo.time);
@@ -94,10 +88,12 @@ function initHaloTree(url, firstTime) {
         })
         .done(function() {
             console.log("\tDone")
-            showSpinner(false);
             console.log("sphereGroup.children", sphereGroup.children.length)
             createHaloLineGeometry();
+
+            showSpinner(false);
             return oboe.drop;
+
         });
 }
 
@@ -165,7 +161,6 @@ function initHaloMap(url) {
                     object: mesh
                 }
                 targetSet = true;
-
             };
 
             return oboe.drop

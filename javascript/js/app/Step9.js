@@ -27,7 +27,7 @@ var linesGroup, sphereGroup, traceGroup;
 // HaloBranch is the object acts like HaloSpheres
 // HaloSelect is a global lookup which keeps track of all SELECTED Halos
 var HaloBranch = {},
-    HaloSelect = {};
+    HaloSelect = [];
 // HaloLUT is a global lookup table to keep track of all loaded halos
 var HaloLUT, __traversed = {};
 
