@@ -138,7 +138,7 @@ function initSlider() {
     console.log("initSlider()");
     slider = $('.tslider');
     slider.noUiSlider({
-        start: [0, 50],
+        start: [0, 88],
         connect: true, // shows areas of coverage
         orientation: "vertical",
         direction: "ltr", //

@@ -63,7 +63,7 @@ function initHaloTree(url, firstTime) {
 
             // vr /= (rmag*vmag);
             sphereMaterial = new THREE.SpriteMaterial({
-                map: (halo.num_prog > 1)? map2: map,
+                map: map, //(halo.num_prog > 1)? map2: map,
                 // color: new THREE.Color( 0.5 + 0.5*vr , 0.5, 0.5 - 0.5*vr ),
                 color: colorKey(halo.time),
                 transparent: true,
@@ -87,7 +87,7 @@ function initHaloTree(url, firstTime) {
                 };
                 curTarget.object.material.opacity = 0.7;
                 DEFERRED = false;
-                tweenToPosition(250, 250, true);
+                tweenToPosition(1250, 1250, true);
             }
             return oboe.drop;
 
