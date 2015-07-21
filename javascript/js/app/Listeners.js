@@ -92,25 +92,24 @@ function onMouseDoubleClick() {
             config.dataset = haloID.toString() + " Picked";
 
             if (event.shiftKey) {
-                console.log("DOUBLT RAINBOW!", haloID, HaloSelect)
-                HaloSelect.push(haloID);
+                if (HaloSelect.length > 5) {
+                    alert("I think Five halos is more than enough for the moment...")
+                    HaloSelect.pop();
+
+                } else {
+                    console.log("DOUBLT RAINBOW!", haloID, HaloSelect)
+                    HaloSelect.push(haloID);
+                };
 
             } else if (HaloSelect.length >= 0) {
 
                 config.__updateData();
                 HaloSelect = null;
-
+                tweenToPosition(4500, 3250, true);
             }
 
             hit.object.material.color.setRGB(1, 1, 0);
             curTarget = hit;
-            // if (prevHit){
-            //     var pIndex = prevHit.index
-            //     prevHit.object.geometry.colors[pIndex].setRGB(1, 0, 0);
-            //     prevHit.object.geometry.colorsNeedUpdate = true;
-            // }
-            tweenToPosition(4500, 3250, true);
-
 
         }
 

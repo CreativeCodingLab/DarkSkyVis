@@ -111,6 +111,7 @@ GUIcontrols.prototype.__animateSlider = function(offset) {
         tweenToTail.start();
     }
     console.log("this.isPlaying", this.isPlaying);
+    this.isPlaying = false;
 
 };
 
@@ -198,12 +199,13 @@ GUIcontrols.prototype.__updateData = function() {
     showSpinner(true);
     var that = this;
     if (HaloSelect.length > 1) {
-        for (var i = HaloSelect.length - 1; i >= 0; i--) {
+        console.log("Adding MULTIPLE HALOS")
+        for (var i = 0; i < HaloSelect.length; i++) {
+            console.log(HaloSelect[i])
             var URL = "js/assets/trees/tree_" + HaloSelect[i].toString() + ".json";
             console.log("\nAdding..", URL)
             initHaloTree(URL, false);
         };
-        tweenToPosition(1500, 1500, true);
     } else {
         var URL = "js/assets/trees/tree_" + this.dataset.split(' ')[0] + ".json";
         console.log("\nUpdating!", URL)
@@ -283,31 +285,31 @@ function initGUI() {
     /*
      * Add or Remove Datasets
      */
-    var dataSetBox = guiBox.addFolder("Choose a Dataset");
-    {
-        var data = dataSetBox.add(config, "dataset", [
-            "None",
-            "676638 777K", "681442 867K",
-            "678449 911K", "676674 925K",
-            "674518 945K", "675540 1.1M",
-            "680478 1.2M", "677567 1.3M",
-            "677601 1.3M", "680500 1.4M",
-            "680488 1.4M", "676657 1.5M",
-            "676579 1.5M", "675530 1.7M",
-            "679604 1.7M", "679642 1.9M",
-            "674567 2.4M", "676540 2.4M",
-            "679619 2.8M", "674539 2.9M",
-            "681422 2.9M", "677545 2.9M",
-            "677521 3.6M", "680462 4.0M",
-            "679582 6.0M"
-        ]).listen();
-        data.name("Tree #");
-        data.onFinishChange(function() {
-            config.__updateData();
-        });
+    // var dataSetBox = guiBox.addFolder("Choose a Dataset");
+    // {
+    //     var data = dataSetBox.add(config, "dataset", [
+    //         "None",
+    //         "676638 777K", "681442 867K",
+    //         "678449 911K", "676674 925K",
+    //         "674518 945K", "675540 1.1M",
+    //         "680478 1.2M", "677567 1.3M",
+    //         "677601 1.3M", "680500 1.4M",
+    //         "680488 1.4M", "676657 1.5M",
+    //         "676579 1.5M", "675530 1.7M",
+    //         "679604 1.7M", "679642 1.9M",
+    //         "674567 2.4M", "676540 2.4M",
+    //         "679619 2.8M", "674539 2.9M",
+    //         "681422 2.9M", "677545 2.9M",
+    //         "677521 3.6M", "680462 4.0M",
+    //         "679582 6.0M"
+    //     ]).listen();
+    //     data.name("Tree #");
+    //     data.onFinishChange(function() {
+    //         config.__updateData();
+    //     });
 
-        dataSetBox.open();
-    }
+    //     dataSetBox.open();
+    // }
 
 
     /*
