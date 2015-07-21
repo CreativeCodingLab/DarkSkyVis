@@ -15,25 +15,14 @@ function initHaloTree(url, firstTime) {
 
     // create halo Sphere components ahead of time to save memory;
     var targetSet = false;
-    var map = THREE.ImageUtils.loadTexture( "js/assets/sprites/spot.png" );
-    map.minFilter = THREE.NearestFilter;
+    var map = THREE.ImageUtils.loadTexture( "js/assets/sprites/circle3.png" );
     var map2 = THREE.ImageUtils.loadTexture( "js/assets/sprites/triangle.png" );
+    map.minFilter = THREE.NearestFilter;
     map2.minFilter = THREE.NearestFilter;
     var sphereGeometry = new THREE.SphereGeometry(1, 32, 32);
 
     var _materialsByPeriod = {}
-    var sphereMaterial = new THREE.SpriteMaterial({
-                    map: map,
-                    color: rgbToHex(255, 255, 255),
-                    // blending: THREE.AdditiveBlending,
-                    // specular: colorKey(halo.time),
-                    // shininess: 40,
-                    // shading: THREE.SmoothShading,
-                    // vertexColors: THREE.VertexColors,
-                    transparent: true,
-                    // side: THREE.BackSide,  // Seems to be slowing things down a lot
-                    opacity: 0.4
-                });
+    var sphereMaterial = new THREE.SpriteMaterial();
 
 
     // var material = new THREE.SpriteMaterial( { map: map, color: 0xffffff, fog: true } );
@@ -58,26 +47,12 @@ function initHaloTree(url, firstTime) {
 
             halo.rs1 = (halo.rvir / halo.rs) * 0.01; // convenience keys, one divided by
             halo.rs2 = (halo.rvir * halo.rs); // the other multiplied
-            // halo.vec3 = THREE.Vector3(halo.x, halo.y, halo.z); // Convenience, make a THREE.Vector3
             halo.time = parseInt(halo.scale * 100) - 12;  // 12 is the offset
 
             // add Halos to list by ID
             HaloLUT[+halo.id] = halo;
 
             console.log(halo.id)
-
-            // var pos = halo.position,
-            //     vel = halo.velocity;
-
-            // var particle = new THREE.Vector3(halo.x, halo.y, halo.z);
-            // // particle.x = halo.position[0];
-            // // particle.y = halo.position[1];
-            // // particle.z = halo.position[2];
-
-            // particle.name = halo.id;
-            // particle.period = halo.time;
-
-            // forestGeometry.vertices.push(particle);
 
             var vmag = Math.sqrt(halo.vx*halo.vx + halo.vy*halo.vy + halo.vz*halo.vz);
             var rmag = Math.sqrt(halo.x*halo.x + halo.y*halo.y + halo.z*halo.z);
@@ -89,14 +64,8 @@ function initHaloTree(url, firstTime) {
             vr /= (rmag*vmag);
             sphereMaterial = new THREE.SpriteMaterial({
                 map: (halo.num_prog > 1)? map2: map,
-                color: new THREE.Color( 0.5 + 0.5*vr , 0.5*vr, 0.5 - 0.5*vr ),
-                // blending: THREE.AdditiveBlending,
-                // specular: colorKey(halo.time),
-                // shininess: 40,
-                // shading: THREE.SmoothShading,
-                // vertexColors: THREE.VertexColors,
+                color: new THREE.Color( 0.5 + 0.5*vr , 0.5, 0.5 - 0.5*vr ),
                 transparent: true,
-                // side: THREE.BackSide,  // Seems to be slowing things down a lot
                 opacity: (halo.num_prog > 1) ? 0.9 : 0.4
             });
             // console.log( halo.scale + halo.scale*vr , halo.scale, halo.scale - halo.scale*vr );
@@ -135,10 +104,15 @@ function initHaloMap(url) {
     console.log("Init The Halo Map", url);
     var forestGeometry = new THREE.Geometry();
     var colors = [];
-    var map = THREE.ImageUtils.loadTexture( "js/assets/sprites/circle.png" );
-    map.minFilter = THREE.NearestFilter;
     prepGlobalStructures();
     showSpinner(true);
+
+    pointCloud = new THREE.Object3D();
+
+
+    var circle = createCircleGeometry();
+    var map = THREE.ImageUtils.loadTexture( "js/assets/sprites/spot.png" );
+        map.minFilter = THREE.NearestFilter;
 
     oboe(url)
         .node("!.*", function(halo, path) {
@@ -161,35 +135,65 @@ function initHaloMap(url) {
             var vmag = Math.sqrt(vel[0]*vel[0] + vel[1]*vel[1] + vel[2]*vel[2]);
             var rmag = Math.sqrt(pos[0]*pos[0] + pos[1]*pos[1] + pos[2]*pos[2]);
             var vr = 0.0;
-            for (var ax=0; ax<3; ax++){
+
+            for (var ax=0; ax<3; ax++) {
                 vr += vel[ax]*pos[ax];
             }
 
             vr /= (rmag*vmag);
 
-            colors.push(new THREE.Color(0.5 + 0.5*vr , 0.5, 0.5 - 0.5*vr ))
+            var material = new THREE.SpriteMaterial({
+                    map: map,
+                    transparent: true,
+                    opacity: 0.6
+            });
+            material.color.set(new THREE.Color(0.5 + 0.5*vr , 0.5, 0.5 - 0.5*vr ))
+
+
+            var rs1 = (halo.rvir / halo.rs) * 0.01
+            var mesh = new THREE.Sprite(material)
+            // mesh.geometry.fromGeometry(circle);
+            // {
+            //     mesh.geometry.verticesNeedUpdate = true;
+            //     mesh.geometry.elementsNeedUpdate = true;
+            //     mesh.geometry.uvsNeedUpdate = true;
+            //     mesh.geometry.normalsNeedUpdate = true;
+            //     mesh.geometry.tangentsNeedUpdate = true;
+            //     mesh.geometry.colorsNeedUpdate = true;
+
+            // }
+            mesh.name = halo.id;
+            // mesh.period = +halo.time;
+            // mesh.rs1 = +halo.rs1;
+            mesh.position.set(pos[0], pos[1], pos[2]);
+            mesh.scale.set(rs1, rs1, rs1);
+            mesh.updateMatrix();
+            pointCloud.add(mesh);
 
             return oboe.drop
         })
         .done(function() {
             console.log("finished uploading")
+        /*
+            var map = THREE.ImageUtils.loadTexture( "js/assets/sprites/particle.png" );
+                map.minFilter = THREE.NearestFilter;
             var material = new THREE.PointCloudMaterial({
-                // color: rgbToHex(255, 0, 0),
                 size: 1.0,
                 vertexColors: THREE.VertexColors,
-                map: map, //THREE.ImageUtils.loadTexture( "js/assets/sprites/circle2.png" ),
-                // blending: THREE.AdditiveBlending,
+                map: map,
                 transparent: true,
                 opacity: 0.6
             });
             forestGeometry.colors = colors;
             pointCloud = new THREE.PointCloud(forestGeometry, material);
+            pointCloud.renderOrder = 1;
             pointCloud.updateMatrix();
             scene.add(pointCloud);
             console.log(pointCloud);
             curTarget = {object: pointCloud}
+        */
             showSpinner(false);
-
+            scene.add(pointCloud);
             // curTarget = {
             //     object: pointCloud
             // };
@@ -199,6 +203,54 @@ function initHaloMap(url) {
             DEFERRED = false;
             console.log("DEFERRED", DEFERRED);
         })
+}
+
+
+function createCircleGeometry() {
+    // geometry
+    var geometry = new THREE.Geometry();
+    var normal = new THREE.Vector3( 0, 0, 1 );
+    var radius = 1.0;
+    var sides = 32;
+    for ( var i = 0; i < sides; i++ ) {
+
+        var radians1 = 2 * Math.PI * i / sides;
+        var x1 = Math.cos( radians1 );
+        var y1 = Math.sin( radians1 );
+
+        var radians2 = 2 * Math.PI * ( i + 1 ) / sides;
+        var x2 = Math.cos( radians2 );
+        var y2 = Math.sin( radians2 );
+
+        // vertices
+        geometry.vertices.push(
+            new THREE.Vector3( 0, 0, 0 ),
+            new THREE.Vector3( x1 * radius, y1 * radius, 0 ),
+            new THREE.Vector3( x2 * radius, y2 * radius, 0 )
+        );
+
+        // uvs
+        geometry.faceVertexUvs[ 0 ].push([
+            new THREE.Vector2( 0.5, 0.5 ),
+            new THREE.Vector2( x1 / 2 + 0.5, y1 / 2 + 0.5 ),
+            new THREE.Vector2( x2 / 2 + 0.5, y2 / 2 + 0.5 )
+        ]);
+
+        // face
+        var face = new THREE.Face3( i * 3, i * 3 + 1, i * 3 + 2 );
+        geometry.faces.push( face );
+
+        // face normal
+        face.normal.copy( normal );
+
+        // face vertex normals
+        face.vertexNormals.push( normal.clone(), normal.clone(), normal.clone() );
+
+    }
+
+    // centroids
+    // geometry.computeCentroids();
+    return geometry;
 }
 
 

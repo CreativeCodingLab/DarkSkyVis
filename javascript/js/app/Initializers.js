@@ -33,7 +33,7 @@ function initRenderer() {
     {
         renderer.setPixelRatio(window.devicePixelRatio);
         renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setClearColor(rgbToHex(255, 255, 255), 1);
+        renderer.setClearColor(rgbToHex(50, 50, 50), 1);
         renderer.gammaInput = true;
         renderer.gammaOutput = true;
     }

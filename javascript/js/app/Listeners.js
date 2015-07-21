@@ -81,7 +81,7 @@ function onMouseDoubleClick() {
     }
     else if (config.showHaloMap) {
         raycaster.setFromCamera(mouse, camera);
-        var hit = raycaster.intersectObject(pointCloud)[0];
+        var hit = raycaster.intersectObjects(pointCloud.children)[0];
         if (hit) {
             var index = hit.index;
             var haloID = hit.object.geometry.vertices[index].name
@@ -90,7 +90,6 @@ function onMouseDoubleClick() {
             pointCloud.geometry.colors[index].setRGB(1, 1, 0);
             pointCloud.geometry.colorsNeedUpdate = true;
             curTarget = hit;
-            tweenToPosition(4500, 4500, true);
             // if (prevHit){
             //     var pIndex = prevHit.index
             //     prevHit.object.geometry.colors[pIndex].setRGB(1, 0, 0);
