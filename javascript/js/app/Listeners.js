@@ -96,7 +96,8 @@ function onMouseDoubleClick() {
             tweenToPosition(4500, 3250, true);
         }
     }
-    // else
+    else
+        tweenToPosition(1500, 1500, true);
 
 }
 

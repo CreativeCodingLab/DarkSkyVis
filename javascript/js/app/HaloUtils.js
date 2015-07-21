@@ -15,7 +15,7 @@ function initHaloTree(url, firstTime) {
 
     // create halo Sphere components ahead of time to save memory;
     var targetSet = false;
-    var map = THREE.ImageUtils.loadTexture( "js/assets/sprites/circle3.png" );
+    var map = THREE.ImageUtils.loadTexture( "js/assets/sprites/nova.png" );
     var map2 = THREE.ImageUtils.loadTexture( "js/assets/sprites/triangle.png" );
     map.minFilter = THREE.NearestFilter;
     map2.minFilter = THREE.NearestFilter;
@@ -45,26 +45,27 @@ function initHaloTree(url, firstTime) {
     oboe(url)
         .node("!.*", function(halo, path) {
 
-            halo.rs1 = (halo.rvir / halo.rs) * 0.01; // convenience keys, one divided by
+            halo.rs1 = (halo.rvir / halo.rs) * 0.05; // convenience keys, one divided by
             halo.rs2 = (halo.rvir * halo.rs); // the other multiplied
             halo.time = parseInt(halo.scale * 100) - 12;  // 12 is the offset
 
             // add Halos to list by ID
             HaloLUT[+halo.id] = halo;
 
-            console.log(halo.id)
+            // console.log(halo.id)
 
-            var vmag = Math.sqrt(halo.vx*halo.vx + halo.vy*halo.vy + halo.vz*halo.vz);
-            var rmag = Math.sqrt(halo.x*halo.x + halo.y*halo.y + halo.z*halo.z);
-            var vr = 0.0;
-            for (var ax=0; ax<3; ax++){
-                vr += halo.velocity[ax]*halo.position[ax];
-            }
+            // var vmag = Math.sqrt(halo.vx*halo.vx + halo.vy*halo.vy + halo.vz*halo.vz);
+            // var rmag = Math.sqrt(halo.x*halo.x + halo.y*halo.y + halo.z*halo.z);
+            // var vr = 0.0;
+            // for (var ax=0; ax<3; ax++){
+            //     vr += halo.velocity[ax]*halo.position[ax];
+            // }
 
-            vr /= (rmag*vmag);
+            // vr /= (rmag*vmag);
             sphereMaterial = new THREE.SpriteMaterial({
                 map: (halo.num_prog > 1)? map2: map,
-                color: new THREE.Color( 0.5 + 0.5*vr , 0.5, 0.5 - 0.5*vr ),
+                // color: new THREE.Color( 0.5 + 0.5*vr , 0.5, 0.5 - 0.5*vr ),
+                color: colorKey(halo.time),
                 transparent: true,
                 opacity: (halo.num_prog > 1) ? 0.9 : 0.4
             });
@@ -150,7 +151,7 @@ function initHaloMap(url) {
             material.color.set(new THREE.Color(0.5 + 0.5*vr , 0.5, 0.5 - 0.5*vr ))
 
 
-            var rs1 = (halo.rvir / halo.rs) * 0.01
+            var rs1 = (halo.rvir / halo.rs) * 0.05
             var mesh = new THREE.Sprite(material)
 
             mesh.name = halo.id;
@@ -171,12 +172,12 @@ function initHaloMap(url) {
         })
         .done(function() {
             console.log("finished uploading")
-            showSpinner(false);
             scene.add(pointCloud);
-            tweenToPosition(2500, 1250, true);
+            tweenToPosition(2500, 0, false);
             DEFERRED = false;
             console.log("DEFERRED", DEFERRED);
         })
+        showSpinner(false);
 }
 
 
@@ -310,7 +311,7 @@ function createHaloLineGeometry() {
 // Helper function
 function intoTheVoid(id, points, steps) {
     // console.log('\tintoTheVoid', typeof id, steps);
-    var maxSteps = 1;
+    var maxSteps = 88;
     var halo = HaloLUT[id]; // use the ID to pull the halo
     var desc_id = +halo.desc_id;
     points.push(halo.position);
