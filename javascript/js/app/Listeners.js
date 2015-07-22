@@ -66,6 +66,7 @@ function onMouseClick(event) {
 function onMouseDoubleClick() {
 
     console.log("Double Click!!", curTarget.object.name);
+    config.treeNum = curTarget.object.name;
     // update the picking ray with the camera and mouse position
     HaloSelect = (HaloSelect) ? HaloSelect : [];
 
@@ -89,7 +90,7 @@ function onMouseDoubleClick() {
         if (hit) {
 
             var haloID = hit.object.name
-            config.dataset = haloID.toString() + " Picked";
+            config.dataset = haloID.toString();
 
             if (event.shiftKey) {
                 if (HaloSelect.length > 5) {

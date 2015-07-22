@@ -14,6 +14,7 @@ function GUIcontrols() {
 
     // Choose Dataset
     this.dataset = "None";
+    this.treeNum = "676638 "
     prepGlobalStructures()
 
     // Reset Position
@@ -208,10 +209,12 @@ GUIcontrols.prototype.__updateData = function() {
             initHaloTree(URL, false);
         };
     } else {
-        var URL = "js/assets/trees/tree_" + this.dataset.split(' ')[0] + ".json";
-        console.log("\nUpdating!", URL)
-        initHaloTree(URL, true);
-        tweenToPosition(1500, 1500, true);
+        if (this.dataset !== "None") {
+            var URL = "js/assets/trees/tree_" + this.dataset + ".json";
+            console.log("\nUpdating!", URL)
+            initHaloTree(URL, true);
+            tweenToPosition(1500, 1500, true);
+        };
     };
 };
 
@@ -286,31 +289,40 @@ function initGUI() {
     /*
      * Add or Remove Datasets
      */
-    // var dataSetBox = guiBox.addFolder("Choose a Dataset");
-    // {
-    //     var data = dataSetBox.add(config, "dataset", [
-    //         "None",
-    //         "676638 777K", "681442 867K",
-    //         "678449 911K", "676674 925K",
-    //         "674518 945K", "675540 1.1M",
-    //         "680478 1.2M", "677567 1.3M",
-    //         "677601 1.3M", "680500 1.4M",
-    //         "680488 1.4M", "676657 1.5M",
-    //         "676579 1.5M", "675530 1.7M",
-    //         "679604 1.7M", "679642 1.9M",
-    //         "674567 2.4M", "676540 2.4M",
-    //         "679619 2.8M", "674539 2.9M",
-    //         "681422 2.9M", "677545 2.9M",
-    //         "677521 3.6M", "680462 4.0M",
-    //         "679582 6.0M"
-    //     ]).listen();
-    //     data.name("Tree #");
-    //     data.onFinishChange(function() {
-    //         config.__updateData();
-    //     });
+    var dataSetBox = guiBox.addFolder("Choose a Dataset");
+    {
+        var text = dataSetBox.add(config, "treeNum").name("Enter Tree #").listen();
+        {
+            text.onFinishChange(function(){
+                config.dataset = config.treeNum + " ";
+                console.log("\tTreeNum entered!", config.treeNum, config.dataset)
+                config.__updateData();
+            });
+        }
 
-    //     dataSetBox.open();
-    // }
+        var data = dataSetBox.add(config, "dataset", [
+            "None",
+            "676638", "681442",
+            "678449", "676674",
+            "674518", "675540",
+            "680478", "677567",
+            "677601", "680500",
+            "680488", "676657",
+            "676579", "675530",
+            "679604", "679642",
+            "674567", "676540",
+            "679619", "674539",
+            "681422", "677545",
+            "677521", "680462",
+            "679582"
+        ]).listen();
+        data.name("Tree #");
+        data.onFinishChange(function() {
+            config.__updateData();
+        });
+
+        dataSetBox.open();
+    }
 
 
     /*
@@ -330,7 +342,7 @@ function initGUI() {
     var haloInteractionBox = guiBox.addFolder("Interaction Components");
     {
         // Turn Halo Selection Mode On/Off
-        var selectionController = haloInteractionBox.add(config, "enableSelection").name("Enable Selection");
+        var selectionController = haloInteractionBox.add(config, "enableSelection").name("Enable Inspection");
         {
             selectionController.onFinishChange(function() {
 //                resetHaloBranchs();
@@ -370,15 +382,6 @@ function initGUI() {
         }
 
         haloInteractionBox.open();
-
-
-        var screenCapture = haloInteractionBox.add(config, "screenshot").name("Take Picture");
-        {
-            screenCapture.onFinishChange(function() {
-                window.open( renderer.domElement.toDataURL("image/png"), "Final");
-                return false;
-            });
-        }
     }
 
 

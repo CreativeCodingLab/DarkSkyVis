@@ -182,6 +182,11 @@ function render() {
         }
         controls.update();
         // updateLightPosition();
+        var time = Date.now() * 0.001;
+
+        // sphereGroup.rotation.y = time * 0.1;
+        // linesGroup.rotation.y = time * 0.1;
+        // pointCloud.rotation.y = time * 0.1;
         renderer.render(scene, camera);
     }
 }
