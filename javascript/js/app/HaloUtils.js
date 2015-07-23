@@ -17,7 +17,7 @@ function initHaloTree(url, firstTime) {
     var targetSet = false;
     var map = THREE.ImageUtils.loadTexture( "js/assets/sprites/nova.png" );  // http://www.goktepeliler.com/vt22/images/414mavi_klar_11_.png
     var sub = THREE.ImageUtils.loadTexture( "js/assets/sprites/triangle.png" );
-    var sup = THREE.ImageUtils.loadTexture( "js/assets/sprites/triangle.png" );
+    var sup = THREE.ImageUtils.loadTexture( "js/assets/sprites/super.png" );
     map.minFilter = THREE.NearestFilter;
     sub.minFilter = THREE.NearestFilter;
     sup.minFilter = THREE.NearestFilter;
@@ -37,6 +37,7 @@ function initHaloTree(url, firstTime) {
             halo.rs1 = (halo.rvir / halo.rs) * 0.01; // convenience keys, one divided by
             halo.time = parseInt(halo.scale * 100) - 12;  // 12 is the offset
             halo.isSub = false;
+            halo.isSuper = false;
             halo.children = [];
             halo.subHalos = [];
 
@@ -63,11 +64,12 @@ function initHaloTree(url, firstTime) {
             // }
             // vr /= (rmag*vmag);
 
+
             var sphereMaterial = new THREE.SpriteMaterial({
-                map: map, //(halo.num_prog > 1)? map2: map,
+                map: map,
                 color: colorKey(halo.time), // color: new THREE.Color( 0.5 + 0.5*vr , 0.5, 0.5 - 0.5*vr ),
                 transparent: true,
-                opacity: (halo.num_prog > 1) ? 0.9 : 0.4
+                opacity: (halo.isSub) ? 0.9 : 0.6
             });
 
 
@@ -430,10 +432,6 @@ function intoTheAbyss(id, period, points) {
     }
 }
 
-function traceBackPath(id, period, points) {
-
-}
-
 
 function createSpline(points, id, period) {
 
@@ -481,17 +479,16 @@ function createSpline(points, id, period) {
 
 function resetHaloBranchs() {
 
-    for (var id in HaloSelect) {
+    // for (var id in HaloSelect) {
 
-        console.log("HaloBranch", id, typeof id)
-        if (id in HaloBranch) {
-            linesGroup.remove(HaloBranch[id]);
-            linesGroup.getObjectByName(id).material.dispose();
-            linesGroup.getObjectByName(id).geometry.dispose();
-        }
-        delete HaloSelect[id]
-    }
-    HaloSelect = {};
+    //     console.log("HaloBranch", id, typeof id)
+    //     if (id in HaloBranch) {
+    //         linesGroup.remove(HaloBranch[id]);
+    //         linesGroup.getObjectByName(id).material.dispose();
+    //         linesGroup.getObjectByName(id).geometry.dispose();
+    //     }
+    // }
+    HaloSelect = [];
     HaloBranch = {};
     __traversed = {};
 
@@ -556,75 +553,4 @@ function resetGlobalStructures() {
     prepGlobalStructures();
 }
 
-
-
-
-function createBufferPathLine(points, id, period, material) {
-    // if points is defined at all...
-    console.log("createBufferPathLine");
-    if (points && points.length > 1) {
-
-        // console.log("creating PathLine!", period);
-        var index, xyz;
-        var colors = [];
-        var numPoints = points.length * nDivisions;
-        var positions = new Float32Array( numPoints * 3 );
-        var spline = new THREE.Spline();
-        var geometry = new THREE.BufferGeometry();
-
-        // spline.initFromArray(points);
-        spline.initFromArray(points);
-
-        for (var i = 0; i <= numPoints; i++) {
-            index = i / numPoints;
-            xyz = spline.getPoint(index);
-
-            positions[ 3 * i + 0] = xyz.x;
-            positions[ 3 * i + 1] = xyz.y;
-            positions[ 3 * i + 2] = xyz.z;
-
-            colors.push(THREE.Color(color));
-            // geometry.vertices[i] = new THREE.Vector3(xyz.x, xyz.y, xyz.z);
-        }
-
-        // // console.log(geometry);
-        // geometry.colors = colors;
-        // geometry.computeLineDistances();
-
-        geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
-        geometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
-
-        geometry.computeBoundingSphere();
-
-        geometry.drawcalls.push( {
-            start: 0,
-            count: 0,
-            index: 0
-        } );
-
-        var material = new THREE.LineBasicMaterial({
-            color: rgbToHex(255, 255, 255),
-            linewidth: 0.5,
-            vertexColors: THREE.VertexColors,
-            transparent: true,
-            opacity: 0.2
-        })
-
-        mesh = new THREE.Line( geometry, material, THREE.LinePieces );
-        mesh.visible = (period >= EPOCH_HEAD && period < EPOCH_TAIL) ? true : false;
-        mesh.name = id;
-        mesh.period = period;
-        console.log("\t", mesh);
-        return mesh;
-
-        // console.log("createPathLine(points, id, period, ", points, typeof id, typeof period, material);
-
-        // var mesh = new THREE.Line(geometry, material);
-        // mesh.visible = (period >= EPOCH_HEAD && period < EPOCH_TAIL) ? true : false;
-        // mesh.name = id;
-        // mesh.period = period;
-        // mesh.renderOrder = 100;
-        // return mesh;
-
-    }
-}
+//674621

@@ -14,7 +14,7 @@ function GUIcontrols() {
 
     // Choose Dataset
     this.dataset = "None";
-    this.treeNum = "676638 "
+    this.treeNum = ""
     prepGlobalStructures()
 
     // Reset Position
@@ -294,7 +294,7 @@ function initGUI() {
         var text = dataSetBox.add(config, "treeNum").name("Enter Tree #").listen();
         {
             text.onFinishChange(function(){
-                config.dataset = config.treeNum + " ";
+                config.dataset = config.treeNum;
                 console.log("\tTreeNum entered!", config.treeNum, config.dataset)
                 config.__updateData();
             });
