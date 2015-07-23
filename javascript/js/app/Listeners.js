@@ -57,7 +57,7 @@ function onMouseClick(event) {
         prevTarget.object.material.opacity = 0.4;
         curTarget.object.material.opacity = 0.8;
 
-        displayHaloStats();
+        // displayHaloStats();
     }
 
 }
@@ -78,8 +78,9 @@ function onMouseDoubleClick() {
         var id = curTarget.object.name;
         var period = curTarget.object.period;
         // just need to use the halo-id's to turn the spheres on, no sense in rebuilding existing data.
-        var points = intoTheAbyss(id, period, []);
-        createSpline(points, id, period);
+        showSpinner(true);
+        fromTheDepths(id, id, [], 0, config.depth);
+        showSpinner(false);
 
     }
     else if (config.showHaloMap) {
@@ -88,7 +89,6 @@ function onMouseDoubleClick() {
         var hit = raycaster.intersectObjects(pointCloud.children)[0];
 
         if (hit) {
-
             var haloID = hit.object.name
             config.dataset = haloID.toString();
 

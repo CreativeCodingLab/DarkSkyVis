@@ -16,11 +16,13 @@ function initScene() {
     {
         linesGroup = new THREE.Object3D();
         sphereGroup = new THREE.Object3D();
+        traceGroup = new THREE.PointCloud();
 
         scene.fog = new THREE.Fog(0x050505, 2000, 3500);
 
         scene.add(linesGroup);
         scene.add(sphereGroup);
+        scene.add(traceGroup);
 
     }
 

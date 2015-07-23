@@ -30,7 +30,8 @@ function GUIcontrols() {
 
     // Interaction Components
     this.enableSelection = false;
-    this.scale = 1.0; // Eventually this will apply to scaling the halos
+    this.depth = 2;
+    this.scale = 0.001; // Eventually this will apply to scaling the halos
 
     this.animateTime = function() {};
     this.isPlaying = false;
@@ -46,76 +47,27 @@ function GUIcontrols() {
 
 }
 
-
-GUIcontrols.prototype.__setColor = function() {
-
-    colorKey = d3.scale.linear()
-        .domain([0, 18, 36, 53, 71, NUMTIMEPERIODS])
-        .range([this.color0, this.color1, this.color2, this.color3, this.color4]);
-
-    for (var id in HaloLUT) {
-
-        var i = +HaloLUT[id].time;
-
-        // Set Halo Line Visibility
-        if (linesGroup.getObjectByName(id)) {
-            // console.log("\tdisplaying Halo line?", i, id, config.showPaths, EPOCH_HEAD, EPOCH_TAIL)
-            linesGroup.getObjectByName(id).visible = (i >= EPOCH_HEAD && i < EPOCH_TAIL) ? config.showPaths : false;
-            linesGroup.getObjectByName(id).material.color.set(colorKey(i));
-        }
-
-        // Set Halo Spheres Visibility
-        if (sphereGroup.getObjectByName(id)) {
-            sphereGroup.getObjectByName(id).visible = (i >= EPOCH_HEAD && i <= EPOCH_TAIL) ? config.showHalos : false;
-            sphereGroup.getObjectByName(id).material.color.set(colorKey(i));
-        }
-    }
-};
-
-
-GUIcontrols.prototype.__animateSlider = function(offset) {
-    if (this.isPlaying){
-        TWEEN.removeAll();
-        this.isPlaying = false;
+GUIcontrols.prototype.__updateData = function() {
+    showSpinner(true);
+    var that = this;
+    if (HaloSelect.length > 1) {
+        console.log("Adding MULTIPLE HALOS")
+        for (var i = 0; i < HaloSelect.length; i++) {
+            console.log(HaloSelect[i])
+            var URL = "js/assets/trees/tree_" + HaloSelect[i].toString() + ".json";
+            console.log("\nAdding..", URL)
+            initHaloTree(URL, false);
+        };
     } else {
-        this.isPlaying = true;
-        var step = slider.noUiSlider('step');
-        console.log("animate", step, slider.val());
-        // Frist we position the camera so it is looking at our Halo of interest
-        var _dur = 3500;
-        var TweenDur = _dur - (EPOCH_TAIL/NUMTIMEPERIODS * _dur)
-        var tweenToTail = new TWEEN.Tween({
-                x: EPOCH_HEAD,
-                y: EPOCH_TAIL
-            })
-            .to({
-                x: 88 - offset,
-                y: 88
-            }, TweenDur)
-            .onUpdate(function() {
-                slider.val([this.x, this.y]);
-            });
-
-        // Then we zoom in
-        var tweenToHead = new TWEEN.Tween({
-                x: 88 - offset,
-                y: 88
-            })
-            .to({
-                x: 0,
-                y: offset
-            }, TweenDur)
-            .onUpdate(function() {
-                slider.val([this.x, this.y]);
-            });
-
-        tweenToTail.chain(tweenToHead);
-        tweenToTail.start();
-    }
-    console.log("this.isPlaying", this.isPlaying);
-    this.isPlaying = false;
-
+        if (this.dataset !== "None") {
+            var URL = "js/assets/trees/tree_" + this.dataset + ".json";
+            console.log("\nUpdating!", URL)
+            initHaloTree(URL, true);
+            tweenToPosition(1500, 1500, true);
+        };
+    };
 };
+
 
 GUIcontrols.prototype.__goToHead = function() {
     var halo;
@@ -197,25 +149,74 @@ GUIcontrols.prototype.__resetView = function(halo) {
 };
 
 
-GUIcontrols.prototype.__updateData = function() {
-    showSpinner(true);
-    var that = this;
-    if (HaloSelect.length > 1) {
-        console.log("Adding MULTIPLE HALOS")
-        for (var i = 0; i < HaloSelect.length; i++) {
-            console.log(HaloSelect[i])
-            var URL = "js/assets/trees/tree_" + HaloSelect[i].toString() + ".json";
-            console.log("\nAdding..", URL)
-            initHaloTree(URL, false);
-        };
+GUIcontrols.prototype.__animateSlider = function(offset) {
+    if (this.isPlaying){
+        TWEEN.removeAll();
+        this.isPlaying = false;
     } else {
-        if (this.dataset !== "None") {
-            var URL = "js/assets/trees/tree_" + this.dataset + ".json";
-            console.log("\nUpdating!", URL)
-            initHaloTree(URL, true);
-            tweenToPosition(1500, 1500, true);
-        };
-    };
+        this.isPlaying = true;
+        var step = slider.noUiSlider('step');
+        console.log("animate", step, slider.val());
+        // Frist we position the camera so it is looking at our Halo of interest
+        var _dur = 3500;
+        var TweenDur = _dur - (EPOCH_TAIL/NUMTIMEPERIODS * _dur)
+        var tweenToTail = new TWEEN.Tween({
+                x: EPOCH_HEAD,
+                y: EPOCH_TAIL
+            })
+            .to({
+                x: 88 - offset,
+                y: 88
+            }, TweenDur)
+            .onUpdate(function() {
+                slider.val([this.x, this.y]);
+            });
+
+        // Then we zoom in
+        var tweenToHead = new TWEEN.Tween({
+                x: 88 - offset,
+                y: 88
+            })
+            .to({
+                x: 0,
+                y: offset
+            }, TweenDur)
+            .onUpdate(function() {
+                slider.val([this.x, this.y]);
+            });
+
+        tweenToTail.chain(tweenToHead);
+        tweenToTail.start();
+    }
+    console.log("this.isPlaying", this.isPlaying);
+    this.isPlaying = false;
+
+};
+
+
+GUIcontrols.prototype.__setColor = function() {
+
+    colorKey = d3.scale.linear()
+        .domain([0, 18, 36, 53, 71, NUMTIMEPERIODS])
+        .range([this.color0, this.color1, this.color2, this.color3, this.color4]);
+
+    for (var id in HaloLUT) {
+
+        var i = +HaloLUT[id].time;
+
+        // Set Halo Line Visibility
+        if (linesGroup.getObjectByName(id)) {
+            // console.log("\tdisplaying Halo line?", i, id, config.showPaths, EPOCH_HEAD, EPOCH_TAIL)
+            linesGroup.getObjectByName(id).visible = (i >= EPOCH_HEAD && i < EPOCH_TAIL) ? config.showPaths : false;
+            linesGroup.getObjectByName(id).material.color.set(colorKey(i));
+        }
+
+        // Set Halo Spheres Visibility
+        if (sphereGroup.getObjectByName(id)) {
+            sphereGroup.getObjectByName(id).visible = (i >= EPOCH_HEAD && i <= EPOCH_TAIL) ? config.showHalos : false;
+            sphereGroup.getObjectByName(id).material.color.set(colorKey(i));
+        }
+    }
 };
 
 
@@ -241,7 +242,7 @@ function initGUI() {
             spheresController.onFinishChange(function() {
                 console.log("spheresController.onFinishChange");
                 if (config.enableSelection)
-                    toggleVisibility(HaloSelect, config.showHalos);
+                    toggleVisibility(sphereGroup, config.showHalos);
                 else
                     sphereGroup.visible = config.showHalos;
                 // toggleVisibility(sphereGroup.getObjectByName,config.showHalos);
@@ -254,7 +255,7 @@ function initGUI() {
             linesController.onFinishChange(function() {
                 console.log("linesController.onFinishChange");
                 if (config.enableSelection)
-                    toggleVisibility(HaloBranch, config.showPaths);
+                    toggleVisibility(traceGroup, config.showPaths);
                 else
                     linesGroup.visible = config.showPaths;
             });
@@ -328,12 +329,12 @@ function initGUI() {
     /*
      * Position Configurations
      */
-    var haloFocusBox = guiBox.addFolder("Reset Position!");
+    var restPositionBox = guiBox.addFolder("Reset Position!");
     {
-        haloFocusBox.add(config, "goToHead").name("Jump to Head");
-        haloFocusBox.add(config, "goToCenter").name("Jump to Center");
-        haloFocusBox.add(config, "goToTail").name("Jump to Tail");
-        //haloFocusBox.open();
+        restPositionBox.add(config, "goToHead").name("Jump to Head");
+        restPositionBox.add(config, "goToCenter").name("Jump to Center");
+        restPositionBox.add(config, "goToTail").name("Jump to Tail");
+        //restPositionBox.open();
     }
 
     /*
@@ -342,31 +343,68 @@ function initGUI() {
     var haloInteractionBox = guiBox.addFolder("Interaction Components");
     {
         // Turn Halo Selection Mode On/Off
-        var selectionController = haloInteractionBox.add(config, "enableSelection").name("Enable Inspection");
+        var selectionController = haloInteractionBox.add(config, "enableSelection").name("Inspect");
         {
             selectionController.onFinishChange(function() {
-//                resetHaloBranchs();
-//                console.log("selectionController.onFinishChange");
-                if (config.enableSelection) {
+                config.showHaloMap = false;
+                pointCloud.visible = false;
 
+
+                if (config.enableSelection) {
+                    resetGlobalStructures('point');
                     console.log("Selection Mode is active!");
                     renderer.setClearColor(rgbToHex(150, 150, 150), 1);
+
+                    // var map = THREE.ImageUtils.loadTexture( "js/assets/sprites/nova.png" );  // http://www.goktepeliler.com/vt22/images/414mavi_klar_11_.png
+                    // var subMap = THREE.ImageUtils.loadTexture( "js/assets/sprites/triangle.png" );
+                    // var superMap = THREE.ImageUtils.loadTexture( "js/assets/sprites/circle3.png" );
+                    // var superSubMap = THREE.ImageUtils.loadTexture( "js/assets/sprites/super.png" );
+                    // map.minFilter = THREE.NearestFilter;
+                    // subMap.minFilter = THREE.NearestFilter;
+                    // superMap.minFilter = THREE.NearestFilter;
+                    // superSubMap.minFilter = THREE.NearestFilter;
+
+                    // sphereGroup.children.forEach(function(mesh) {
+                    //     var halo = HaloLUT[+mesh.name]
+                    //     if (halo.isSub)
+                    //         mesh.material.map = subMap;
+
+                    //     if (halo.subHalos.length > 0)
+                    //         mesh.material.map = superMap;
+
+                    //     if (halo.isSub && halo.subHalos.length > 0)
+                    //         mesh.material.map = superSubMap;
+                    // });
+
                 } else {
-//                    toggleVisibility(linesGroup, config.showPaths);
-//                    toggleVisibility(sphereGroup, config.showHalos);
+                    // toggleVisibility(linesGroup, config.showPaths);
+                    // toggleVisibility(sphereGroup, config.showHalos);
+                    showSpinner(true);
+                    config.showHaloMap = true;
+                    resetGlobalStructures('trace');
+                    initHaloMap("js/assets/hlist_1.0.json");
                     renderer.setClearColor(rgbToHex(50, 50, 50), 1);
+                    showSpinner(false);
+                    // var map = THREE.ImageUtils.loadTexture( "js/assets/sprites/nova.png" );  // http://www.goktepeliler.com/vt22/images/414mavi_klar_11_.png
+                    // map.minFilter = THREE.NearestFilter;
+                    // sphereGroup.children.forEach(function(mesh) {
+                    //         mesh.material.map = map;
+                    // });
                 }
 
             })
         }
 
-        var scalingController = haloInteractionBox.add(config, "scale").min(0.01).step(0.01).name("Scale Halo");
+        var depthController = haloInteractionBox.add(config, "depth"). min(1).step(1).name("Depth")
+
+        var scalingController = haloInteractionBox.add(config, "scale").min(0.0001).step(0.0001).name("Scale Halo");
         {
             scalingController.onFinishChange(function() {
                 console.log("trying out scaling");
-                var scale = config.scale <= 0.0 ? 0.001 : config.scale;
+                var scale = config.scale <= 0.0 ? 0.0001 : config.scale;
                 sphereGroup.children.forEach(function(mesh) {
                     var _s = scale * mesh.rs1;
+                    console.log("\t",_s);
                     mesh.scale.set(_s, _s, _s);
                 });
             });

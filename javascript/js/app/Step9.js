@@ -107,6 +107,7 @@ function onCreate() {
     initListeners();
 
     // initHaloTree("js/assets/tree_676638.json", true);
+    showSpinner(true);
     initHaloMap("js/assets/hlist_1.0.json");
 
     // showSpinner(true)

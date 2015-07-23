@@ -44,6 +44,7 @@ function displayHalos() {
 
 // Controls the visibility of the object in question
 function toggleVisibility(haloObjectGroup, isVisible, opacity) {
+    console.log("toggleVisibility?", haloObjectGroup)
     if (isVisible)
         haloObjectGroup.children.forEach(function(objMesh) {
             i = +objMesh.period;
@@ -63,13 +64,13 @@ function toggleVisibility(haloObjectGroup, isVisible, opacity) {
 
             var id = EPOCH_PERIODS[i][j];
 
-            if(HaloObject.getObjectByName(id)){
+            if(haloObjectGroup.getObjectByName(id)){
 
-                HaloObject.getObjectByName(id).visible = isVisible;
+                haloObjectGroup.getObjectByName(id).visible = isVisible;
 
                 if (opacity){
                     console.log("toggleVisibility", i, opacity);
-                    HaloObject.getObjectByName(id).material.opacity = opacity;
+                    haloObjectGroup.getObjectByName(id).material.opacity = opacity;
 
                 }
             }
