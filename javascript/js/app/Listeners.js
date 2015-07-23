@@ -72,8 +72,8 @@ function onMouseDoubleClick() {
 
     if(config.enableSelection) {
 
-        toggleVisibility(linesGroup, false);
-        toggleVisibility(sphereGroup, false);
+        // toggleVisibility(linesGroup, false);
+        // toggleVisibility(sphereGroup, false);
 
         var id = curTarget.object.name;
         var period = curTarget.object.period;

@@ -46,6 +46,15 @@ var colorKey = d3.scale.linear()
     .range([rgbToHex(255, 0, 0), rgbToHex(255, 0, 255), rgbToHex(0, 0, 255), rgbToHex(0, 255, 255), rgbToHex(0, 255, 0)]);
 
 
+var NovaMap = THREE.ImageUtils.loadTexture( "js/assets/sprites/nova.png" );  // http://www.goktepeliler.com/vt22/images/414mavi_klar_11_.png
+var SubMap = THREE.ImageUtils.loadTexture( "js/assets/sprites/triangle.png" );
+var SuperMap = THREE.ImageUtils.loadTexture( "js/assets/sprites/circle3.png" );
+var SuperSubMap = THREE.ImageUtils.loadTexture( "js/assets/sprites/super.png" );
+NovaMap.minFilter = THREE.NearestFilter;
+SubMap.minFilter = THREE.NearestFilter;
+SuperMap.minFilter = THREE.NearestFilter;
+SuperSubMap.minFilter = THREE.NearestFilter;
+
 // ==========================================
 //              Start
 //    Main entry point into the application
@@ -108,7 +117,7 @@ function onCreate() {
 
     // initHaloTree("js/assets/tree_676638.json", true);
     showSpinner(true);
-    initHaloMap("js/assets/hlist_1.0.json");
+    // initHaloMap("js/assets/hlist_1.0.json");
 
     // showSpinner(true)
     // oboe("js/assets/tree_0_0_0.json")

@@ -15,15 +15,8 @@ function initHaloTree(url, firstTime) {
 
     // create halo Sphere components ahead of time to save memory;
     var targetSet = false;
-    var map = THREE.ImageUtils.loadTexture( "js/assets/sprites/nova.png" );  // http://www.goktepeliler.com/vt22/images/414mavi_klar_11_.png
-    var sub = THREE.ImageUtils.loadTexture( "js/assets/sprites/triangle.png" );
-    var sup = THREE.ImageUtils.loadTexture( "js/assets/sprites/circle3.png" );
-    var supsub = THREE.ImageUtils.loadTexture( "js/assets/sprites/super.png" );
-    map.minFilter = THREE.NearestFilter;
-    sub.minFilter = THREE.NearestFilter;
-    sup.minFilter = THREE.NearestFilter;
 
-    var sphereMaterial;
+    var sphereGeometry, sphereMaterial;
 
     showSpinner(true);
 
@@ -44,7 +37,6 @@ function initHaloTree(url, firstTime) {
 
             // Keep Track of Halo Children
             if (+halo.desc_id !== -1) {
-                console.log("\tits a boy!")
                 HaloLUT[+halo.desc_id].children.push(halo.id)
             }
 
@@ -57,6 +49,8 @@ function initHaloTree(url, firstTime) {
 
             // add Halos to list by ID
             HaloLUT[+halo.id] = halo;
+            if ( halo.id === 360254 || halo.id === "360254") console.log("AhHA! You do exist!");
+            if ( halo.id === 360254 || halo.id === "360254") console.log("AhHA! You do exist!");
             EPOCH_PERIODS[+halo.time].push(halo.id);
             // console.log(halo.id)
 
@@ -70,7 +64,7 @@ function initHaloTree(url, firstTime) {
 
 
             var sphereMaterial = new THREE.SpriteMaterial({
-                map: map,
+                map: NovaMap,
                 color: colorKey(halo.time), // color: new THREE.Color( 0.5 + 0.5*vr , 0.5, 0.5 - 0.5*vr ),
                 transparent: true,
                 opacity: (halo.isSub) ? 0.9 : 0.6
@@ -122,17 +116,14 @@ function createHaloEntity() {
 }
 
 
-
 function initHaloMap(url) {
     console.log("Init The Halo Map", url);
     var forestGeometry = new THREE.Geometry();
     var colors = [];
-    prepGlobalStructures();
-    var targetSet = false;
-
-
     var map = THREE.ImageUtils.loadTexture( "js/assets/sprites/nova.png" );
-        map.minFilter = THREE.NearestFilter;
+    map.minFilter = THREE.NearestFilter;
+    prepGlobalStructures();
+    showSpinner(true);
 
     oboe(url)
         .node("!.*", function(halo, path) {
@@ -155,47 +146,52 @@ function initHaloMap(url) {
             var vmag = Math.sqrt(vel[0]*vel[0] + vel[1]*vel[1] + vel[2]*vel[2]);
             var rmag = Math.sqrt(pos[0]*pos[0] + pos[1]*pos[1] + pos[2]*pos[2]);
             var vr = 0.0;
-
-            for (var ax=0; ax<3; ax++) {
+            for (var ax=0; ax<3; ax++){
                 vr += vel[ax]*pos[ax];
             }
 
             vr /= (rmag*vmag);
 
-            var material = new THREE.SpriteMaterial({
-                    map: map,
-                    transparent: true,
-                    opacity: 0.6
-            });
-            material.color.set(new THREE.Color(0.5 + 0.5*vr , 0.5, 0.5 - 0.5*vr ))
-
-
-            var rs1 = halo.rvir * 0.01;
-            var mesh = new THREE.Sprite(material)
-
-            mesh.name = halo.id;
-            mesh.position.set(pos[0], pos[1], pos[2]);
-            mesh.scale.set(rs1, rs1, rs1);
-            mesh.updateMatrix();
-            pointCloud.add(mesh);
+            colors.push(new THREE.Color(0.5 + 0.5*vr , 0.5, 0.5 - 0.5*vr ))
 
             if (!targetSet) {
                 curTarget = {
-                    object: mesh
+                    object: { position: particle }
                 }
                 targetSet = true;
             };
+
 
             return oboe.drop
         })
         .done(function() {
             console.log("finished uploading")
+            var material = new THREE.PointCloudMaterial({
+                // color: rgbToHex(255, 0, 0),
+                size: 10.0,
+                vertexColors: THREE.VertexColors,
+                map: map, //THREE.ImageUtils.loadTexture( "js/assets/sprites/circle2.png" ),
+                // blending: THREE.AdditiveBlending,
+                transparent: true,
+                opacity: 0.6
+            });
+            forestGeometry.colors = colors;
+            pointCloud = new THREE.PointCloud(forestGeometry, material);
+            pointCloud.updateMatrix();
             scene.add(pointCloud);
-            tweenToPosition(2500, 0, false);
+            console.log(pointCloud);
+            curTarget = {object: pointCloud}
+            showSpinner(false);
+
+            // curTarget = {
+            //     object: pointCloud
+            // };
+            // curTarget.object.material.opacity = 0.7;
+            // console.log("currTarget",curTarget);
+            // tweenToPosition(4500, 4250, true);
             DEFERRED = false;
             console.log("DEFERRED", DEFERRED);
-        })
-        showSpinner(false);
+        });
 }
 
 
@@ -408,41 +404,60 @@ function fromTheDepths(target, id, points, distance, depth) {
         return;
     };
 
-    var halo = HaloLUT[+id];
-    if (!halo) {
-        console.error("Halo Dont exist!", id, halo)
-        return;
-    };
-    sphereGroup.getObjectByName(+id).visible = true;
+    if (id in HaloLUT) {
+        var halo = HaloLUT[+id];
 
-    points.push(halo.position);
+        sphereGroup.getObjectByName(+id).visible = true;
 
-    if (halo.children.length < 1 || distance >= depth ) {
-        var material = new THREE.LineBasicMaterial({
-            linewidth: 1,
-            vertexColors: THREE.VertexColors,
-            transparent: true,
-            opacity: 0.2
-        })
+        points.push(halo.position);
 
-        points.reverse();
-        var path = intoTheVoid(target, points, distance);
-        var mesh = createPathLine(path, +id, distance+depth)
-        traceGroup.add(mesh);
+        if (halo.children.length < 1 || distance >= depth ) {
+            var material = new THREE.LineBasicMaterial({
+                linewidth: 1,
+                vertexColors: THREE.VertexColors,
+                transparent: true,
+                opacity: 0.2
+            });
 
-    } else if (halo.children.length === 1) {
+            __traversed = {};
+            points.reverse();
+            console.log("Into the Void, Bitch!", target, points, distance);
+            var path = intoTheVoid(target, points, distance);
+            var mesh = createPathLine(path, +id, distance+depth)
+            traceGroup.add(mesh);
 
-        var _id = halo.children[0];
-        // if there is a direct path, ie only one child, dont count the distance.
-        fromTheDepths(target, +_id, points, distance, depth);
+        } else if (halo.children.length === 1) {
+
+            var _id = halo.children[0];
+            // if there is a direct path, ie only one child, dont count the distance.
+            fromTheDepths(target, +_id, points, distance, depth);
+
+        } else {
+
+            halo.children.forEach(function(_id) {
+
+                fromTheDepths(target, +_id, points, distance+1, depth);
+
+            })
+        };
 
     } else {
-
-        halo.children.forEach(function(_id) {
-
-            fromTheDepths(target, +_id, points, distance+1, depth);
-
-        })
+        console.error("Halo Dont exist!", id)
+       if (points.length > 1) {
+           var material = new THREE.LineBasicMaterial({
+                linewidth: 1,
+                vertexColors: THREE.VertexColors,
+                transparent: true,
+                opacity: 0.2
+            })
+            __traversed = {};
+            points.reverse();
+            points.pop();
+            console.log("Into the Void, Bitch!", target, points, distance);
+            var path = intoTheVoid(target, points, distance);
+            var mesh = createPathLine(path, +id, distance+depth)
+            traceGroup.add(mesh);
+       };
     };
 
     console.log("...I Come!", id);
@@ -521,11 +536,11 @@ function prepGlobalStructures() {
     // The min and Max components represent the min/max time in dataset
     //  min is set to maximum time periods, while max is set to zero so we
     //  can ensure we get an accurate representation of the halos time frame
-    // HaloLUT = {
-    //     length: 0,
-    //     min: NUMTIMEPERIODS,
-    //     max: 0
-    // };
+    HaloLUT = {
+        length: 0,
+        min: NUMTIMEPERIODS,
+        max: 0
+    };
 
     EPOCH_PERIODS = [];
     for (var i = 0; i < NUMTIMEPERIODS; i++) {
@@ -604,7 +619,7 @@ function resetGlobalStructures(lock) {
     //sphereGroup.dispose();
     //linesGroup.dispose();
     console.log("\t", sphereGroup.children, linesGroup.children, scene, HaloLUT);
-    prepGlobalStructures();
+    // prepGlobalStructures();
 }
 
 
