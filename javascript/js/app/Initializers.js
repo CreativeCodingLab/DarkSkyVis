@@ -17,6 +17,7 @@ function initScene() {
         linesGroup = new THREE.Object3D();
         sphereGroup = new THREE.Object3D();
         traceGroup = new THREE.Object3D();
+        arrowGroup = new THREE.Object3D();
         pointCloud = new THREE.PointCloud();
 
         scene.fog = new THREE.Fog(0x050505, 2000, 3500);
@@ -24,6 +25,7 @@ function initScene() {
         scene.add(linesGroup);
         scene.add(sphereGroup);
         scene.add(traceGroup);
+        scene.add(arrowGroup);
         scene.add(pointCloud);
 
     }
@@ -63,15 +65,15 @@ function initContainer() {
 
 function initLights() {
     console.log("initLights()")
-        // ambient = new THREE.AmbientLight(0xFFFFFF); //rgbToHex(197, 176, 255)
-        // scene.add(ambient);
+         var ambient = new THREE.AmbientLight(0xFFFFFF); //rgbToHex(197, 176, 255)
+         scene.add(ambient);
 
-    light = new THREE.PointLight(0xffffff, 0.5, 1000);
-    light.position.set(1, 1, 1);
-
+    //light = new THREE.PointLight(0xffffff, 0.5, 1000);
+    //light.position.set(1, 1, 1);
+    //
     var dir1 = new THREE.DirectionalLight(0xffffff, 0.5)
-    light.position.set(0, 0, 0);
-    scene.add(light);
+    //light.position.set(0, 0, 0);
+    //scene.add(light);
     scene.add(dir1);
 
 }
@@ -133,7 +135,7 @@ function initListeners() {
 
 function initStatsInfo() {
     console.log("initStatsInfo\n");
-    haloStats = d3.select("#Sandbox")
+    haloStats = d3.select("#DarkSky")
         .append("div")
         .attr("class", "haloStats");
 

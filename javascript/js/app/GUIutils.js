@@ -32,6 +32,7 @@ function GUIcontrols() {
     this.enableSelection = false;
     this.depth = 2;
     this.scale = 0.001; // Eventually this will apply to scaling the halos
+    this.scaleByMass = true;
 
     this.animateTime = function() {};
     this.isPlaying = false;
@@ -269,20 +270,20 @@ function initGUI() {
             })
         }
 
-        // // Halo Properties display
-        // var statsController = displayBox.add(config, "showStats").name("Properties");
-        // {
-        //     statsController.onFinishChange(function() {
-        //         console.log("statsController.onFinishChange");
-        //         haloStats
-        //             .style("display", function() {
-        //                 if (config.showStats)
-        //                     return "block";
-        //                 else
-        //                     return "none";
-        //             })
-        //     })
-        // }
+         // Halo Properties display
+         var statsController = displayBox.add(config, "showStats").name("Properties");
+         {
+             statsController.onFinishChange(function() {
+                 console.log("statsController.onFinishChange");
+                 haloStats
+                     .style("display", function() {
+                         if (config.showStats)
+                             return "block";
+                         else
+                             return "none";
+                     })
+             })
+         }
         displayBox.open();
     }
 
@@ -315,7 +316,7 @@ function initGUI() {
             "679619", "674539",
             "681422", "677545",
             "677521", "680462",
-            "679582"
+            "679582", "31410"
         ]).listen();
         data.name("Tree #");
         data.onFinishChange(function() {
@@ -355,34 +356,15 @@ function initGUI() {
                     console.log("Selection Mode is active!");
                     renderer.setClearColor(rgbToHex(150, 150, 150), 1);
 
-                    // var map = THREE.ImageUtils.loadTexture( "js/assets/sprites/nova.png" );  // http://www.goktepeliler.com/vt22/images/414mavi_klar_11_.png
-                    // var subMap = THREE.ImageUtils.loadTexture( "js/assets/sprites/triangle.png" );
-                    // var superMap = THREE.ImageUtils.loadTexture( "js/assets/sprites/circle3.png" );
-                    // var superSubMap = THREE.ImageUtils.loadTexture( "js/assets/sprites/super.png" );
-                    // map.minFilter = THREE.NearestFilter;
-                    // subMap.minFilter = THREE.NearestFilter;
-                    // superMap.minFilter = THREE.NearestFilter;
-                    // superSubMap.minFilter = THREE.NearestFilter;
-
-                    // sphereGroup.children.forEach(function(mesh) {
-                    //     var halo = HaloLUT[+mesh.name]
-                    //     if (halo.isSub)
-                    //         mesh.material.map = subMap;
-
-                    //     if (halo.subHalos.length > 0)
-                    //         mesh.material.map = superMap;
-
-                    //     if (halo.isSub && halo.subHalos.length > 0)
-                    //         mesh.material.map = superSubMap;
-                    // });
+                    resetGlobalStructures('path');
 
                 } else {
                     // toggleVisibility(linesGroup, config.showPaths);
                     // toggleVisibility(sphereGroup, config.showHalos);
-                    showSpinner(true);
-                    config.showHaloMap = true;
+                    //showSpinner(true);
+                    //config.showHaloMap = true;
                     resetGlobalStructures('trace');
-                    initHaloMap("js/assets/hlist_1.0.json");
+                    //initHaloMap("js/assets/hlist_1.0.json");
                     renderer.setClearColor(rgbToHex(50, 50, 50), 1);
                     showSpinner(false);
                     // var map = THREE.ImageUtils.loadTexture( "js/assets/sprites/nova.png" );  // http://www.goktepeliler.com/vt22/images/414mavi_klar_11_.png
@@ -395,7 +377,9 @@ function initGUI() {
             })
         }
 
-        var depthController = haloInteractionBox.add(config, "depth"). min(1).step(1).name("Depth")
+        var depthController = haloInteractionBox.add(config, "depth"). min(0).step(1).name("Depth")
+
+        var scaleByMassController = haloInteractionBox.add(config, "scaleByMass").name("Scale By Mass");
 
         var scalingController = haloInteractionBox.add(config, "scale").min(0.0001).step(0.0001).name("Scale Halo");
         {
@@ -403,12 +387,17 @@ function initGUI() {
                 console.log("trying out scaling");
                 var scale = config.scale <= 0.0 ? 0.0001 : config.scale;
                 sphereGroup.children.forEach(function(mesh) {
-                    var _s = scale * mesh.rs1;
-                    console.log("\t",_s);
+                    var _s;
+                    if (config.scaleByMass)
+                        _s = scale * mesh.rs1;
+                    else
+                        _s = scale;
                     mesh.scale.set(_s, _s, _s);
                 });
             });
         }
+
+
 
         // Animate Time Button
         var animateTime = haloInteractionBox.add(config, "animateTime").name("Animate Time!");

@@ -10,9 +10,6 @@ function rgbToHex(R,G,B){
     return "#" + toHex(R) + toHex(G) + toHex(B)
 }
 
-
-
-
 // wrapper function to update the light position
 function updateLightPosition() {
     light.position.set(camera.position.x, camera.position.y, camera.position.z);
@@ -27,7 +24,7 @@ function displayHalos() {
         if (config.showHalos)
             sphereGroup.children.forEach(function(mesh) {
                 i = +mesh.period;
-                mesh.visible = (i >= EPOCH_HEAD && i <= EPOCH_TAIL)? true : false;
+                mesh.visible = !!(i >= EPOCH_HEAD && i <= EPOCH_TAIL);
                 if (curTarget && mesh.position !== curTarget.object.position){
                     // mesh.material.color.set(colorKey(i));
                     mesh.material.opacity = 0.4;
@@ -37,7 +34,7 @@ function displayHalos() {
         if (config.showPaths)
             linesGroup.children.forEach(function(lineMesh) {
                 i = lineMesh.period;
-                lineMesh.visible = (i >= EPOCH_HEAD && i < EPOCH_TAIL)? true : false;
+                lineMesh.visible = !!(i >= EPOCH_HEAD && i < EPOCH_TAIL);
             });
     }
 }
@@ -80,34 +77,6 @@ function toggleVisibility(haloObjectGroup, isVisible, opacity) {
 }
 
 
-// Display currently selected Halo's Attribute information
-function displayHaloStats() {
-
-    var haloData = HaloLUT[curTarget.object.name];
-    console.log(haloStats, haloData,curTarget);
-
-    var result = "<b> time:</b> " + haloData['time'] + "</br>" +
-        "<b>        id:</b> " + haloData['id'] + "</br>" +
-        "<b>   desc_id:</b> " + haloData['desc_id'] + "</br>" +
-        "<b>  num_prog:</b> " + haloData['num_prog'] + "</br>" +
-        "<b>       pid:</b> " + haloData['pid'] + "</br>" +
-        "<b>      upid:</b> " +  haloData['upid'] + "</br>" +
-        "<b>  desc_pid:</b> " +  haloData['desc_pid'] + "</br>" +
-        "<b>     scale:</b> " +  haloData['scale'] + "</br>" +
-        "<b>desc_scale:</b> " +  haloData['desc_scale'] + "</br>" +
-        "<b>   phantom:</b> " +  haloData['phantom'] + "</br>" +
-        "<b>  position:</b> " +  haloData['position'] + "</br>" +
-        "<b>  velocity:</b> " +  haloData['velocity'] + "</br>" +
-        "<b>        rs:</b> " +  haloData['rs'] + "</br>" +
-        "<b>      mvir:</b> " +  haloData['mvir'] + "</br>" +
-        "<b>      rvir:</b> " +  haloData['rvir'] + "</br>" +
-        "<b>      vrms:</b> " +  haloData['vrms'] + "</br>" +
-        "<b>      vmax:</b> " +  haloData['vmax'] + "</br>" +
-        "<b>  sam_mvir:</b> " +  haloData['sam_mvir'] + "</br>" +
-        "<b>      Spin:</b> " +  haloData['Spin'] + "</br>"
-
-    haloStats.html(result);
-}
 
 
 function tweenToPosition(durationA, durationB, zoom) {

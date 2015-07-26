@@ -22,7 +22,7 @@ var nDivisions = 10,
 
 // Halo Components
 // linesGroup and sphereGroup contain the lines and spheres of the halos
-var linesGroup, sphereGroup, traceGroup;
+var linesGroup, sphereGroup, traceGroup, arrowGroup;
 
 // HaloBranch is the object acts like HaloSpheres
 // HaloSelect is a global lookup which keeps track of all SELECTED Halos
@@ -42,8 +42,8 @@ var DEFERRED = true;
 
 // Be sure to match this with the slider's connect!!
 var colorKey = d3.scale.linear()
-    .domain([0, 18, 36, 53, 71, NUMTIMEPERIODS])
-    .range([rgbToHex(255, 0, 0), rgbToHex(255, 0, 255), rgbToHex(0, 0, 255), rgbToHex(0, 255, 255), rgbToHex(0, 255, 0)]);
+    .domain([0, NUMTIMEPERIODS])
+    .range([rgbToHex(255, 0, 0), rgbToHex(0, 0, 255)]);
 
 
 var NovaMap = THREE.ImageUtils.loadTexture( "js/assets/sprites/nova.png" );  // http://www.goktepeliler.com/vt22/images/414mavi_klar_11_.png
@@ -106,6 +106,7 @@ function onCreate() {
 
     // **** Stream in our data! Build Add scene components *** //
 
+    initLights();
     // **** Camera! ***
     initCamera();
 
@@ -189,8 +190,8 @@ function render() {
                     hits[i].object.material.opacity = 0.6;
                 }
             }
-        }
-        controls.update();
+        }        controls.update();
+
         // updateLightPosition();
         var time = Date.now() * 0.001;
 
