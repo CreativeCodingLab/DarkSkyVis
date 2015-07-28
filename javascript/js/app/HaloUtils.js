@@ -59,11 +59,11 @@ function initHaloTree(url, firstTime) {
                     descendant = HaloLUT[desc_id];
                     descendant.children.push(id);
                 }
-                else{
-
-                    debugger;
-                    error.log("descendant",desc_id, "not in HaloLUT yet!!");
-                }
+                //else{
+                //
+                //    debugger;
+                //    error.log("descendant",desc_id, "not in HaloLUT yet!!");
+                //}
                 //console.log('\tIts a boy', id, desc_id, descendant.children);
             }
 
@@ -281,12 +281,15 @@ function createHaloTrajectories() {
                 var points = intoTheVoid(+id, [], 0);
                 // console.log("\tnot been traversed", id, points.length, material)
                 // console.log("gonna create some lines now")
-                var lineMesh = createPathLine(points, id, period, material);
-                var arrowMesh = createPathArrow(points, points[0],points[1], period );
-                if (lineMesh)
-                    linesGroup.add(lineMesh);
-                if (arrowMesh)
-                    arrowGroup.add(arrowMesh);
+                if (points.length > 1) {
+                    var lineMesh = createPathArrow(points, id, period ); //createPathLine(points, id, period, material);
+                    if (lineMesh)
+                        linesGroup.add(lineMesh);
+                }
+
+                //var arrowMesh = createPathArrow(points, points[0],points[1], period );
+                //if (arrowMesh)
+                //    arrowGroup.add(arrowMesh);
             }
         }
     });
@@ -301,7 +304,7 @@ function createHaloTrajectories() {
 */
 function intoTheVoid(id, points, steps) {
     // console.log('\tintoTheVoid', typeof id, steps);
-    var maxSteps = 1;
+    var maxSteps = 2;
     var halo = HaloLUT[id]; // use the ID to pull the halo
     var desc_id = +halo.desc_id;
     points.push(halo.position);
@@ -326,22 +329,30 @@ function intoTheVoid(id, points, steps) {
 
 
 
-function createPathArrow(points, src, dest, period) {
-    console.log("createPathArrow",points, period);
-    if (points && points.length > 1) {
-        console.log(points, period);
-        var direction = new THREE.Vector3();
-        direction.subVectors(dest, src);
-        var length = direction.length();
-        direction.normalize();
-        return new THREE.ArrowHelper(direction, dest, length, rgbToHex(255,255,255))
+function createPathArrow(points, id, period) {
+    console.log("createPathArrow",id, period);
+    var _src = points[0], _dest = points[1];
+    var src = new THREE.Vector3(_src[0], _src[1], _src[2]);
+    var dest = new THREE.Vector3(_dest[0], _dest[1], _dest[2]);
+    var direction = new THREE.Vector3();
+    direction.subVectors(dest,src);
+    var length = direction.length();
+    direction.normalize();
+    var arrow = new THREE.ArrowHelper(direction, src, length, colorKey(period))
+    arrow.name = id;
+    arrow.period = period;
 
-    }
+    // Maximum scale for super long halo paths
+    // T…E.Vector3 {x: 0.003764163673380706, y: 0.018820818366903528, z: 0.003764163673380706}
+    // This is too big...
+    // T…E.Vector3 {x: 0.04006696419345994, y: 0.20033482096729968, z: 0.04006696419345994}
+    // There is no min size
+    return arrow;
 }
 
 
 function createPathLine(points, id, period, material, useSpline) {
-    // console.log("createPathLine(points, id, period, ", points, typeof id, typeof period, material);
+     console.log("createPathLine(points, id, period, ", points, typeof id, typeof period, material);
     // if points is defined at all...
     if (points && points.length > 1) {
 
@@ -379,7 +390,7 @@ function createPathLine(points, id, period, material, useSpline) {
 
         // console.log(geometry);
         geometry.colors = colors;
-        geometry.computeLineDistances();
+        //geometry.computeLineDistances();
 
         var mesh = new THREE.Line(geometry, material);
         mesh.visible = !!(period >= EPOCH_HEAD && period < EPOCH_TAIL);
@@ -416,6 +427,7 @@ function updateAllTheGeometry() {
 // given a clicked Halo id, traverse the tree with the given halo.
 function fromTheDepths(target, id, points, distance, depth) {
     depth = depth? depth: 10000;
+    var path, mesh;
 
     if (distance === 0) console.log("From the Depths.....", target, id, points, distance, depth)
 
@@ -426,12 +438,10 @@ function fromTheDepths(target, id, points, distance, depth) {
 
     var material = new THREE.LineBasicMaterial({
         linewidth: 1,
-        vertexColors: THREE.VertexColors,
-        transparent: true,
-        opacity: 0.2
+        vertexColors: THREE.VertexColors
     });
 
-    if (+id in HaloLUT) {
+    if (HaloLUT.hasOwnProperty(id)) {
         var halo = HaloLUT[+id];
 
         sphereGroup.getObjectByName(+id).visible = true;
@@ -440,24 +450,26 @@ function fromTheDepths(target, id, points, distance, depth) {
 
         if (halo.children.length < 1 || distance >= depth ) {
 
-            //__traversed = {};
+            __traversed = {};
             points.reverse();
+            points.pop();
             console.log("Into the Void, Bitch!", target, points, distance);
-            var path = intoTheVoid(target, points, distance);
-            var mesh = createPathLine(path, +id, HaloLUT[target], true)
+            path = intoTheVoid(target, points, distance);
+            mesh = createPathLine(path, +id, HaloLUT[target].time, material)
+            //mesh = createPathArrow(path, +id, HaloLUT[target].time)
             traceGroup.add(mesh);
 
         } else if (halo.children.length === 1) {
 
             var _id = halo.children[0];
             // if there is a direct path, ie only one child, dont count the distance.
-            fromTheDepths(target, +_id, points, distance+1, depth);
+            fromTheDepths(target, +_id, points, distance, depth);
 
         } else {
-
+            console.log("\tHalo has multiple children", halo.children);
             halo.children.forEach(function(_id) {
 
-                fromTheDepths(target, +_id, points, distance+1, depth);
+                fromTheDepths(target, +_id, points.slice(), distance+1, depth);
 
             })
         }
@@ -469,74 +481,13 @@ function fromTheDepths(target, id, points, distance, depth) {
             points.reverse();
             points.pop();
             console.log("Into the Void, Bitch!", target, points, distance);
-            var path = intoTheVoid(target, points, distance);
-            var mesh = createPathLine(path, +id, distance+depth);
+            path = intoTheVoid(target, points, distance);
+            mesh = createPathLine(path, +id, distance+depth, material);
             traceGroup.add(mesh);
        }
     }
 
     console.log("...I Come!", id);
-
-}
-
-
-function createSpline(points, id, period) {
-
-    // if points is defined at all...
-    if (points && points.length > 1) {
-
-        //console.log("creating PathLine!", period);
-        var index, xyz;
-        var colors = [];
-        var spline = new THREE.Spline();
-        var numPoints = points.length * nDivisions;
-
-        var splineGeometry = new THREE.Geometry();
-
-        spline.initFromArray(points);
-        for (var i = 0; i <= numPoints; i++) {
-
-            index = i / numPoints;
-            xyz = spline.getPoint(index);
-            splineGeometry.vertices[i] = new THREE.Vector3(xyz.x, xyz.y, xyz.z);
-
-            // this should give us an accurate color..I think
-            colors[i] = new THREE.Color(colorKey(index * points.length + period));
-
-        }
-        splineGeometry.colors = colors;
-        splineGeometry.computeBoundingSphere();
-
-        var material = new THREE.LineBasicMaterial({
-            color: rgbToHex(255, 255, 255),
-            linewidth: 2,
-            vertexColors: THREE.VertexColors,
-            transparent: true,
-            opacity: 0.5
-        });
-
-        var mesh = new THREE.Line(splineGeometry, material);
-        mesh.name = id;
-        mesh.period = period;
-        traceGroup.add(mesh);
-    }
-}
-
-
-function resetHaloBranchs() {
-
-    // for (var id in HaloSelect) {
-
-    //     console.log("HaloBranch", id, typeof id)
-    //     if (id in HaloBranch) {
-    //         linesGroup.remove(HaloBranch[id]);
-    //         linesGroup.getObjectByName(id).material.dispose();
-    //         linesGroup.getObjectByName(id).geometry.dispose();
-    //     }
-    // }
-    HaloSelect = [];
-    HaloBranch = {};
-    __traversed = {};
 
 }
 
@@ -599,9 +550,28 @@ function displayHaloStats() {
     haloStats.html(result);
 }
 
-
-function closureTest(group) {
+function resetArrow(group) {
     return (function() {
+        console.log(group.children)
+        var arrow;
+        var children = group.children.length;
+
+        for( var i= 0; i < children; i++ ) {
+            arrow = group.children[0];
+
+            group.remove(arrow);
+            resetGroup(arrow);
+
+        }
+        console.log(group.children)
+    })()
+
+}
+
+function resetGroup(group) {
+
+    return (function() {
+        console.log(group.children)
         var mesh;
         var children = group.children.length;
 
@@ -612,6 +582,7 @@ function closureTest(group) {
             mesh.geometry.dispose();
             mesh.material.dispose();
         }
+        console.log(group.children)
     })()
 }
 
@@ -622,70 +593,45 @@ function resetGlobalStructures(lock) {
     switch(lock){
 
         case 'trace':
-            closureTest(traceGroup)
-            //children = traceGroup.children.length;
-            //for( i= 0; i < children; i++ ) {
-            //    //console.log("\tsphere",typeof id, id);
-            //    line = traceGroup.children[0];
-            //
-            //    traceGroup.remove(line);
-            //    line.geometry.dispose();
-            //    line.material.dispose();
-            //}
+            __traversed = {};
+            resetArrow(traceGroup)
             break;
 
         case 'point':
-            closureTest(pointCloud)
-            //console.log("Kill the Point Cloud!")
-            //children = pointCloud.children.length;
-            //for( i= 0; i < children; i++ ) {
-            //    //console.log("\tsphere",typeof id, id);
-            //    mesh = pointCloud.children[0];
-            //
-            //    pointCloud.remove(mesh);
-            //    mesh.geometry.dispose();
-            //    mesh.material.dispose();
-            //}
+            resetGroup(pointCloud)
             break;
 
         case "path":
-            closureTest(linesGroup);
+            __traversed = {};
+            resetArrow(linesGroup);
             break;
         default:
-            console.log("Kill Everything else!")
-            closureTest(sphereGroup);
-            closureTest(linesGroup);
-            //children = sphereGroup.children.length;
-            //for( i= 0; i < children; i++ ) {
-            //    //console.log("\tsphere",typeof id, id);
-            //    mesh = sphereGroup.children[0];
-            //    id = +mesh.name;
-            //
-            //    sphereGroup.remove(mesh);
-            //    mesh.geometry.dispose();
-            //    mesh.material.dispose();
-            //
-            //    line = linesGroup.getObjectByName(id)
-            //    if (line) {
-            //        linesGroup.remove(line);
-            //
-            //        line.geometry.dispose();
-            //        line.material.dispose();
-            //    }
-            //    console.log('POR QUE?!?!?!?!?!', id)
-            //    delete HaloLUT[id];
-            //    HaloLUT.length--;
-            //}
+            console.log("Kill Everything else!");
+            __traversed = {};
+            resetGroup(sphereGroup);
+            resetArrow(linesGroup);
+            for (var id in HaloLUT) {
+                delete HaloLUT[id];
+            }
             HaloLUT = {length:0, min: NUMTIMEPERIODS, max:0};
             break
     }
-    //sphereGroup.dispose();
-    //linesGroup.dispose();
     console.log("\t", sphereGroup.children, linesGroup.children, scene, HaloLUT);
-    // prepGlobalStructures();
 }
 
 
+function setArrowAttribs(arrow, length, headLength, headWidth) {
+
+    if ( headLength === undefined ) headLength = 0.2 * length;
+    if ( headWidth === undefined ) headWidth = 0.2 * headLength;
+
+    arrow.line.scale.set( 1, length, 1 );
+    arrow.line.updateMatrix();
+
+    arrow.cone.scale.set( headWidth, headLength, headWidth );
+    arrow.cone.position.y = length;
+    arrow.cone.updateMatrix();
+}
 
 function createCircleGeometry() {
     // geometry

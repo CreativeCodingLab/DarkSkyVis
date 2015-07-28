@@ -45,7 +45,7 @@ function toggleVisibility(haloObjectGroup, isVisible, opacity) {
     if (isVisible)
         haloObjectGroup.children.forEach(function(objMesh) {
             i = +objMesh.period;
-            objMesh.visible = (i >= EPOCH_HEAD && i < EPOCH_TAIL)? true : false;
+            objMesh.visible = !!(i >= EPOCH_HEAD && i < EPOCH_TAIL);
             if (opacity){
                 console.log("toggleVisibility", i, opacity);
                 objMesh.material.opacity = opacity;

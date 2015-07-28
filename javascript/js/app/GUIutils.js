@@ -354,18 +354,22 @@ function initGUI() {
                 if (config.enableSelection) {
                     resetGlobalStructures('point');
                     console.log("Selection Mode is active!");
-                    renderer.setClearColor(rgbToHex(150, 150, 150), 1);
+                    renderer.setClearColor(rgbToHex(255, 255, 255), 1);
 
                     resetGlobalStructures('path');
+
+                    linesGroup.visible = false;
+                    config.showPaths = true;
+
 
                 } else {
                     // toggleVisibility(linesGroup, config.showPaths);
                     // toggleVisibility(sphereGroup, config.showHalos);
-                    //showSpinner(true);
-                    //config.showHaloMap = true;
+                    showSpinner(true);
                     resetGlobalStructures('trace');
+                    createHaloTrajectories();
                     //initHaloMap("js/assets/hlist_1.0.json");
-                    renderer.setClearColor(rgbToHex(50, 50, 50), 1);
+                    renderer.setClearColor(rgbToHex(255, 255, 255), 1);
                     showSpinner(false);
                     // var map = THREE.ImageUtils.loadTexture( "js/assets/sprites/nova.png" );  // http://www.goktepeliler.com/vt22/images/414mavi_klar_11_.png
                     // map.minFilter = THREE.NearestFilter;
@@ -379,7 +383,8 @@ function initGUI() {
 
         var depthController = haloInteractionBox.add(config, "depth"). min(0).step(1).name("Depth")
 
-        var scaleByMassController = haloInteractionBox.add(config, "scaleByMass").name("Scale By Mass");
+        //var scaleByMassController =
+            haloInteractionBox.add(config, "scaleByMass").name("Scale By Mass");
 
         var scalingController = haloInteractionBox.add(config, "scale").min(0.0001).step(0.0001).name("Scale Halo");
         {
