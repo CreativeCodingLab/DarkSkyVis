@@ -27,13 +27,12 @@ function onMouseMove( event ) {
 }
 
 
-function onMouseClick(event) {
-    console.log("Single Click!!", event.shiftKey);
+function onMouseClick() {
+    console.log("Single Click!!");
     // update the picking ray with the camera and mouse position
     raycaster.setFromCamera( mouse, camera );
     // calculate objects intersecting the picking ray
-    var hit,
-        hits = raycaster.intersectObjects( sphereGroup.children );
+    var hit, hits = raycaster.intersectObjects( sphereGroup.children );
 
     for (var i = 0; i < hits.length; i++) {
 
@@ -59,65 +58,28 @@ function onMouseClick(event) {
 
         displayHaloStats();
     }
-
 }
 
 
 function onMouseDoubleClick() {
 
-    console.log("Double Click!!", curTarget.object.name);
+    console.log("Double Click!!", curTarget.object.halo_id);
     // update the picking ray with the camera and mouse position
-    HaloSelect = (HaloSelect) ? HaloSelect : [];
 
     if(config.enableSelection) {
 
         toggleVisibility(linesGroup, false);
         toggleVisibility(sphereGroup, false);
 
-        var id = curTarget.object.name;
-        var period = curTarget.object.period;
+        var id = curTarget.object.halo_id;
+        var period = curTarget.object.halo_period;
         // just need to use the halo-id's to turn the spheres on, no sense in rebuilding existing data.
         var points = intoTheAbyss(id, period, []);
-        // fromTheDepths(id, id, [], 0, 2);
-        traceGroup.add( createPathLine(points, id, period) ) ; // createSpline(points, id, period);
+        createSpline(points, id, period);
 
-    }
-    else if (config.showHaloMap) {
+    } else
+        tweenToPosition(1500, 500, false);
 
-        raycaster.setFromCamera(mouse, camera);
-        var hit = raycaster.intersectObjects(pointCloud.children)[0];
-
-        if (hit) {
-
-            var haloID = hit.object.name
-            config.dataset = haloID.toString() + " Picked";
-
-            if (event.shiftKey) {
-                if (HaloSelect.length > 5) {
-                    alert("I think Five halos is more than enough for the moment...")
-                    HaloSelect.pop();
-
-                } else {
-                    console.log("DOUBLT RAINBOW!", haloID, HaloSelect)
-                    HaloSelect.push(haloID);
-                };
-
-            } else if (HaloSelect.length >= 0) {
-
-                config.__updateData();
-                HaloSelect = [];
-                tweenToPosition(4500, 3250, true);
-            }
-
-            // hit.object.material.color.setRGB(1, 1, 0);
-            curTarget = hit;
-
-        }
-
-
-    }
-    else
-        tweenToPosition(1500, 1500, true);
 }
 
 

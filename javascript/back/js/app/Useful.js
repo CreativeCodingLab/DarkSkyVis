@@ -10,9 +10,6 @@ function rgbToHex(R,G,B){
     return "#" + toHex(R) + toHex(G) + toHex(B)
 }
 
-
-
-
 // wrapper function to update the light position
 function updateLightPosition() {
     light.position.set(camera.position.x, camera.position.y, camera.position.z);
@@ -27,9 +24,9 @@ function displayHalos() {
         if (config.showHalos)
             sphereGroup.children.forEach(function(mesh) {
                 i = +mesh.period;
-                mesh.visible = (i >= EPOCH_HEAD && i <= EPOCH_TAIL)? true : false;
+                mesh.visible = !!(i >= EPOCH_HEAD && i <= EPOCH_TAIL);
                 if (curTarget && mesh.position !== curTarget.object.position){
-                    // mesh.material.color.set(colorKey(i));
+                    // mesh.material.color.set(epochColorKey(i));
                     mesh.material.opacity = 0.4;
                 }
             });
@@ -37,17 +34,53 @@ function displayHalos() {
         if (config.showPaths)
             linesGroup.children.forEach(function(lineMesh) {
                 i = lineMesh.period;
-                lineMesh.visible = (i >= EPOCH_HEAD && i < EPOCH_TAIL)? true : false;
+                lineMesh.visible = !!(i >= EPOCH_HEAD && i < EPOCH_TAIL);
             });
     }
 }
 
+function toggleInspectionVisibility() {
+    toggleGroupVisbility(supGroup, config.showSupers)
+    toggleGroupVisbility(mapGroup, config.showSubs)
+
+    for (var i=EPOCH_HEAD; i<EPOCH_TAIL+1; i++) {
+
+        for (var j = 0; j < EPOCH_PERIODS[i].length; j++) {
+
+            var id = EPOCH_PERIODS[i][j];
+
+            if(mapGroup.getObjectByName(id)){
+                var sprite = mapGroup.getObjectByName(id)
+                if (sprite.isSub)
+                    sprite.visible = config.showSubs;
+                else
+                    sprite.visible = config.showDecendant;
+            }
+
+            if(supGroup.getObjectByName(id))
+                supGroup.getObjectByName(id).visible = config.showSupers;
+
+        }
+    }
+}
+
+function toggleGroupVisbility(objGroup, isVisible) {
+    var i
+    if (isVisible)
+        objGroup.children.forEach(function(objMesh) {
+            i = +objMesh.period;
+            objMesh.visible = !!(i >= EPOCH_HEAD && i < EPOCH_TAIL);
+        });
+}
+
 // Controls the visibility of the object in question
 function toggleVisibility(haloObjectGroup, isVisible, opacity) {
+    console.log("toggleVisibility?", haloObjectGroup)
+    var i;
     if (isVisible)
         haloObjectGroup.children.forEach(function(objMesh) {
             i = +objMesh.period;
-            objMesh.visible = (i >= EPOCH_HEAD && i < EPOCH_TAIL)? true : false;
+            objMesh.visible = !!(i >= EPOCH_HEAD && i < EPOCH_TAIL);
             if (opacity){
                 console.log("toggleVisibility", i, opacity);
                 objMesh.material.opacity = opacity;
@@ -79,35 +112,6 @@ function toggleVisibility(haloObjectGroup, isVisible, opacity) {
 }
 
 
-// Display currently selected Halo's Attribute information
-function displayHaloStats() {
-
-    var haloData = HaloLUT[curTarget.object.name];
-    console.log(haloStats, haloData,curTarget);
-
-    var result = "<b> time:</b> " + haloData['time'] + "</br>" +
-        "<b>        id:</b> " + haloData['id'] + "</br>" +
-        "<b>   desc_id:</b> " + haloData['desc_id'] + "</br>" +
-        "<b>  num_prog:</b> " + haloData['num_prog'] + "</br>" +
-        "<b>       pid:</b> " + haloData['pid'] + "</br>" +
-        "<b>      upid:</b> " +  haloData['upid'] + "</br>" +
-        "<b>  desc_pid:</b> " +  haloData['desc_pid'] + "</br>" +
-        "<b>     scale:</b> " +  haloData['scale'] + "</br>" +
-        "<b>desc_scale:</b> " +  haloData['desc_scale'] + "</br>" +
-        "<b>   phantom:</b> " +  haloData['phantom'] + "</br>" +
-        "<b>  position:</b> " +  haloData['position'] + "</br>" +
-        "<b>  velocity:</b> " +  haloData['velocity'] + "</br>" +
-        "<b>        rs:</b> " +  haloData['rs'] + "</br>" +
-        "<b>      mvir:</b> " +  haloData['mvir'] + "</br>" +
-        "<b>      rvir:</b> " +  haloData['rvir'] + "</br>" +
-        "<b>      vrms:</b> " +  haloData['vrms'] + "</br>" +
-        "<b>      vmax:</b> " +  haloData['vmax'] + "</br>" +
-        "<b>  sam_mvir:</b> " +  haloData['sam_mvir'] + "</br>" +
-        "<b>      Spin:</b> " +  haloData['Spin'] + "</br>" +
-        "<b>      VR:</b> " +  haloData['vr'] + "</br>"
-
-    haloStats.html(result);
-}
 
 
 function tweenToPosition(durationA, durationB, zoom) {

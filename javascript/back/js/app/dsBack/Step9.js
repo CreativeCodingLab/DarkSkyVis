@@ -27,7 +27,7 @@ var linesGroup, sphereGroup, traceGroup;
 // HaloBranch is the object acts like HaloSpheres
 // HaloSelect is a global lookup which keeps track of all SELECTED Halos
 var HaloBranch = {},
-    HaloSelect = [];
+    HaloSelect = {};
 // HaloLUT is a global lookup table to keep track of all loaded halos
 var HaloLUT, __traversed = {};
 
@@ -35,9 +35,11 @@ var HaloLUT, __traversed = {};
 var hits = [],
     curTarget, prevTarget;
 
+
 var pointCloud;
 var haloStats;
 var DEFERRED = true;
+
 
 // Be sure to match this with the slider's connect!!
 var colorKey = d3.scale.linear()
@@ -95,29 +97,7 @@ function onCreate() {
     /* -------------------------------*/
 
     // **** Stream in our data! Build Add scene components *** //
-
-    // **** Camera! ***
-    initCamera();
-
-    // **** Setup our Raycasting stuff ***
-    initRayCaster();
-
-    // **** Action! Listeners *** //
-    initListeners();
-
-    // initHaloTree("js/assets/tree_676638.json", true);
-    initHaloMap("js/assets/hlist_1.0.json");
-
-    // showSpinner(true)
-    // oboe("js/assets/tree_0_0_0.json")
-    //     .node("!.*", function(halo, path) {
-    //         console.log(halo, path)
-    //         return oboe.drop
-
-    //     }).done(function(){
-    //         console.log("done")
-    //     })
-
+    initHaloTree("js/assets/trees/tree_676638.json", true);
 }
 
 /* ================================== *

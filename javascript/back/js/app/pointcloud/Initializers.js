@@ -16,14 +16,12 @@ function initScene() {
     {
         linesGroup = new THREE.Object3D();
         sphereGroup = new THREE.Object3D();
-        traceGroup = new THREE.Object3D();
         pointCloud = new THREE.Object3D();
 
         scene.fog = new THREE.Fog(0x050505, 2000, 3500);
 
         scene.add(linesGroup);
         scene.add(sphereGroup);
-        scene.add(traceGroup);
         scene.add(pointCloud);
         // scene.add(axisHelper);
 

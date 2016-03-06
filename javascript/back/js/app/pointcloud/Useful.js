@@ -63,13 +63,13 @@ function toggleVisibility(haloObjectGroup, isVisible, opacity) {
 
             var id = EPOCH_PERIODS[i][j];
 
-            if(haloObjectGroup.getObjectByName(id)){
+            if(HaloObject.getObjectByName(id)){
 
-                haloObjectGroup.getObjectByName(id).visible = isVisible;
+                HaloObject.getObjectByName(id).visible = isVisible;
 
                 if (opacity){
                     console.log("toggleVisibility", i, opacity);
-                    haloObjectGroup.getObjectByName(id).material.opacity = opacity;
+                    HaloObject.getObjectByName(id).material.opacity = opacity;
 
                 }
             }

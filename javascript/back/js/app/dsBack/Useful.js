@@ -29,7 +29,7 @@ function displayHalos() {
                 i = +mesh.period;
                 mesh.visible = (i >= EPOCH_HEAD && i <= EPOCH_TAIL)? true : false;
                 if (curTarget && mesh.position !== curTarget.object.position){
-                    // mesh.material.color.set(colorKey(i));
+                    mesh.material.color.set(colorKey(i));
                     mesh.material.opacity = 0.4;
                 }
             });
@@ -63,13 +63,13 @@ function toggleVisibility(haloObjectGroup, isVisible, opacity) {
 
             var id = EPOCH_PERIODS[i][j];
 
-            if(haloObjectGroup.getObjectByName(id)){
+            if(HaloObject.getObjectByName(id)){
 
-                haloObjectGroup.getObjectByName(id).visible = isVisible;
+                HaloObject.getObjectByName(id).visible = isVisible;
 
                 if (opacity){
                     console.log("toggleVisibility", i, opacity);
-                    haloObjectGroup.getObjectByName(id).material.opacity = opacity;
+                    HaloObject.getObjectByName(id).material.opacity = opacity;
 
                 }
             }
@@ -103,8 +103,7 @@ function displayHaloStats() {
         "<b>      vrms:</b> " +  haloData['vrms'] + "</br>" +
         "<b>      vmax:</b> " +  haloData['vmax'] + "</br>" +
         "<b>  sam_mvir:</b> " +  haloData['sam_mvir'] + "</br>" +
-        "<b>      Spin:</b> " +  haloData['Spin'] + "</br>" +
-        "<b>      VR:</b> " +  haloData['vr'] + "</br>"
+        "<b>      Spin:</b> " +  haloData['Spin'] + "</br>"
 
     haloStats.html(result);
 }
@@ -112,7 +111,7 @@ function displayHaloStats() {
 
 function tweenToPosition(durationA, durationB, zoom) {
 
-    console.log("we are tweenToPosition!",durationA, durationB, zoom);
+    console.log("we are tweenToPosition! Pre");
     TWEEN.removeAll();
 
 

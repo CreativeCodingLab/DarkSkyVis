@@ -78,8 +78,7 @@ function onMouseDoubleClick() {
         var period = curTarget.object.period;
         // just need to use the halo-id's to turn the spheres on, no sense in rebuilding existing data.
         var points = intoTheAbyss(id, period, []);
-        // fromTheDepths(id, id, [], 0, 2);
-        traceGroup.add( createPathLine(points, id, period) ) ; // createSpline(points, id, period);
+        createSpline(points, id, period);
 
     }
     else if (config.showHaloMap) {
@@ -105,7 +104,7 @@ function onMouseDoubleClick() {
             } else if (HaloSelect.length >= 0) {
 
                 config.__updateData();
-                HaloSelect = [];
+                HaloSelect = null;
                 tweenToPosition(4500, 3250, true);
             }
 

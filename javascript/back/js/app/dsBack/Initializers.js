@@ -11,21 +11,16 @@
 function initScene() {
     console.log("initScene()");
     scene = new THREE.Scene();
-    var axisHelper = new THREE.AxisHelper( 10 );
+
     // **** Adding our Group object ***
     {
         linesGroup = new THREE.Object3D();
         sphereGroup = new THREE.Object3D();
-        traceGroup = new THREE.Object3D();
-        pointCloud = new THREE.Object3D();
 
         scene.fog = new THREE.Fog(0x050505, 2000, 3500);
 
         scene.add(linesGroup);
         scene.add(sphereGroup);
-        scene.add(traceGroup);
-        scene.add(pointCloud);
-        // scene.add(axisHelper);
 
     }
 
@@ -38,7 +33,7 @@ function initRenderer() {
     {
         renderer.setPixelRatio(window.devicePixelRatio);
         renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setClearColor(0, 0, 0, 1);
+        renderer.setClearColor(rgbToHex(10, 10, 10), 1);
         renderer.gammaInput = true;
         renderer.gammaOutput = true;
     }
@@ -75,27 +70,24 @@ function initLights() {
 
 function initRayCaster() {
     console.log("initRayCaster()")
-    raycaster = new THREE.Raycaster();
-    {
-        raycaster.params.PointCloud.threshold = 0.1;
+    raycaster = new THREE.Raycaster(); {
         mouse = new THREE.Vector2();
-        // curTarget.object.material.opacity = 0.7;
-        // tweenToPosition(250, 250, false);
+        curTarget.object.material.opacity = 0.7;
+        tweenToPosition(250, 250, false);
     }
 
 }
 
 function initCamera() {
     console.log("initCamera()", curTarget);
-    camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-    {
+    camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000); {
         // **** position the camera near the first halo; ***
         // var pos = sphereGroup.children[0].position;
-        // var pos = curTarget.object.position;
-        // console.log("\t", pos)
-            // var pos = pointCloud.position;
+        var pos = curTarget.object.position;
+        console.log("\t", pos)
+            //var pos = pointCloud.position;
         // light.position.set(pos.x, pos.y + 0.1, pos.z - (pos.z * 0.5));
-        // camera.position.set(-1, -1, -1);
+        camera.position.set(pos.x, pos.y + 0.1, pos.z - (pos.z * 0.5));
         controls = new THREE.TrackballControls(camera, renderer.domElement); {
             controls.rotateSpeed = 4.0;
             controls.zoomSpeed = 1.5;
@@ -110,9 +102,9 @@ function initCamera() {
             controls.keys = [65, 83, 68];
             controls.enabled = true;
         }
-        // camera.lookAt(pos);
-        // controls.target.set(-1, -1, -1);
-        // controls.update();
+        camera.lookAt(pos);
+        controls.target.set(pos.x, pos.y, pos.z);
+        controls.update();
         // updateLightPosition();
     }
 
@@ -130,7 +122,7 @@ function initListeners() {
 
 function initStatsInfo() {
     console.log("initStatsInfo\n");
-    haloStats = d3.select("#DarkSky")
+    haloStats = d3.select("#Sandbox")
         .append("div")
         .attr("class", "haloStats");
 
@@ -143,7 +135,7 @@ function initSlider() {
     console.log("initSlider()");
     slider = $('.tslider');
     slider.noUiSlider({
-        start: [0, 88],
+        start: [0, 50],
         connect: true, // shows areas of coverage
         orientation: "vertical",
         direction: "ltr", //
@@ -211,6 +203,5 @@ function initSpinner() {
     };
     var target = document.getElementById('loading')
     spinner = new Spinner(opts).spin(target);
-    spinner.stop();
     console.log("Initializing the spinner!", target, spinner)
 }

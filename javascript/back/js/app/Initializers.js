@@ -8,24 +8,28 @@
 //      Order does matter
 // *****************************
 
+
 function initScene() {
     console.log("initScene()");
     scene = new THREE.Scene();
-    var axisHelper = new THREE.AxisHelper( 10 );
+    scene2 = new THREE.Scene();
+
     // **** Adding our Group object ***
     {
         linesGroup = new THREE.Object3D();
         sphereGroup = new THREE.Object3D();
         traceGroup = new THREE.Object3D();
-        pointCloud = new THREE.Object3D();
+        supGroup = new THREE.Object3D();
+        mapGroup = new THREE.Object3D();
 
         scene.fog = new THREE.Fog(0x050505, 2000, 3500);
-
         scene.add(linesGroup);
         scene.add(sphereGroup);
         scene.add(traceGroup);
-        scene.add(pointCloud);
-        // scene.add(axisHelper);
+        scene.add(mapGroup);
+
+        scene2.fog = new THREE.Fog(0x050505, 2000, 3500);
+        scene2.add(supGroup);
 
     }
 
@@ -34,11 +38,15 @@ function initScene() {
 
 function initRenderer() {
     console.log("initRenderer()");
+    // preserveDrawingBuffer allows us to take a screenshot!
+    // There is a performance implication to this however, so dont use it if not needed
+    // http://stackoverflow.com/questions/15558418/how-do-you-save-an-image-from-a-three-js-canvas
+    // renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
     renderer = new THREE.WebGLRenderer({ antialias: true });
     {
         renderer.setPixelRatio(window.devicePixelRatio);
         renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setClearColor(0, 0, 0, 1);
+        renderer.setClearColor(rgbToHex(255,255,255), 1);
         renderer.gammaInput = true;
         renderer.gammaOutput = true;
     }
@@ -60,15 +68,15 @@ function initContainer() {
 
 function initLights() {
     console.log("initLights()")
-        // ambient = new THREE.AmbientLight(0xFFFFFF); //rgbToHex(197, 176, 255)
-        // scene.add(ambient);
+         var ambient = new THREE.AmbientLight(0xFFFFFF); //rgbToHex(197, 176, 255)
+         scene.add(ambient);
 
-    light = new THREE.PointLight(0xffffff, 0.5, 1000);
-    light.position.set(1, 1, 1);
-
+    //light = new THREE.PointLight(0xffffff, 0.5, 1000);
+    //light.position.set(1, 1, 1);
+    //
     var dir1 = new THREE.DirectionalLight(0xffffff, 0.5)
-    light.position.set(0, 0, 0);
-    scene.add(light);
+    //light.position.set(0, 0, 0);
+    //scene.add(light);
     scene.add(dir1);
 
 }
@@ -111,7 +119,8 @@ function initCamera() {
             controls.enabled = true;
         }
         // camera.lookAt(pos);
-        // controls.target.set(-1, -1, -1);
+        // SAFARI
+
         // controls.update();
         // updateLightPosition();
     }

@@ -204,7 +204,7 @@ GUIcontrols.prototype.__resetView = function(halo) {
 GUIcontrols.prototype.__updateData = function() {
     showSpinner(true);
     var that = this;
-    if (HaloSelect.hasOwnProperty("length") && HaloSelect.length > 1) {
+    if (HaloSelect.length > 1) {
         console.log("Adding MULTIPLE HALOS")
         for (var i = 0; i < HaloSelect.length; i++) {
             console.log(HaloSelect[i])
@@ -348,26 +348,26 @@ function initGUI() {
         var selectionController = haloInteractionBox.add(config, "enableSelection").name("Enable Selection");
         {
             selectionController.onFinishChange(function() {
-               resetHaloBranchs();
+//                resetHaloBranchs();
 //                console.log("selectionController.onFinishChange");
                 if (config.enableSelection) {
 
                     console.log("Selection Mode is active!");
                     renderer.setClearColor(rgbToHex(150, 150, 150), 1);
                 } else {
-                    toggleVisibility(linesGroup, config.showPaths);
-                    toggleVisibility(sphereGroup, config.showHalos);
-                    renderer.setClearColor(rgbToHex(0, 0, 0), 1);
+//                    toggleVisibility(linesGroup, config.showPaths);
+//                    toggleVisibility(sphereGroup, config.showHalos);
+                    renderer.setClearColor(rgbToHex(50, 50, 50), 1);
                 }
 
             })
         }
 
-        var scalingController = haloInteractionBox.add(config, "scale").min(0.0001).step(0.0001).name("Scale Halo");
+        var scalingController = haloInteractionBox.add(config, "scale").min(0.01).step(0.01).name("Scale Halo");
         {
             scalingController.onFinishChange(function() {
                 console.log("trying out scaling");
-                var scale = config.scale <= 0.0 ? 0.0001 : config.scale;
+                var scale = config.scale <= 0.0 ? 0.001 : config.scale;
                 sphereGroup.children.forEach(function(mesh) {
                     var _s = scale * mesh.rs1;
                     mesh.scale.set(_s, _s, _s);
@@ -387,6 +387,89 @@ function initGUI() {
         haloInteractionBox.open();
     }
 
+/*
+    //     var haloFilterBox = guiBox.addFolder("Filter Halos by Properties");
+    //     {
+
+    //     "scale": str(data[0] + 0.000000000000000001), #Scale: Scale factor of halo.,
+    //     "id": int(data[1]), #ID: ID of halo (unique across entire simulation).,
+    //     "desc_scale": data[2], #Desc_Scale: Scale of descendant halo, if applicable.,
+    //     "desc_id": int(data[3]), #Descid: ID of descendant halo, if applicable.,
+    //     "num_prog": int(data[4]), #Num_prog: Number of progenitors.,
+
+    //     "pid": int(data[5]), #Pid: Host halo ID (-1 if distinct halo).,
+    //     "upid": int(data[6]), #Upid: Most massive host halo ID (only different from Pid in cases of sub-subs, or sub-sub-subs, etc.).,
+    //     "desc_pid": data[7], #Desc_pid: Pid of descendant halo (if applicable).,
+    //     "phantom": data[8], #Phantom: Nonzero for halos interpolated across timesteps.,
+
+    //     "sam_mvir": data[9], #SAM_Mvir: Halo mass, smoothed across accretion history; always greater than sum of halo masses of contributing progenitors (Msun/h).  Only for use with select semi-analytic models.,
+    //     "mvir": data[10], #Mvir: Halo mass (Msun/h).,
+    //     "rvir": data[11], #Rvir: Halo radius (kpc/h comoving).,
+    //     "rs": data[12], #Rs: Scale radius (kpc/h comoving).,
+    //     "vrms": data[13], #Vrms: Velocity dispersion (km/s physical).,
+
+    //     "mmp": data[14], #mmp?: whether the halo is the most massive progenitor or not.,
+    //     "scale_of_last_MM": data[15], #scale_of_last_MM: scale factor of the last major merger (Mass ratio > 0.3).,
+
+    //     "vmax": data[16], #Vmax: Maxmimum circular velocity (km/s physical).,
+
+    //     "position": list([float(data[17]), float(data[18]), float(data[19])]), #X/Y/Z: Halo position (Mpc/h comoving).,
+    //     "x": float(data[17]), #X/Y/Z: Halo position (Mpc/h comoving).,
+    //     "y": float(data[18]),
+    //     "z": float(data[19]),
+
+    //     "velocity": list([float(data[20]), float(data[21]), float(data[22])]), #VX/VY/VZ: Halo velocity (km/s physical).,
+    //     "vx": float(data[20]), #VX/VY/VZ: Halo velocity (km/s physical).,
+    //     "vy": float(data[21]),
+    //     "vz": float(data[22]),
+
+    //     "angVel": list([float(data[23]), float(data[24]), float(data[25])]), #JX/JY/JZ: Halo angular momenta ((Msun/h) * (Mpc/h) * km/s (physical)).,
+    //     "Jx": float(data[23]), #JX/JY/JZ: Halo angular momenta ((Msun/h) * (Mpc/h) * km/s (physical)).,
+    //     "Jy": float(data[24]),
+    //     "Jz": float(data[25]),
+
+    //     "Spin": data[26], #Spin: Halo spin parameter.,
+    //     "Breadth_first_ID": data[27], #Breadth_first_ID: breadth-first ordering of halos within a tree.,
+    //     "Depth_first_ID": data[28], #Depth_first_ID: depth-first ordering of halos within a tree.,
+    //     "Tree_root_ID": data[29], #Tree_root_ID: ID of the halo at the last timestep in the tree.,
+    //     "Orig_halo_ID": data[30], #Orig_halo_ID: Original halo ID from halo finder.,
+    //     "Snap_num": data[31], #Snap_num: Snapshot number from which halo originated.,
+    //     "Next_coprogenitor_depthfirst_ID": data[32], #Next_coprogenitor_depthfirst_ID: Depthfirst ID of next coprogenitor.,
+    //     "Last_progenitor_depthfirst_ID": data[33], #Last_progenitor_depthfirst_ID: Depthfirst ID of last progenitor.,
+    //     "Rs_Klypin": data[34], #Rs_Klypin: Scale radius determined using Vmax and Mvir (see Rockstar paper),
+
+    //     "M_all": data[35], #M_all: Mass enclosed within the specified overdensity, including unbound particles (Msun/h),
+    //     "M200b": data[36], #M200b--M2500c: Mass enclosed within specified overdensities (Msun/h),
+    //     "M200c": data[37],
+    //     "M500c": data[38],
+    //     "M2500c": data[39],
+
+    //     "Xoff": data[40], #Xoff: Offset of density peak from average particle position (kpc/h comoving),
+    //     "Voff": data[41], #Voff: Offset of density peak from average particle velocity (km/s physical),
+
+    //     "Spin_Bullock": data[42], #Spin_Bullock: Bullock spin parameter (J/(sqrt(2)*GMVR)),
+
+    //     "b_to_a": data[43], #b_to_a, c_to_a: Ratio of second and third largest shape ellipsoid axes (B and C) to largest shape ellipsoid axis (A) (dimensionless).,
+    //     "c_to_a": data[44], #  Shapes are determined by the method in Allgood et al. (2006). #  (500c) indicates that only particles within R500c are considered.,
+
+    //     "a": [data[45], data[46], data[47]], #A[x],A[y],A[z]: Largest shape ellipsoid axis (kpc/h,
+    //     "b_to_a500c": data[48],
+    //     "c_to_a500c": data[49],
+
+    //     "a500c": [data[50], data[51] , data[52]],
+    //     "kinToPotRatio": data[53], #T/|U|: ratio of kinetic to potential energies,
+    //     "M_pe_Behroozi": data[54],
+    //     "M_pe_Diemer": data[55],
+
+    //     "rootHaloID": -1,
+    //     "nextDesc_id": -1,
+
+    //     "trackedPos": list(np.empty(0)),
+    //     "trackedVel": list(np.empty(0))
+    //     }
+*/
+
+
     /*
      *  Color configuration stuff
     */
@@ -398,13 +481,12 @@ function initGUI() {
                 if (config.byTime) {
                     config.byMass = false;
                     sphereGroup.children.forEach(function(mesh) {
-                        // console.log("byTime: there is mesh?", mesh.period, colorKey(+mesh.period));
                         mesh.material.color =  colorKey(+mesh.period)
                     })
                 } else {
                     config.byTime = true;
                     config.byMass = false;
-                    console.log("Else byTime still true?", config.byTime, config.byMass);
+                    console.log("Else byTime still true?");
                 };
             })
         }
@@ -414,19 +496,16 @@ function initGUI() {
                 if (config.byMass) {
                     config.byTime = false;
                     sphereGroup.children.forEach(function(mesh) {
-                        // console.log("byMass: there is mesh?", mesh);
                         mesh.material.color.set(
                                 // new THREE.Color( 0.5 + 0.5*mesh.vr , mesh.mvir/sphereGroup.maxMASS, 0.5 - 0.5*mesh.vr )
                                 new THREE.Color( 0.5 + 0.5*mesh.vr , mesh.mvir/pointCloud.maxMASS, 0.5 - 0.5*mesh.vr )
-                                // new THREE.Color( 0.5 + 0.5*mesh.vr , mesh.mvir/mesh.maxMASS, 0.5 - 0.5*mesh.vr )
-
                             )
                     })
 
                 } else {
-                    config.byTime = false;
                     config.byMass = true;
-                    console.log("Else byMass still true?", config.byMass, config.byTime);
+                    config.byTime = false;
+                    console.log("Else byMass still true?");
                     // sphereGroup.children.forEach(function(mesh) {
 
                     // })

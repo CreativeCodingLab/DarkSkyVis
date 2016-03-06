@@ -57,7 +57,7 @@ function onMouseClick(event) {
         prevTarget.object.material.opacity = 0.4;
         curTarget.object.material.opacity = 0.8;
 
-        displayHaloStats();
+         displayHaloStats();
     }
 
 }
@@ -66,20 +66,21 @@ function onMouseClick(event) {
 function onMouseDoubleClick() {
 
     console.log("Double Click!!", curTarget.object.name);
+    config.treeNum = curTarget.object.name;
     // update the picking ray with the camera and mouse position
     HaloSelect = (HaloSelect) ? HaloSelect : [];
 
-    if(config.enableSelection) {
+    if(config.enableInspection) {
 
-        toggleVisibility(linesGroup, false);
-        toggleVisibility(sphereGroup, false);
+        // toggleVisibility(linesGroup, false);
+        // toggleVisibility(sphereGroup, false);
 
         var id = curTarget.object.name;
         var period = curTarget.object.period;
         // just need to use the halo-id's to turn the spheres on, no sense in rebuilding existing data.
-        var points = intoTheAbyss(id, period, []);
-        // fromTheDepths(id, id, [], 0, 2);
-        traceGroup.add( createPathLine(points, id, period) ) ; // createSpline(points, id, period);
+        showSpinner(true);
+        fromTheDepths(id, id, [], 0, config.depth);
+        showSpinner(false);
 
     }
     else if (config.showHaloMap) {
@@ -88,9 +89,8 @@ function onMouseDoubleClick() {
         var hit = raycaster.intersectObjects(pointCloud.children)[0];
 
         if (hit) {
-
             var haloID = hit.object.name
-            config.dataset = haloID.toString() + " Picked";
+            config.dataset = haloID.toString();
 
             if (event.shiftKey) {
                 if (HaloSelect.length > 5) {
@@ -105,11 +105,11 @@ function onMouseDoubleClick() {
             } else if (HaloSelect.length >= 0) {
 
                 config.__updateData();
-                HaloSelect = [];
+                HaloSelect = null;
                 tweenToPosition(4500, 3250, true);
             }
 
-            // hit.object.material.color.setRGB(1, 1, 0);
+            hit.object.material.color.setRGB(1, 1, 0);
             curTarget = hit;
 
         }
@@ -118,6 +118,7 @@ function onMouseDoubleClick() {
     }
     else
         tweenToPosition(1500, 1500, true);
+
 }
 
 

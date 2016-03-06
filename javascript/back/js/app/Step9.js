@@ -9,7 +9,7 @@ var spinner; // our Loading spinner thing
 
 // Three.js components
 var container; // WebGL container, fps stats
-var scene, renderer; // scene, renderer
+var scene, scene2, renderer; // scene, renderer
 var camera, slider, controls; // camera, slider, camera-controls
 var config, mouse, raycaster, light; // gui, mouse, raycaster, lights
 
@@ -22,7 +22,7 @@ var nDivisions = 10,
 
 // Halo Components
 // linesGroup and sphereGroup contain the lines and spheres of the halos
-var linesGroup, sphereGroup, traceGroup;
+var linesGroup, sphereGroup, traceGroup, mapGroup, supGroup;
 
 // HaloBranch is the object acts like HaloSpheres
 // HaloSelect is a global lookup which keeps track of all SELECTED Halos
@@ -35,15 +35,30 @@ var HaloLUT, __traversed = {};
 var hits = [],
     curTarget, prevTarget;
 
+
+var minMass = 0, maxMass = 0;
+
 var pointCloud;
 var haloStats;
 var DEFERRED = true;
 
-// Be sure to match this with the slider's connect!!
-var colorKey = d3.scale.linear()
-    .domain([0, 18, 36, 53, 71, NUMTIMEPERIODS])
-    .range([rgbToHex(255, 0, 0), rgbToHex(255, 0, 255), rgbToHex(0, 0, 255), rgbToHex(0, 255, 255), rgbToHex(0, 255, 0)]);
+var propertyColorKey;
 
+// Be sure to match this with the slider's connect!!
+var epochColorKey = d3.scale.linear()
+
+    .domain([0, NUMTIMEPERIODS])
+    .range([rgbToHex(255, 0, 0), rgbToHex(0, 0, 255)]);
+
+
+var NovaMap = THREE.ImageUtils.loadTexture( "js/assets/sprites/Halo.png" );  // http://www.goktepeliler.com/vt22/images/414mavi_klar_11_.png
+var SubMap = THREE.ImageUtils.loadTexture( "js/assets/sprites/Halo.png" ); // for the sub halo
+var NormMap = THREE.ImageUtils.loadTexture( "js/assets/sprites/Halo.png" );
+var SuperMap = THREE.ImageUtils.loadTexture( "js/assets/sprites/Halo.png" );
+NovaMap.minFilter = THREE.NearestFilter;
+SubMap.minFilter = THREE.NearestFilter;
+NormMap.minFilter = THREE.NearestFilter;
+SuperMap.minFilter = THREE.NearestFilter;
 
 // ==========================================
 //              Start
@@ -96,6 +111,7 @@ function onCreate() {
 
     // **** Stream in our data! Build Add scene components *** //
 
+    initLights();
     // **** Camera! ***
     initCamera();
 
@@ -106,7 +122,8 @@ function onCreate() {
     initListeners();
 
     // initHaloTree("js/assets/tree_676638.json", true);
-    initHaloMap("js/assets/hlist_1.0.json");
+    showSpinner(true);
+    // initHaloMap("js/assets/hlist_1.0.json");
 
     // showSpinner(true)
     // oboe("js/assets/tree_0_0_0.json")
@@ -178,9 +195,23 @@ function render() {
                     hits[i].object.material.opacity = 0.6;
                 }
             }
-        }
-        controls.update();
+        }        controls.update();
+
         // updateLightPosition();
-        renderer.render(scene, camera);
+        var time = Date.now() * 0.001;
+
+        // sphereGroup.rotation.y = time * 0.1;
+        // linesGroup.rotation.y = time * 0.1;
+        // pointCloud.rotation.y = time * 0.1;
+
+        if (config.enableInspection) {
+            renderer.clear();
+            renderer.render( scene, camera );
+            renderer.clearDepth(); // optional, depending on use case
+            renderer.render( scene2, camera );
+        } else {
+            renderer.render( scene, camera );
+        }
+
     }
 }

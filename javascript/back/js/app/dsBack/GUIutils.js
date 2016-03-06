@@ -12,12 +12,8 @@ function GUIcontrols() {
     this.showStats = false;
     this.showHaloMap = true;
 
-    // Set colors
-
     // Choose Dataset
-    this.treeNum = ""
-    this.dataset = "None";
-    prepGlobalStructures()
+    this.dataset = "676638 777K";
 
     // Reset Position
     this.goToHead = function() {
@@ -32,21 +28,15 @@ function GUIcontrols() {
 
     // Interaction Components
     this.enableSelection = false;
-    this.scale = 0.001; // Eventually this will apply to scaling the halos
-
     this.animateTime = function() {};
-    this.isPlaying = false;
-
-
-    this.byTime = true;
-    this.byMass = false;
+    this.scale = 1.0; // Eventually this will apply to scaling the halos
 
     // Cosmetic manipulations
-    // this.color0 = rgbToHex(255, 0, 0);
-    // this.color1 = rgbToHex(255, 0, 255);
-    // this.color2 = rgbToHex(0, 0, 255);
-    // this.color3 = rgbToHex(0, 255, 255);
-    // this.color4 = rgbToHex(0, 255, 0);
+    this.color0 = rgbToHex(255, 0, 0);
+    this.color1 = rgbToHex(255, 0, 255);
+    this.color2 = rgbToHex(0, 0, 255);
+    this.color3 = rgbToHex(0, 255, 255);
+    this.color4 = rgbToHex(0, 255, 0);
 
 }
 
@@ -56,7 +46,6 @@ GUIcontrols.prototype.__setColor = function() {
     colorKey = d3.scale.linear()
         .domain([0, 18, 36, 53, 71, NUMTIMEPERIODS])
         .range([this.color0, this.color1, this.color2, this.color3, this.color4]);
-
     for (var id in HaloLUT) {
 
         var i = +HaloLUT[id].time;
@@ -78,46 +67,36 @@ GUIcontrols.prototype.__setColor = function() {
 
 
 GUIcontrols.prototype.__animateSlider = function(offset) {
-    if (this.isPlaying){
-        TWEEN.removeAll();
-        this.isPlaying = false;
-    } else {
-        this.isPlaying = true;
-        var step = slider.noUiSlider('step');
-        console.log("animate", step, slider.val());
-        // Frist we position the camera so it is looking at our Halo of interest
-        var _dur = 3500;
-        var TweenDur = _dur - (EPOCH_TAIL/NUMTIMEPERIODS * _dur)
-        var tweenToTail = new TWEEN.Tween({
-                x: EPOCH_HEAD,
-                y: EPOCH_TAIL
-            })
-            .to({
-                x: 88 - offset,
-                y: 88
-            }, TweenDur)
-            .onUpdate(function() {
-                slider.val([this.x, this.y]);
-            });
+    var step = slider.noUiSlider('step');
+    console.log("animate", step, slider.val());
+    // Frist we position the camera so it is looking at our Halo of interest
+    var tweenToTail = new TWEEN.Tween({
+            x: EPOCH_HEAD,
+            y: EPOCH_TAIL
+        })
+        .to({
+            x: 88 - offset,
+            y: 88
+        }, 3500)
+        .onUpdate(function() {
+            slider.val([this.x, this.y]);
+        });
 
-        // Then we zoom in
-        var tweenToHead = new TWEEN.Tween({
-                x: 88 - offset,
-                y: 88
-            })
-            .to({
-                x: 0,
-                y: offset
-            }, TweenDur)
-            .onUpdate(function() {
-                slider.val([this.x, this.y]);
-            });
+    // Then we zoom in
+    var tweenToHead = new TWEEN.Tween({
+            x: 88 - offset,
+            y: 88
+        })
+        .to({
+            x: 0,
+            y: offset
+        }, 3500)
+        .onUpdate(function() {
+            slider.val([this.x, this.y]);
+        });
 
-        tweenToTail.chain(tweenToHead);
-        tweenToTail.start();
-    }
-    console.log("this.isPlaying", this.isPlaying);
-    this.isPlaying = false;
+    tweenToTail.chain(tweenToHead);
+    tweenToTail.start();
 
 };
 
@@ -173,11 +152,6 @@ GUIcontrols.prototype.__goToTail = function() {
 GUIcontrols.prototype.__resetView = function(halo) {
     console.log("You hit the reset button!!", halo);
 
-    // if (this.showHaloMap) {
-
-    //     tweenToPosition
-
-    // } else
     if (halo !== undefined) { // This implies we are in the wrong time-frame
         console.log("\tnew halo is", halo)
         if (curTarget.object)
@@ -204,20 +178,9 @@ GUIcontrols.prototype.__resetView = function(halo) {
 GUIcontrols.prototype.__updateData = function() {
     showSpinner(true);
     var that = this;
-    if (HaloSelect.hasOwnProperty("length") && HaloSelect.length > 1) {
-        console.log("Adding MULTIPLE HALOS")
-        for (var i = 0; i < HaloSelect.length; i++) {
-            console.log(HaloSelect[i])
-            var URL = "js/assets/trees/tree_" + HaloSelect[i].toString() + ".json";
-            console.log("\nAdding..", URL)
-            initHaloTree(URL, false);
-        };
-    } else {
-        var URL = "js/assets/trees/tree_" + this.dataset.split(' ')[0] + ".json";
-        console.log("\nUpdating!", URL)
-        initHaloTree(URL, true);
-        tweenToPosition(1500, 1500, true);
-    };
+    var URL = "js/assets/trees/tree_" + this.dataset.split(' ')[0] + ".json";
+    console.log("\nUpdating!", URL)
+    initHaloTree(URL, false);
 };
 
 
@@ -238,7 +201,7 @@ function initGUI() {
     var displayBox = guiBox.addFolder("Display Halo Properties");
     {
         //Turn Halo Spheres On/Off
-        var spheresController = displayBox.add(config, "showHalos").name("Halos").listen();
+        var spheresController = displayBox.add(config, "showHalos").name("Halos");
         {
             spheresController.onFinishChange(function() {
                 console.log("spheresController.onFinishChange");
@@ -251,7 +214,7 @@ function initGUI() {
         }
 
         // Turn Halo Lines On/Off
-        var linesController = displayBox.add(config, "showPaths").name("Paths").listen();
+        var linesController = displayBox.add(config, "showPaths").name("Paths");
         {
             linesController.onFinishChange(function() {
                 console.log("linesController.onFinishChange");
@@ -260,14 +223,6 @@ function initGUI() {
                 else
                     linesGroup.visible = config.showPaths;
             });
-        }
-
-        var cloudController = displayBox.add(config, "showHaloMap").name("Cluster").listen();
-        {
-            cloudController.onFinishChange(function() {
-                console.log("cloudController.onFinishChange");
-                pointCloud.visible = config.showHaloMap;
-            })
         }
 
         // Halo Properties display
@@ -293,32 +248,14 @@ function initGUI() {
      */
     var dataSetBox = guiBox.addFolder("Choose a Dataset");
     {
-        var text = dataSetBox.add(config, "treeNum").name("Enter Tree #").listen();
-        {
-            text.onFinishChange(function(){
-                config.dataset = config.treeNum;
-                console.log("\tTreeNum entered!", config.treeNum, config.dataset)
-                config.__updateData();
-            });
-        }
-
-
         var data = dataSetBox.add(config, "dataset", [
-            "None",
-            "676638 777K", "681442 867K",
-            "678449 911K", "676674 925K",
-            "674518 945K", "675540 1.1M",
-            "680478 1.2M", "677567 1.3M",
-            "677601 1.3M", "680500 1.4M",
-            "680488 1.4M", "676657 1.5M",
-            "676579 1.5M", "675530 1.7M",
-            "679604 1.7M", "679642 1.9M",
-            "674567 2.4M", "676540 2.4M",
-            "679619 2.8M", "674539 2.9M",
-            "681422 2.9M", "677545 2.9M",
-            "677521 3.6M", "680462 4.0M",
-            "679582 6.0M"
-        ]).listen();
+            "682265 3.9K",
+            "31410 32K", "676879 157K",
+            "675650 209K", "675608 252K",
+            "676638 777K", "679619 2.8M",
+            "677545 2.9M", "677521 3.6M",
+            "680462 4.0M", "679582 6.0M",
+        ]);
         data.name("Tree #");
         data.onFinishChange(function() {
             config.__updateData();
@@ -348,26 +285,26 @@ function initGUI() {
         var selectionController = haloInteractionBox.add(config, "enableSelection").name("Enable Selection");
         {
             selectionController.onFinishChange(function() {
-               resetHaloBranchs();
+//                resetHaloBranchs();
 //                console.log("selectionController.onFinishChange");
                 if (config.enableSelection) {
 
                     console.log("Selection Mode is active!");
                     renderer.setClearColor(rgbToHex(150, 150, 150), 1);
                 } else {
-                    toggleVisibility(linesGroup, config.showPaths);
-                    toggleVisibility(sphereGroup, config.showHalos);
-                    renderer.setClearColor(rgbToHex(0, 0, 0), 1);
+//                    toggleVisibility(linesGroup, config.showPaths);
+//                    toggleVisibility(sphereGroup, config.showHalos);
+                    renderer.setClearColor(rgbToHex(50, 50, 50), 1);
                 }
 
             })
         }
 
-        var scalingController = haloInteractionBox.add(config, "scale").min(0.0001).step(0.0001).name("Scale Halo");
+        var scalingController = haloInteractionBox.add(config, "scale").min(0.01).step(0.01).name("Scale Halo");
         {
             scalingController.onFinishChange(function() {
                 console.log("trying out scaling");
-                var scale = config.scale <= 0.0 ? 0.0001 : config.scale;
+                var scale = config.scale <= 0.0 ? 0.001 : config.scale;
                 sphereGroup.children.forEach(function(mesh) {
                     var _s = scale * mesh.rs1;
                     mesh.scale.set(_s, _s, _s);
@@ -389,64 +326,24 @@ function initGUI() {
 
     /*
      *  Color configuration stuff
-    */
-    var colorBox = guiBox.addFolder("Color Schemes");
+     */
+    var colorBox = guiBox.addFolder("Cosmetic");
     {
-        var byTime = colorBox.add(config, "byTime").name("By Time").listen()
-        {
-            byTime.onFinishChange(function() {
-                if (config.byTime) {
-                    config.byMass = false;
-                    sphereGroup.children.forEach(function(mesh) {
-                        // console.log("byTime: there is mesh?", mesh.period, colorKey(+mesh.period));
-                        mesh.material.color =  colorKey(+mesh.period)
-                    })
-                } else {
-                    config.byTime = true;
-                    config.byMass = false;
-                    console.log("Else byTime still true?", config.byTime, config.byMass);
-                };
-            })
-        }
-        var byMass = colorBox.add(config, "byMass").name("By Mass").listen()
-        {
-            byMass.onFinishChange(function() {
-                if (config.byMass) {
-                    config.byTime = false;
-                    sphereGroup.children.forEach(function(mesh) {
-                        // console.log("byMass: there is mesh?", mesh);
-                        mesh.material.color.set(
-                                // new THREE.Color( 0.5 + 0.5*mesh.vr , mesh.mvir/sphereGroup.maxMASS, 0.5 - 0.5*mesh.vr )
-                                new THREE.Color( 0.5 + 0.5*mesh.vr , mesh.mvir/pointCloud.maxMASS, 0.5 - 0.5*mesh.vr )
-                                // new THREE.Color( 0.5 + 0.5*mesh.vr , mesh.mvir/mesh.maxMASS, 0.5 - 0.5*mesh.vr )
+        colorBox.addColor(config, "color0").onChange(function() {
+            config.__setColor()
+        });
+        colorBox.addColor(config, "color1").onChange(function() {
+            config.__setColor()
+        });
+        colorBox.addColor(config, "color2").onChange(function() {
+            config.__setColor()
+        });
+        colorBox.addColor(config, "color3").onChange(function() {
+            config.__setColor()
+        });
+        colorBox.addColor(config, "color4").onChange(function() {
+            config.__setColor()
+        });
 
-                            )
-                    })
-
-                } else {
-                    config.byTime = false;
-                    config.byMass = true;
-                    console.log("Else byMass still true?", config.byMass, config.byTime);
-                    // sphereGroup.children.forEach(function(mesh) {
-
-                    // })
-                };
-            })
-        }
-        // colorBox.addColor(config, "color0").onChange(function() {
-        //     config.__setColor()
-        // });
-        // colorBox.addColor(config, "color1").onChange(function() {
-        //     config.__setColor()
-        // });
-        // colorBox.addColor(config, "color2").onChange(function() {
-        //     config.__setColor()
-        // });
-        // colorBox.addColor(config, "color3").onChange(function() {
-        //     config.__setColor()
-        // });
-        // colorBox.addColor(config, "color4").onChange(function() {
-        //     config.__setColor()
-        // });
     }
 };
